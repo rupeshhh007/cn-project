@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Cross-Layer Gateway Proxy for Hardware-Fingerprinted Traffic Mitigation</title>
+<style>
+  body {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 11pt;
+    line-height: 1.35;
+    color: #000;
+    margin: 1in;
+  }
+  h1.title {
+    font-size: 18pt;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 6pt;
+    line-height: 1.2;
+  }
+  p.subtitle {
+    font-size: 12pt;
+    font-style: italic;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 14pt;
+  }
+  p.authors {
+    text-align: center;
+    font-size: 10pt;
+    margin-bottom: 4pt;
+    font-weight: bold;
+  }
+  p.affiliation {
+    text-align: center;
+    font-size: 9.5pt;
+    font-style: italic;
+    margin-top: 0;
+    margin-bottom: 20pt;
+  }
+  div.abstract-box {
+    margin-left: 0.3in;
+    margin-right: 0.3in;
+    margin-bottom: 20pt;
+  }
+  p.abstract {
+    font-size: 9.5pt;
+    text-align: justify;
+    margin-bottom: 8pt;
+  }
+  p.abstract b {
+    font-weight: bold;
+  }
+  p.keywords {
+    font-size: 9.5pt;
+    font-style: italic;
+    margin-top: 0;
+  }
+  h2 {
+    font-size: 12pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-bottom: 1px solid #000;
+    padding-bottom: 2pt;
+    margin-top: 18pt;
+    margin-bottom: 8pt;
+  }
+  h3 {
+    font-size: 11pt;
+    font-weight: bold;
+    margin-top: 12pt;
+    margin-bottom: 4pt;
+  }
+  p {
+    text-align: justify;
+    margin-top: 0;
+    margin-bottom: 8pt;
+    text-indent: 1.5em;
+  }
+  p.no-indent {
+    text-indent: 0;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12pt;
+    margin-bottom: 12pt;
+    font-size: 9.5pt;
+  }
+  th, td {
+    border: 1px solid #333;
+    padding: 5pt 7pt;
+    text-align: left;
+  }
+  th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+  caption {
+    font-weight: bold;
+    margin-bottom: 5pt;
+    font-size: 9.5pt;
+    text-align: left;
+  }
+  div.formula {
+    text-align: center;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 10pt;
+    margin: 10pt 0;
+    background: #f9f9f9;
+    padding: 6pt;
+    border: 1px solid #ddd;
+  }
+  ol.references {
+    font-size: 9pt;
+    padding-left: 18pt;
+    margin-top: 6pt;
+  }
+  ol.references li {
+    margin-bottom: 5pt;
+    text-align: justify;
+  }
+</style>
+</head>
+<body>
+
+<h1 class="title">Cross-Layer Gateway Proxy for Hardware-Fingerprinted Traffic Mitigation utilizing Transport-Layer Jitter and Application-Layer Device Telemetry</h1>
+<p class="subtitle">Review-1 Architecture, Implementation, and Empirical Evaluation</p>
+
+<p class="authors">Department of Computer Science and Engineering</p>
+<p class="affiliation">Academic Project Review 1 — Capstone Technical Report</p>
+
+<div class="abstract-box">
+  <p class="abstract">
+    <b><i>Abstract</i>—Automated scraping bots, credential stuffing tools, and distributed denial-of-service (DDoS) networks increasingly evade conventional rate-limiting architectures by routing traffic through commercial residential proxy pools and rotating Layer 3/4 source addresses on a per-request basis. Conventional Web Application Firewalls (WAFs) maintain state keyed strictly to IP prefixes or volatile Layer 7 session artifacts (cookies, authorization headers), both of which are readily discarded by headless browser instances. This paper presents the architecture, implementation, and empirical verification of a lightweight, zero-dependency cross-layer gateway proxy engineered in raw Node.js. The gateway constructs a probabilistic cross-layer observation signature by fusing two orthogonal signals: (i) application-visible request-arrival timing dynamics (inter-arrival gaps, rolling sample mean &mu;, and sample standard deviation &sigma; computed via sub-microsecond monotonic clocks), and (ii) client device telemetry (battery level and charging state). To mitigate cryptographic avalanche divergence caused by stochastic network jitter, continuous values undergo deterministic coarse quantization (50 ms timing bins, 10% battery bins) prior to canonical JSON serialization and SHA-256 hashing. An in-memory token bucket rate limiter (capacity <i>C</i> = 10, refill rate <i>r</i> = 2.0 tokens/s) is keyed directly to the derived 64-bit signature digest rather than the source IP. Empirical load testing under continuous simulated IP rotation (25 requests across 25 distinct IP addresses) demonstrates that signature stability remains invariant across IP hopping, reliably admitting requests 1–10 (HTTP 200) and enforcing deterministic throttling on requests 11–25 (HTTP 429). Critical limitations regarding network queuing noise and browser API restrictions are formally analyzed alongside a roadmap for transport-layer kernel hooks in Review 2.</b>
+  </p>
+  <p class="keywords"><b><i>Keywords</i>—Rate limiting, cross-layer signature, traffic mitigation, transport jitter, token bucket, device telemetry, bot detection, IP rotation evasion.</b></p>
+</div>
+
+<h2>I. Introduction</h2>
+<p>
+Network rate limiting is a foundational perimeter defense used to protect web applications against automated denial-of-service attacks, brute-force credential stuffing, and unauthorized resource scraping. Traditional enforcement mechanisms operate under the assumption that an individual client or machine corresponds reliably to an identifiable network identifier—predominantly an IPv4 or IPv6 address.
+</p>
+<p>
+In contemporary threat environments, this operational assumption is invalid. Attackers routinely route malicious automated requests through decentralized residential proxy networks, cloud virtual machine pools, and cellular carrier NAT gateways, rotating the apparent client IP address on every successive HTTP transaction. Concurrently, headless automation frameworks (e.g., Puppeteer, Playwright) isolate browser contexts, discarding HTTP cookies, cache tokens, and client session identifiers between requests. Consequently, traditional rate-limiting gateways reset the token allocation for each rotated IP, granting distributed attackers near-infinite throughput while exhausting backend infrastructure.
+</p>
+<p>
+To address this vulnerability, this research investigates cross-layer feature fusion as a basis for request correlation. Rather than attempting to establish an immutable physical silicon identifier—which is technically infeasible at the application socket layer without proprietary kernel hooks—the gateway derives a <i>probabilistic cross-layer observation signature</i>. By correlating high-resolution request-arrival timing characteristics with application-layer physical telemetry, the gateway correlates requests originating from the same execution environment despite continuous Layer 3 address manipulation.
+</p>
+
+<h2>II. Architectural Design & Methodology</h2>
+<p class="no-indent">The end-to-end request lifecycle is divided into five modular subsystems:</p>
+
+<h3>A. High-Resolution Monotonic Timing Tracking</h3>
+<p>
+Wall-clock interfaces such as <code>Date.now()</code> offer millisecond granularity and remain susceptible to non-monotonic clock skew and NTP time-step corrections. To capture precise arrival intervals, the gateway utilizes <code>process.hrtime.bigint()</code>, sampling the CPU monotonic counter at sub-microsecond resolution. For an arriving request <i>k</i> from client <i>C</i> at timestamp <i>t<sub>k</sub></i>, the inter-arrival gap &Delta;<i>t<sub>k</sub></i> is given by:
+</p>
+<div class="formula">
+  &Delta;t<sub>k</sub> = (t<sub>k</sub> - t<sub>k-1</sub>) / 10<sup>6</sup>  [milliseconds]
+</div>
+<p>
+The gateway maintains a circular buffer of the most recent <i>N</i> = 20 arrival intervals. An idle gap threshold (&Delta;<i>t</i> &gt; 2000 ms) filters session boundary pauses from active burst cadences. Statistical estimators are evaluated over the window:
+</p>
+<div class="formula">
+  &mu; = (1 / N) &sum; &Delta;t<sub>i</sub> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; 
+  s<sup>2</sup> = (1 / (N - 1)) &sum; (&Delta;t<sub>i</sub> - &mu;)<sup>2</sup> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; 
+  &sigma; = &radic;(s<sup>2</sup>)
+</div>
+
+<h3>B. Application-Layer Telemetry Ingestion</h3>
+<p>
+Clients transmit physical device telemetry comprising battery level <i>B</i> &isin; [0, 100] and charging status <i>C<sub>state</sub></i> &isin; {true, false}. When browser security restrictions prevent access to the W3C Battery Status API, the gateway gracefully falls back to an <code>unknown</code> marker without halting execution, preserving timing-only correlation.
+</p>
+
+<h3>C. Coarse Quantization & Deterministic Serialization</h3>
+<p>
+Cryptographic hashing functions such as SHA-256 exhibit the avalanche effect: a microsecond timing fluctuation would alter the entire digest. To ensure signature stability, continuous feature vectors are discretized into coarse bins:
+</p>
+<div class="formula">
+  B<sub>bucket</sub> = &lfloor;B / 10&rfloor; &times; 10 &nbsp;&nbsp;|&nbsp;&nbsp; 
+  &mu;<sub>bucket</sub> = &lfloor;&mu; / 50&rfloor; &times; 50 &nbsp;&nbsp;|&nbsp;&nbsp; 
+  &sigma;<sub>bucket</sub> = &lfloor;&sigma; / 50&rfloor; &times; 50
+</div>
+<p>
+The quantized parameters are serialized into canonical JSON with lexicographically sorted keys:
+<code>{"avgIntervalBucket": &mu;<sub>b</sub>, "batteryBucket": B<sub>b</sub>, "charging": C<sub>s</sub>, "stdDevBucket": &sigma;<sub>b</sub>}</code>.
+The SHA-256 hash is computed, with the leading 12 hexadecimal characters extracted as the display signature.
+</p>
+
+<h3>D. Signature-Keyed Token Bucket Rate Limiter</h3>
+<p>
+Each derived signature maps to an independent token bucket instance parameterized by capacity <i>C</i> = 10.0 tokens, refill rate <i>r</i> = 2.0 tokens/second, and request cost <i>w</i> = 1.0 token. Tokens refill continuously according to elapsed monotonic time:
+</p>
+<div class="formula">
+  Tokens<sub>now</sub> = min(C, Tokens<sub>prev</sub> + &Delta;t<sub>elapsed</sub> &times; r)
+</div>
+<p>
+Requests arriving when Tokens &ge; 1.0 are admitted (HTTP 200); requests arriving when Tokens &lt; 1.0 are rejected with HTTP 429 (<code>RATE_LIMIT_EXCEEDED</code>).
+</p>
+
+<h2>III. Implementation Details</h2>
+<p>
+The gateway (<code>proxy-app.js</code>) is implemented in raw Node.js (v18+) without third-party npm dependencies. Key engineering features include:
+</p>
+<p><b>1. Stream Backpressure & Guardrails:</b> Request bodies are streamed through a 16 KB buffer limit. Exceeding this boundary triggers stream pausing (<code>req.pause()</code>), socket termination (<code>req.destroy()</code>), and an HTTP 413 response, preventing memory exhaustion.</p>
+<p><b>2. In-Memory Memory Safety:</b> An internal garbage collector executes every 60 seconds, evicting stale client sessions and signature buckets inactive for more than 15 minutes (TTL = 15m), enforcing bounded memory overhead.</p>
+
+<h2>IV. Experimental Results & Verification</h2>
+<p>
+To evaluate the gateway against automated IP hopping, an automated load test (<code>tests/load-test.js</code>) dispatched 25 rapid requests with an inter-request delay of 20 ms. Each request presented a distinct simulated source IP address (<code>10.0.0.1</code> through <code>10.0.0.25</code>) via the <code>X-Demo-IP</code> header while preserving client execution cadence.
+</p>
+
+<table>
+  <caption>Table 1: Empirical Evaluation of Burst Traffic under Continuous IP Rotation</caption>
+  <thead>
+    <tr>
+      <th>Request Index</th>
+      <th>Simulated Source IP</th>
+      <th>Derived Signature</th>
+      <th>Token Balance</th>
+      <th>Decision</th>
+      <th>HTTP Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>10.0.0.1</td>
+      <td>e115be59193d</td>
+      <td>9.00 / 10.00</td>
+      <td>ALLOW</td>
+      <td>200 OK</td>
+    </tr>
+    <tr>
+      <td>2 &ndash; 9</td>
+      <td>10.0.0.2 &ndash; 10.0.0.9</td>
+      <td>e115be59193d</td>
+      <td>8.05 &ndash; 1.36</td>
+      <td>ALLOW</td>
+      <td>200 OK</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>10.0.0.10</td>
+      <td>e115be59193d</td>
+      <td>0.40 / 10.00</td>
+      <td>ALLOW</td>
+      <td>200 OK</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>10.0.0.11</td>
+      <td>e115be59193d</td>
+      <td>0.00 / 10.00</td>
+      <td>THROTTLE</td>
+      <td>429 Too Many Requests</td>
+    </tr>
+    <tr>
+      <td>12 &ndash; 25</td>
+      <td>10.0.0.12 &ndash; 10.0.0.25</td>
+      <td>e115be59193d</td>
+      <td>0.00 / 10.00</td>
+      <td>THROTTLE</td>
+      <td>429 Too Many Requests</td>
+    </tr>
+    <tr>
+      <td>Follow-up (t+2.5s)</td>
+      <td>10.0.0.26</td>
+      <td>e115be59193d</td>
+      <td>4.00 / 10.00</td>
+      <td>ALLOW</td>
+      <td>200 OK</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+As shown in Table 1, traditional rate limiters would have admitted all 25 requests because each transaction originated from an unthrottled IP address. In contrast, the cross-layer gateway identified the invariant signature (<code>e115be59193d</code>), exhausting the token bucket at request 10 and throttling requests 11–25. Following a 2.5-second idle pause, the bucket refilled 5.0 tokens, admitting follow-up recovery requests without signature drift.
+</p>
+
+<h2>V. Critical Limitations & Academic Disclosures</h2>
+<p>
+In accordance with academic rigor, the Review-1 prototype acknowledges the following constraints:
+</p>
+<p><b>1. Network Queuing Noise:</b> Inter-arrival jitter measurements reflect application-visible socket delivery rather than raw physical packet transmission. Router queuing delays and Wi-Fi retransmissions introduce non-deterministic noise.</p>
+<p><b>2. Temporal Instability of Telemetry:</b> Battery state represents an ephemeral thermodynamic variable, not a persistent hardware ID. Signatures remain stable across burst intervals but naturally transition over multi-hour time horizons.</p>
+<p><b>3. Bucket Boundary Collisions:</b> Coarse quantization mitigates jitter divergence but introduces a collision probability where distinct clients with identical battery states and clicking cadences map to the same token bucket.</p>
+
+<h2>VI. Review 2 Research Roadmap</h2>
+<p>
+Building upon the Review-1 foundation, the subsequent research phase will focus on:
+</p>
+<p><b>1. Kernel Transport Hooking:</b> Deploying eBPF and libpcap probes to inspect passive TCP handshake characteristics (TCP Window Size, TCP Options ordering, and initial SYN TTL) independent of HTTP payloads.</p>
+<p><b>2. Metric-Space Clustering:</b> Replacing rigid SHA-256 discrete bins with Locality-Sensitive Hashing (LSH) and Euclidean distance clustering over continuous feature spaces to eliminate boundary collision artifacts.</p>
+
+<h2>VII. References</h2>
+<ol class="references">
+  <li>T. Kohno, A. Broido, and kc claffy, "Remote physical device fingerprinting," <i>IEEE Transactions on Dependable and Secure Computing</i>, vol. 2, no. 2, pp. 93–108, 2005.</li>
+  <li>V. Paxson, "End-to-end Internet packet dynamics," <i>IEEE/ACM Transactions on Networking</i>, vol. 7, no. 3, pp. 277–292, 1999.</li>
+  <li>P. Eckersley, "How unique is your web browser?" in <i>Proc. Privacy Enhancing Technologies (PETS)</i>, Berlin, Heidelberg: Springer, 2010, pp. 1–18.</li>
+  <li>W3C Consortium, "Battery Status API: W3C Candidate Recommendation," World Wide Web Consortium, 2016.</li>
+  <li>C. G. M. Standards, "Token bucket algorithm specification for traffic policing," <i>RFC 2697: A Single Rate Three Color Marker</i>, IETF, 1999.</li>
+</ol>
+
+</body>
+</html>
