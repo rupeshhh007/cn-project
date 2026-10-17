@@ -1,0 +1,30 @@
+{
+  "name": "sentinel-network-lab",
+  "version": "1.0.0",
+  "description": "SENTINEL / NETWORK LAB — Explainable Network Traffic Defense Workbench & Reverse Proxy",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "start:upstream": "node apps/upstream/server.js",
+    "start:gateway": "node apps/gateway/server.js",
+    "start": "node apps/gateway/runner.js",
+    "test:core": "node packages/core/test/core.test.js",
+    "test:vertical-slice": "node tests/vertical-slice-test.js",
+    "test:legacy": "node legacy/review1/tests/unit-test.js && node legacy/review1/tests/mock-http-test.js",
+    "test": "npm run test:legacy && npm run test:core && npm run test:vertical-slice"
+  },
+  "keywords": [
+    "network-security",
+    "reverse-proxy",
+    "rate-limiting",
+    "token-bucket",
+    "traffic-analysis",
+    "behavioral-signatures"
+  ],
+  "author": "Computer Networks Project Team",
+  "license": "MIT"
+}
