@@ -1,0 +1,55 @@
+{
+  "scenarioId": "burst-recovery",
+  "scenarioMetadata": {
+    "id": "burst-recovery",
+    "name": "Burst Overload & Leaky Recovery",
+    "category": "Rate Limiter Dynamics",
+    "description": "Sharp microburst of 18 requests exceeding bucket capacity (10 tokens), followed by a 2-second recovery pause.",
+    "expectedPolicyOutcome": "Demonstrates mathematically predicted token depletion and linear time-based replenishment at 2.0 tokens/second."
+  },
+  "timestamp": "2026-10-17T17:16:24.384Z",
+  "comparisons": [
+    {
+      "policyMode": "IP_BASELINE",
+      "totalRequests": 25,
+      "allowedCount": 10,
+      "throttledCount": 15,
+      "tp": 8,
+      "fp": 7,
+      "tn": 10,
+      "fn": 0,
+      "accuracyPercent": 72,
+      "falsePositiveRatePercent": 41.2,
+      "falseNegativeRatePercent": 0,
+      "avgLatencyMs": 0.41
+    },
+    {
+      "policyMode": "SESSION_BASELINE",
+      "totalRequests": 25,
+      "allowedCount": 10,
+      "throttledCount": 15,
+      "tp": 8,
+      "fp": 7,
+      "tn": 10,
+      "fn": 0,
+      "accuracyPercent": 72,
+      "falsePositiveRatePercent": 41.2,
+      "falseNegativeRatePercent": 0,
+      "avgLatencyMs": 0.39
+    },
+    {
+      "policyMode": "HYBRID_BEHAVIORAL",
+      "totalRequests": 25,
+      "allowedCount": 10,
+      "throttledCount": 15,
+      "tp": 8,
+      "fp": 7,
+      "tn": 10,
+      "fn": 0,
+      "accuracyPercent": 72,
+      "falsePositiveRatePercent": 41.2,
+      "falseNegativeRatePercent": 0,
+      "avgLatencyMs": 0.43
+    }
+  ]
+}

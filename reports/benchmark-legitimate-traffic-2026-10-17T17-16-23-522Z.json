@@ -1,0 +1,55 @@
+{
+  "scenarioId": "legitimate-traffic",
+  "scenarioMetadata": {
+    "id": "legitimate-traffic",
+    "name": "Legitimate Human Workload",
+    "category": "Baseline Validation",
+    "description": "Natural spaced web requests from laptop and mobile devices with human-like inter-arrival delays.",
+    "expectedPolicyOutcome": "All policies should exhibit 0% false positives, allowing steady token replenishment."
+  },
+  "timestamp": "2026-10-17T17:16:23.522Z",
+  "comparisons": [
+    {
+      "policyMode": "IP_BASELINE",
+      "totalRequests": 25,
+      "allowedCount": 20,
+      "throttledCount": 5,
+      "tp": 0,
+      "fp": 5,
+      "tn": 20,
+      "fn": 0,
+      "accuracyPercent": 80,
+      "falsePositiveRatePercent": 20,
+      "falseNegativeRatePercent": 0,
+      "avgLatencyMs": 1.51
+    },
+    {
+      "policyMode": "SESSION_BASELINE",
+      "totalRequests": 25,
+      "allowedCount": 20,
+      "throttledCount": 5,
+      "tp": 0,
+      "fp": 5,
+      "tn": 20,
+      "fn": 0,
+      "accuracyPercent": 80,
+      "falsePositiveRatePercent": 20,
+      "falseNegativeRatePercent": 0,
+      "avgLatencyMs": 1.04
+    },
+    {
+      "policyMode": "HYBRID_BEHAVIORAL",
+      "totalRequests": 25,
+      "allowedCount": 20,
+      "throttledCount": 5,
+      "tp": 0,
+      "fp": 5,
+      "tn": 20,
+      "fn": 0,
+      "accuracyPercent": 80,
+      "falsePositiveRatePercent": 20,
+      "falseNegativeRatePercent": 0,
+      "avgLatencyMs": 1.1
+    }
+  ]
+}

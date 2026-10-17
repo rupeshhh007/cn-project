@@ -1,0 +1,55 @@
+{
+  "scenarioId": "shared-nat-fairness",
+  "scenarioMetadata": {
+    "id": "shared-nat-fairness",
+    "name": "Shared NAT IP Multi-Client Fairness",
+    "category": "False Positive Analysis",
+    "description": "Three legitimate clients on a single public IP (e.g., student dorm or office NAT) making concurrent normal requests.",
+    "expectedPolicyOutcome": "Policy A causes severe collateral damage (starving innocent clients). Policy C isolates cadences and maintains high throughput."
+  },
+  "timestamp": "2026-10-17T17:16:24.136Z",
+  "comparisons": [
+    {
+      "policyMode": "IP_BASELINE",
+      "totalRequests": 25,
+      "allowedCount": 10,
+      "throttledCount": 15,
+      "tp": 0,
+      "fp": 15,
+      "tn": 10,
+      "fn": 0,
+      "accuracyPercent": 40,
+      "falsePositiveRatePercent": 60,
+      "falseNegativeRatePercent": 0,
+      "avgLatencyMs": 0.55
+    },
+    {
+      "policyMode": "SESSION_BASELINE",
+      "totalRequests": 25,
+      "allowedCount": 25,
+      "throttledCount": 0,
+      "tp": 0,
+      "fp": 0,
+      "tn": 25,
+      "fn": 0,
+      "accuracyPercent": 100,
+      "falsePositiveRatePercent": 0,
+      "falseNegativeRatePercent": 0,
+      "avgLatencyMs": 0.71
+    },
+    {
+      "policyMode": "HYBRID_BEHAVIORAL",
+      "totalRequests": 25,
+      "allowedCount": 10,
+      "throttledCount": 15,
+      "tp": 0,
+      "fp": 15,
+      "tn": 10,
+      "fn": 0,
+      "accuracyPercent": 40,
+      "falsePositiveRatePercent": 60,
+      "falseNegativeRatePercent": 0,
+      "avgLatencyMs": 0.58
+    }
+  ]
+}

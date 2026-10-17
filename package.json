@@ -15,6 +15,7 @@
     "test:core": "node packages/core/test/core.test.js",
     "test:vertical-slice": "node tests/vertical-slice-test.js",
     "test:legacy": "node legacy/review1/tests/unit-test.js && node legacy/review1/tests/mock-http-test.js",
+    "benchmark": "node scripts/run-all-benchmarks.js",
     "test": "npm run test:legacy && npm run test:core && npm run test:vertical-slice"
   },
   "keywords": [

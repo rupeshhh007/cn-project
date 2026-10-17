@@ -1,0 +1,4 @@
+Policy,TotalRequests,Allowed,Throttled,TP,FP,TN,FN,AccuracyPercent,FPRPercent,FNRPercent,AvgLatencyMs
+IP_BASELINE,25,20,5,0,5,20,0,80,20,0,1.51
+SESSION_BASELINE,25,20,5,0,5,20,0,80,20,0,1.04
+HYBRID_BEHAVIORAL,25,20,5,0,5,20,0,80,20,0,1.1

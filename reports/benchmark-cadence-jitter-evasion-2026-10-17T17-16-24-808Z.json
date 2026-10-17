@@ -1,0 +1,55 @@
+{
+  "scenarioId": "cadence-jitter-evasion",
+  "scenarioMetadata": {
+    "id": "cadence-jitter-evasion",
+    "name": "Cadence Jitter Evasion (Honest Limits)",
+    "category": "Adversarial Boundary",
+    "description": "Sophisticated attacker injecting randomized inter-arrival jitter (100-300ms) to evade behavioral clustering.",
+    "expectedPolicyOutcome": "Demonstrates where behavioral clustering experiences signature drift and boundary limits, triggering fallback to IP protection."
+  },
+  "timestamp": "2026-10-17T17:16:24.808Z",
+  "comparisons": [
+    {
+      "policyMode": "IP_BASELINE",
+      "totalRequests": 25,
+      "allowedCount": 25,
+      "throttledCount": 0,
+      "tp": 0,
+      "fp": 0,
+      "tn": 0,
+      "fn": 25,
+      "accuracyPercent": 0,
+      "falsePositiveRatePercent": 0,
+      "falseNegativeRatePercent": 100,
+      "avgLatencyMs": 0.7
+    },
+    {
+      "policyMode": "SESSION_BASELINE",
+      "totalRequests": 25,
+      "allowedCount": 10,
+      "throttledCount": 15,
+      "tp": 15,
+      "fp": 0,
+      "tn": 0,
+      "fn": 10,
+      "accuracyPercent": 60,
+      "falsePositiveRatePercent": 0,
+      "falseNegativeRatePercent": 40,
+      "avgLatencyMs": 0.54
+    },
+    {
+      "policyMode": "HYBRID_BEHAVIORAL",
+      "totalRequests": 25,
+      "allowedCount": 25,
+      "throttledCount": 0,
+      "tp": 0,
+      "fp": 0,
+      "tn": 0,
+      "fn": 25,
+      "accuracyPercent": 0,
+      "falsePositiveRatePercent": 0,
+      "falseNegativeRatePercent": 100,
+      "avgLatencyMs": 0.61
+    }
+  ]
+}
