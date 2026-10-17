@@ -7,9 +7,16 @@
  */
 
 import http from 'http';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { EventEmitter } from 'events';
 import { PolicyModes, DecisionTypes, DecisionReasons, validateDecisionEvent } from '../../packages/contracts/index.js';
 import { PolicyEngine } from '../../packages/core/index.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const DIST_PATH = path.resolve(__dirname, '../web/dist');
 
 const GATEWAY_PORT = parseInt(process.env.GATEWAY_PORT || process.env.PORT, 10) || 8080;
 const GATEWAY_HOST = process.env.GATEWAY_HOST || '0.0.0.0';
@@ -389,6 +396,35 @@ export const server = http.createServer(async (req, res) => {
 
       eventBus.emit('decision', event);
       return;
+    }
+  }
+
+  // 7. STATIC WEB UI SERVING (from apps/web/dist)
+  if (method === 'GET') {
+    let filePath = path.join(DIST_PATH, pathname === '/' ? 'index.html' : pathname);
+    if (!fs.existsSync(filePath) && fs.existsSync(path.join(DIST_PATH, 'index.html'))) {
+      filePath = path.join(DIST_PATH, 'index.html');
+    }
+
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+      const ext = path.extname(filePath).toLowerCase();
+      const mimeTypes = {
+        '.html': 'text/html; charset=utf-8',
+        '.js': 'application/javascript; charset=utf-8',
+        '.css': 'text/css; charset=utf-8',
+        '.svg': 'image/svg+xml',
+        '.json': 'application/json; charset=utf-8',
+        '.png': 'image/png',
+        '.ico': 'image/x-icon'
+      };
+      const contentType = mimeTypes[ext] || 'application/octet-stream';
+      const fileData = fs.readFileSync(filePath);
+      res.writeHead(200, {
+        'Content-Type': contentType,
+        'Content-Length': fileData.length,
+        'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=31536000'
+      });
+      return res.end(fileData);
     }
   }
 
