@@ -514,8 +514,8 @@ const server = http.createServer(async (req, res) => {
   const pathname = parsedUrl.pathname;
   const method = req.method;
 
-  // 1. GET / -> Serve client.html
-  if (method === 'GET' && pathname === '/') {
+  // 1. GET or HEAD / -> Serve client.html
+  if ((method === 'GET' || method === 'HEAD') && pathname === '/') {
     const clientPath = path.join(__dirname, 'client.html');
     fs.readFile(clientPath, 'utf8', (err, content) => {
       if (err) {
@@ -525,19 +525,31 @@ const server = http.createServer(async (req, res) => {
       }
       res.writeHead(200, {
         'Content-Type': 'text/html; charset=utf-8',
-        'Content-Length': Buffer.byteLength(content)
+        'Content-Length': Buffer.byteLength(content),
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
       });
-      res.end(content);
+      if (method === 'HEAD') {
+        res.end();
+      } else {
+        res.end(content);
+      }
     });
     return;
   }
 
-  // 2. GET /health -> Service health status
-  if (method === 'GET' && pathname === '/health') {
-    sendJson(res, 200, {
-      status: 'ok',
-      service: 'cross-layer-gateway'
-    });
+  // 2. GET or HEAD /health -> Service health status
+  if ((method === 'GET' || method === 'HEAD') && pathname === '/health') {
+    if (method === 'HEAD') {
+      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end();
+    } else {
+      sendJson(res, 200, {
+        status: 'ok',
+        service: 'cross-layer-gateway'
+      });
+    }
     return;
   }
 
