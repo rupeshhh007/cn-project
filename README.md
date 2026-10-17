@@ -1,241 +1,215 @@
-# Cross-Layer Gateway Proxy for Hardware-Fingerprinted Traffic Mitigation
+# SENTINEL / NETWORK LAB
 
-**Academic Prototype — Review 1**  
-**Subheading:** Utilizing Application-Visible Request Timing Dynamics and Application-Layer Device Telemetry for Resilient Traffic Mitigation.
-
----
-
-## 1. Project Title & Scope
-
-**Official Title:** Cross-Layer Gateway Proxy for Hardware-Fingerprinted Traffic Mitigation utilizing Transport-Layer Jitter and Application-Layer Device Telemetry  
-**Internal Technical Rigor Definition:** The prototype derives a **probabilistic cross-layer observation signature**, not a permanent physical hardware identifier, using **application-visible request-arrival timing characteristics** and application-layer device telemetry.
+**Explainable Network Traffic Defense Workbench & Edge Reverse Proxy**  
+*Evaluating Probabilistic Behavioral Correlation vs. Conventional Rate-Limiting Policies*
 
 ---
 
-## 2. Problem Statement
+## Visual Laboratory Interface
 
-Conventional web application firewalls (WAFs) and API gateways enforce rate limiting primarily keyed on:
-1. **Network Layer IP Addresses (L3/L4):** Trivial to circumvent through automated IP rotation (residential proxy networks, cloud VM spinning, TOR, cellular subnet switching, botnets).
-2. **Application Layer Session Tokens / Cookies (L7):** Easily cleared, spoofed, or isolated by automated headless scraping scripts.
+![Sentinel 3D Network Diorama](docs/screenshots/sentinel_01_3d_network_diorama.png)
 
-When an attacker rotates their source IP address on every request while maintaining an identical attack pattern or device source, traditional rate-limiting engines fail completely because each request is treated as a distinct client with a fresh rate-limit quota.
-
----
-
-## 3. Review-1 Objective
-
-The objective of Review 1 is to build and demonstrate a modular, zero-external-dependency Node.js prototype that:
-- Captures high-resolution monotonic request arrival intervals (`process.hrtime.bigint()`).
-- Ingests application-layer client telemetry (battery level, charging status).
-- Quantizes/normalizes noisy features into coarse buckets to maintain signature stability.
-- Synthesizes a deterministic canonical representation hashed via SHA-256 into a pseudonymous observation signature.
-- Enforces an in-memory **Token Bucket Rate Limiter** keyed on the cross-layer signature rather than the IP address.
-- Proves through simulation (`X-Demo-IP`) that rapid IP rotation fails to bypass mitigation when the underlying cross-layer signature remains identical.
-
----
-
-## 4. Architecture Overview
-
-```text
-HTTP Client Request
-        |
-        v
-  [ proxy-app.js (Raw Node.js HTTP Server) ]
-        |
-        +---> TimingTracker: High-resolution monotonic timing & rolling statistics (N=20)
-        |
-        +---> TelemetryStore: In-memory store for client battery and charging status
-        |
-        +---> SignatureEngine: Normalization, coarse bucketing, deterministic JSON, SHA-256
-        |
-        +---> RateLimiter (TokenBucket): Keyed by SHA-256 signature (Capacity: 10, Refill: 2/s)
-        |
-        +---> Decision Gate:
-                 |
-                 +---> ALLOW    (HTTP 200 OK + remaining tokens)
-                 +---> THROTTLE (HTTP 429 Too Many Requests)
+```
+┌──────────────────────────────────────────────────────────────────────────────────────────┐
+│                               SENTINEL / NETWORK LAB                                     │
+│  [IP BASELINE]        [SESSION ID BASELINE]        [HYBRID BEHAVIORAL (ACTIVE)]          │
+├───────────────────────────────┬──────────────────────────────────────────────────────────┤
+│                               │  CONTEXTUAL INSPECTOR / SCENARIO STUDIO                  │
+│   3D ISOMETRIC DIORAMA        │  ▸ Selected: Workstation Terminal (192.168.1.42)         │
+│   ▸ Workstation Laptop        │  ▸ Mean Cadence (μ): 850ms | Jitter Std (σ): 45ms        │
+│   ▸ Mobile Phone              │  ▸ Battery Level: 85% [Charging: YES]                    │
+│   ▸ IoT Sensor Hub            │  ▸ Token Bucket: 8.00 / 10.0 [Refill: 2.0/s]             │
+│   ▸ Sentinel Reverse Proxy    │  ▸ Ground Truth Accuracy: 96.0% | FPR: 0.0% | FNR: 4.0%  │
+│   ▸ Upstream Application      │                                                          │
+├───────────────────────────────┴──────────────────────────────────────────────────────────┤
+│  LIVE PACKET FEED (Server-Sent Events)                                                   │
+│  23:10:04 | GET /protected/api/data | 192.168.1.42 | Cluster: 298861943b44 | ALLOW  | 2ms │
+│  23:10:05 | GET /protected/api/data | 198.51.100.4 | Cluster: 298861943b44 | THROTTLE| 429 │
+└──────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-For detailed architecture diagrams and mathematical formulations, see [`docs/architecture.md`](docs/architecture.md).
+| Contextual Hardware Inspector | Accessible 2D Topology Fallback |
+| :---: | :---: |
+| ![Device Inspector](docs/screenshots/sentinel_02_device_inspector.png) | ![2D Topology](docs/screenshots/sentinel_03_2d_topology_schematic.png) |
+
+| Defense Architecture Matrix | Benchmark Comparison Studio |
+| :---: | :---: |
+| ![Policy Comparison Modal](docs/screenshots/sentinel_04_policy_comparison_modal.png) | High-contrast neo-brutalist experimentation studio with real-time confusion metrics. |
 
 ---
 
-## 5. How the Prototype Works
+## 1. Executive Summary & Research Motivation
 
-1. **Monotonic Timing Feature Extraction:**  
-   Every incoming request to `/api/request` captures an arrival timestamp via `process.hrtime.bigint()`. It maintains a rolling circular buffer of the past 20 arrival gaps ($\Delta t$) per logical client and calculates the sample mean ($\mu$), sample variance ($s^2$), and standard deviation ($s$).
-2. **Telemetry Ingestion & Graceful Fallback:**  
-   The gateway tracks battery percentage and charging state via `/api/telemetry` or inline request bodies. If battery telemetry is unavailable (due to browser security policies), the system gracefully assigns an `unknown` bucket without crashing.
-3. **Feature Normalization & Coarse Bucketing:**  
-   To prevent hash divergence caused by microsecond jitter, values are bucketed into stable intervals:
-   - Battery: 10% buckets (`0, 10, 20, ..., 90`).
-   - Timing Average: 20ms buckets.
-   - Timing Std Dev: 10ms buckets.
-4. **Cryptographic Signature Engine:**  
-   The bucketed features are serialized into canonical JSON with lexicographically sorted keys and hashed with SHA-256. A 12-character hexadecimal prefix is displayed in logs and responses.
-5. **Per-Signature Token Bucket:**  
-   A dedicated token bucket is indexed by the SHA-256 hash:
-   - **Capacity:** 10 tokens
-   - **Refill Rate:** 2 tokens/sec
-   - **Cost:** 1 token/request  
-   Requests exceeding the available quota are rejected with HTTP 429 (`RATE_LIMIT_EXCEEDED`).
+Conventional web application rate limiters rely on two brittle assumptions:
+1. **Network-Layer Source IP (L3/L4):** Trivial for modern scraping infrastructure to bypass by rotating through residential proxy pools, VPNs, or cloud subnets. Simultaneously, it unfairly penalizes multiple legitimate clients sharing a single carrier-grade NAT gateway.
+2. **Application-Layer Session Tokens (L7):** Easily cleared, rotated, or omitted by automated headless scripts.
+
+**SENTINEL / NETWORK LAB** investigates **probabilistic behavioral correlation** to mitigate automated attacks that rotate source IPs. Rather than claiming to identify permanent silicon hardware, Sentinel extracts application-visible arrival timing statistics ($\mu, \sigma, CV$) and optional client telemetry, mapping requests into deterministic observation clusters. Permitted traffic is actively forwarded through a genuine HTTP reverse proxy to an independent upstream service; abusive traffic is throttled at the gateway edge with HTTP 429.
 
 ---
 
-## 6. Current Implementation Details
+## 2. Core Scientific & Engineering Principles
 
-- **Language & Runtime:** Pure Node.js (v18+).
-- **Zero NPM Dependencies:** Employs only standard library modules (`http`, `crypto`, `fs`, `path`, `url`).
-- **Memory Safety:** Periodic garbage collection cleans up idle sessions and token buckets after 15 minutes of inactivity (`TTL = 15m`).
-- **Stream Backpressure & Payload Limits:** Request bodies exceeding 16 KB trigger stream pausing (`req.pause()`), socket termination (`req.destroy()`), and an HTTP 413 response.
+1. **Genuine Reverse Proxy Pipeline:**  
+   Unlike synthetic dashboards, Sentinel is an active HTTP reverse proxy (`apps/gateway`). Requests to `/protected/*` are evaluated by the policy engine; permitted traffic is proxied to an independent backend service (`apps/upstream` on port 8081); throttled traffic receives HTTP 429 directly at the gateway without reaching upstream resources.
+2. **Scientific Honesty & Boundary Disclosures:**  
+   - Arrival intervals represent application-layer measurements in Node.js (`process.hrtime.bigint()`), influenced by kernel socket buffers and network jitter, not hardware-level clock ticks.
+   - SHA-256 serves as an exact deterministic digest of normalized feature inputs; it is an identifier, not a machine-learning classifier.
+   - `X-Demo-IP` is strictly labeled simulation metadata for reproducible benchmarks. Real client addresses use socket `remoteAddress`.
+   - Battery level and charging status are self-reported, untrusted client inputs with explicit browser availability limitations.
+   - The workbench explicitly demonstrates where behavioral defenses fail (e.g. cadence jitter evasion).
+3. **Reproducible Benchmarks & Ground Truth:**  
+   All 5 experimental scenarios run on deterministic PRNG seeds (Mulberry32), reporting quantitative false-positive rates (FPR), false-negative rates (FNR), true positives (TP), and proxy latencies.
 
 ---
 
-## 7. How to Run
+## 3. Defense Policies Under Evaluation
+
+Sentinel provides runtime policy switching between three distinct rate-limiting strategies:
+
+```
+                                  INCOMING REQUEST
+                                         │
+                                         ▼
+                     ┌───────────────────────────────────────┐
+                     │          ACTIVE POLICY ENGINE         │
+                     └───────────────────┬───────────────────┘
+                                         │
+         ┌───────────────────────────────┼───────────────────────────────┐
+         ▼                               ▼                               ▼
+ ┌───────────────┐               ┌───────────────┐               ┌───────────────┐
+ │   POLICY A    │               │   POLICY B    │               │   POLICY C    │
+ │  Per-IP Token │               │  Session-ID   │               │ Experimental  │
+ │    Bucket     │               │    Bucket     │               │ Hybrid Cluster│
+ └───────┬───────┘               └───────┬───────┘               └───────┬───────┘
+         │                               │                               │
+         │ Key: Socket/Simulated IP      │ Key: Client-Supplied Header   │ Key: Cadence Cluster ID
+         │ Vulnerability: IP Rotation    │ Vulnerability: ID Rotation    │ Jitter & Telemetry
+         │ Fails on: Residential Proxies │ Fails on: Stateless Bots      │ Safety Fallback: IP Baseline
+         │                               │                               │
+         └───────────────────────────────┼───────────────────────────────┘
+                                         │
+                                         ▼
+                                 [ TOKEN BUCKET ]
+                                Capacity: C = 10.0
+                              Refill: r = 2.0 tokens/s
+                                         │
+                        ┌────────────────┴────────────────┐
+                        ▼                                 ▼
+                 [ TOKENS >= 1.0 ]                 [ TOKENS < 1.0 ]
+                        │                                 │
+                        ▼                                 ▼
+             HTTP 200 / FORWARD                   HTTP 429 THROTTLE
+         Forward to Upstream Service             Blocked at Gateway Edge
+         (apps/upstream on port 8081)           (Upstream Not Contacted)
+```
+
+1. **Policy A — Source-IP Token Bucket (Conventional Baseline):**  
+   Partitions rate quotas strictly by IP address. Vulnerable to IP rotation; starves legitimate users behind shared NAT gateways.
+2. **Policy B — Session Identifier Baseline:**  
+   Partitions rate quotas by explicit client session headers. Honestly labeled as spoofable.
+3. **Policy C — Experimental Hybrid Behavioral Defense:**  
+   Extracts rolling inter-arrival mean ($\mu$), standard deviation ($\sigma$), and coefficient of variation ($CV$) over a sliding window ($N=20$). Quantizes statistical features and combines them with optional telemetry into a deterministic cluster ID. During cold-start ($N < 4$), it safely falls back to IP baseline rate limiting.
+
+---
+
+## 4. Five Deterministic Scenarios & Benchmark Findings
+
+Sentinel ships with 5 reproducible local scenarios evaluated on identical trace workloads:
+
+| Scenario | Focus | Policy A (IP) | Policy B (Session) | Policy C (Behavioral) | Scientific Finding |
+| :--- | :--- | :---: | :---: | :---: | :--- |
+| **1. Legitimate Workload** | Human web browsing | **0% FPR** | **0% FPR** | **0% FPR** | Natural human intervals (600-1200ms) allow continuous token replenishment across all policies. |
+| **2. Scripted IP Rotation** | High-rate scraper rotating IPs | **100% FNR** *(Bypass)* | 0% FNR | **0% FNR** *(Mitigated)* | Policy A fails completely because each rotated IP gets fresh tokens. Policy C groups requests by arrival cadence and throttles the bot. |
+| **3. Shared NAT Fairness** | 3 users sharing one external IP | 60% FPR *(Starvation)* | **0% FPR** | **Preserved** | Policy A exhausts shared quota, causing severe collateral damage. Policy C isolates cadences and maintains throughput. |
+| **4. Burst & Recovery** | 18 requests at 15ms interval | 72% Accuracy | 72% Accuracy | 72% Accuracy | Demonstrates mathematically predicted bucket depletion ($C=10$) and linear time-based replenishment at 2.0 tokens/s. |
+| **5. Jitter Evasion (Limits)** | Bot injecting 80-400ms random delay | 100% FNR | 40% FNR | **100% FNR** *(Drift)* | **Honest Boundary Case:** Deliberate inter-arrival noise prevents convergence to a single cluster, illustrating the limits of statistical classification. |
+
+---
+
+## 5. Monorepo Architecture
+
+```
+cn-project/
+├── apps/
+│   ├── gateway/                 # Reverse proxy, policy engine, SSE stream, static host (:8080)
+│   │   ├── runner.js            # Dual-service orchestrator booting Gateway + Upstream
+│   │   └── server.js            # HTTP proxy, policy evaluation, SSE bus, static bundle host
+│   ├── upstream/                # Independent application service backend (:8081)
+│   │   └── server.js            # Real API endpoints (/health, /api/data, /api/compute)
+│   └── web/                     # Interactive 3D Web Workbench (React + Three.js + Tailwind)
+│       ├── src/components/canvas/    # 3D isometric diorama & procedural hardware models
+│       ├── src/components/diorama/   # Accessible 2D SVG topology schematic fallback
+│       ├── src/components/layout/    # Master header, telemetry drawer, status indicators
+│       ├── src/components/studio/    # Scenario launcher, confusion matrix, packet feed
+│       └── src/components/timeline/  # Step-by-step event scrubber timeline
+├── packages/
+│   ├── contracts/               # Shared TypeScript schemas, DecisionEvent DTOs, policy enums
+│   └── core/                    # Token bucket state machine, SignalExtractor, PolicyEngine
+├── legacy/
+│   └── review1/                 # Preserved original Review-1 standalone prototype & test suites
+├── scripts/
+│   ├── scenarios/               # Deterministic seed-based scenario generator & test runner
+│   └── run-all-benchmarks.js    # Automated benchmark suite generating JSON & CSV reports
+├── reports/                     # Exported benchmark evaluations and confusion matrices
+├── docs/                        # Specifications, architectural briefs, and UI screenshots
+├── tests/                       # End-to-end vertical slice integration test suite
+└── package.json                 # Monorepo workspaces and unified execution scripts
+```
+
+---
+
+## 6. Getting Started & Verification
 
 ### Prerequisites
-- Node.js version 18.0.0 or higher.
-- Compatible with macOS, Linux, and Windows.
+- Node.js v18+ (tested on Node.js v24.2.0)
+- npm v9+
 
-### Start the Gateway Server
+### Quick Start
 ```bash
-node proxy-app.js
-```
-The server will start at:
-```text
-http://localhost:8080/
-```
+# 1. Install root & frontend dependencies
+npm install --prefix apps/web
 
-### Run the Automated Load & Mitigation Test
-In a separate terminal window:
+# 2. Build the production 3D web application
+npm run build --prefix apps/web
+
+# 3. Boot both Gateway Reverse Proxy (:8080) and Upstream Service (:8081)
+npm start
+```
+Open **[http://localhost:8080/](http://localhost:8080/)** in your browser.
+
+---
+
+### Running the Test Suites
 ```bash
-node tests/load-test.js
+# Run all test suites (Legacy Review-1 tests + Core Unit tests + End-to-End Vertical Slice):
+npm test
+
+# Run isolated core state machine & statistics unit tests:
+npm run test:core
+
+# Run the end-to-end reverse proxy & SSE vertical slice test:
+npm run test:vertical-slice
+
+# Run the legacy Review-1 unit and mock pipeline tests:
+npm run test:legacy
 ```
 
 ---
 
-## 8. API Endpoints Specification
-
-### `GET /`
-Serves the interactive web-based monitoring and demonstration dashboard (`client.html`).
-
-### `GET /health`
-Returns health check status:
-```json
-{
-  "status": "ok",
-  "service": "cross-layer-gateway"
-}
-```
-
-### `POST /api/telemetry`
-Ingests client-side device telemetry.
-- **Headers:** `Content-Type: application/json`
-- **Body:**
-```json
-{
-  "clientId": "demo-phone-1",
-  "batteryLevel": 75,
-  "charging": true
-}
-```
-- **Validation:** Battery must be an integer between 0 and 100; charging must be boolean.
-
-### `POST /api/request` (Protected Endpoint)
-Protected API endpoint executing the cross-layer signature engine and token bucket rate limiter.
-- **Headers:** 
-  - `Content-Type: application/json`
-  - `X-Demo-IP: 10.0.0.1` *(Optional development simulation header)*
-- **Body:**
-```json
-{
-  "clientId": "demo-phone-1",
-  "payload": "sample-data"
-}
-```
-- **Response (HTTP 200 ALLOW):**
-```json
-{
-  "allowed": true,
-  "signature": "a83f6c9214bd",
-  "remainingTokens": 9.0,
-  "timing": {
-    "sampleCount": 8,
-    "averageMs": 21.482,
-    "stdDevMs": 3.124
-  }
-}
-```
-- **Response (HTTP 429 THROTTLE):**
-```json
-{
-  "allowed": false,
-  "reason": "RATE_LIMIT_EXCEEDED",
-  "signature": "a83f6c9214bd"
-}
-```
-
-### `GET /api/stats`
-Returns aggregated real-time metrics, global counters, and safe signature summaries.
-```json
-{
-  "totalRequests": 50,
-  "allowedRequests": 38,
-  "blockedRequests": 12,
-  "activeSignatures": 1,
-  "uptimeSeconds": 124,
-  "signatures": [
-    {
-      "signature": "a83f6c9214bd",
-      "requestCount": 50,
-      "allowed": 38,
-      "blocked": 12,
-      "remainingTokens": 0,
-      "lastSeen": "2026-09-23T13:16:00.000Z"
-    }
-  ]
-}
+### Executing Academic Benchmarks & Generating Reports
+```bash
+# Execute all 5 deterministic scenarios and export JSON/CSV reports to reports/
+npm run benchmark
 ```
 
 ---
 
-## 9. Demo Procedure (Step-by-Step for Review 1)
+## 7. Viva & Academic Defense Guide
 
-1. **Launch Server:**  
-   Execute `node proxy-app.js`. Observe startup banner in the console.
-2. **Access Dashboard:**  
-   Open `http://localhost:8080/` in your browser.
-3. **Inspect Hardware Detection:**  
-   Review the Battery API banner. If the browser supports `navigator.getBattery()`, live values populate. If unsupported (e.g. desktop Chrome / Safari restrictions), the fallback message clearly appears:
-   `Battery API unavailable — using manually supplied demo telemetry.`
-4. **Single Request Flow:**  
-   Click **"Send Single Request"**. Inspect the server terminal output to observe the formatted `REQUEST OBSERVED` log block, showing arrival gap, sample count, battery bucket, derived signature, and token balance.
-5. **Demonstrate IP-Rotation Evasion Mitigation:**  
-   - Keep "Auto-rotate IP during burst" checked.
-   - Click **"Send Burst (20 Requests) — Trigger Throttle"**.
-   - Notice the live event feed: the burst retains one signature and later requests are throttled (`429 THROTTLE`) despite each request reporting a rotating IP (`10.0.0.1`, `10.0.0.2`, ...). The exact allow/throttle split can vary by one request because the bucket refills continuously during the burst.
-6. **Automated Verification:**  
-   Run `node tests/load-test.js` to demonstrate reproducible token bucket exhaustion and automatic token refill.
-
----
-
-## 10. Known Limitations (Explicit Disclosures)
-
-In adherence to academic integrity, the following limitations are formally acknowledged for Review 1:
-
-1. **Network Jitter Skew:** Timing observations are affected by intermediate network hops, bufferbloat, router queuing delay, and OS scheduling latency.
-2. **Battery State Instability:** Battery levels continuously discharge or charge, meaning battery telemetry is a dynamic state rather than a permanent hardware identifier.
-3. **Browser Telemetry Availability:** The W3C Battery Status API is deprecated or disabled in several browsers due to fingerprinting privacy concerns; fallbacks are required.
-4. **Cryptographic Hash Properties:** SHA-256 exhibits the avalanche effect and does not stabilize noisy inputs; stability relies entirely on the upstream bucketing scheme.
-5. **Resolution Trade-Off:** Coarse feature bucketing reduces noise divergence but increases collision rates across distinct legitimate devices sharing similar battery levels and request cadences.
-6. **Probabilistic Correlation vs. Hardware Identification:** The system demonstrates cross-layer feature correlation, not guaranteed physical silicon identification.
-7. **Lack of Kernel-Level TCP Inspection:** Actual packet-level fingerprinting (e.g., TCP initial sequence numbers, window sizing, SYN packet inter-arrival jitter) requires low-level network instrumentation (e.g., eBPF or libpcap), which is outside the scope of raw Node.js application-layer sockets.
-8. **Empirical Calibration Needed:** Determining optimal bucket widths, window lengths, and collision probabilities requires rigorous experimental dataset evaluation.
-
----
-
-## 11. Future Work (Review 2 Roadmap)
-
-- **Kernel/Transport Layer Hooking:** Integrate raw socket sniffing or an eBPF sidecar to extract genuine TCP handshake timestamps and IP ID sequences.
-- **Entropy Weighting & Distance Clustering:** Replace rigid deterministic bucketing with continuous metric spaces (e.g., Euclidean distance or Locality-Sensitive Hashing / MinHash) to cluster timing distributions rather than relying on exact SHA-256 matches.
-- **Dynamic Adaptive Refill:** Adjust token bucket capacity dynamically based on signature confidence score and request entropy.
+1. **How does Sentinel handle NAT clients without silicon hardware IDs?**  
+   *Answer:* It clusters application-visible arrival cadence and optional client telemetry. In cold start ($N < 4$), it uses an IP baseline fallback. When timing stabilizes, requests cluster into distinct buckets.
+2. **What happens if an attacker randomizes their arrival jitter?**  
+   *Answer:* As demonstrated in Scenario 5, deliberate high jitter ($CV > 0.5$) fragments clusters. Sentinel discloses this boundary honestly rather than fabricating perfection.
+3. **Is this a real reverse proxy?**  
+   *Answer:* Yes. Permitted requests are actively forwarded over HTTP to `http://127.0.0.1:8081`, and upstream response headers and payloads are streamed back to the client. Throttled requests are stopped at the gateway edge with HTTP 429.

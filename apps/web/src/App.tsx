@@ -107,6 +107,18 @@ export const App: React.FC = () => {
     }
   };
 
+  // Read deep-link URL search parameters
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('view') === '2d') setViewMode('2d');
+    const select = params.get('select');
+    if (select) {
+      const dev = INITIAL_DEVICES.find(d => d.id === select);
+      if (dev) setSelectedDevice(dev);
+    }
+    if (params.get('modal') === 'policy') setIsPolicyModalOpen(true);
+  }, []);
+
   useEffect(() => {
     fetchOverview();
     const interval = setInterval(fetchOverview, 5000);
