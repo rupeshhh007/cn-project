@@ -13,7 +13,9 @@ import {
   deviceCategorySchema,
   safeDisplayName,
   type Peer,
+  type OverlayLink,
   type ServerSocketMessage,
+  type TopologyEdge,
 } from "@hopnet/protocol";
 
 const createRoomSchema = z.object({
@@ -40,6 +42,8 @@ type Room = {
   createdAt: number;
   sessions: Map<string, Session>;
   joins: Map<string, JoinRequest>;
+  edges: TopologyEdge[];
+  links: Map<string, OverlayLink>;
 };
 
 const rooms = new Map<string, Room>();
@@ -53,6 +57,10 @@ function secretsEqual(left: string, right: string): boolean {
   const leftBuffer = Buffer.from(left);
   const rightBuffer = Buffer.from(right);
   return leftBuffer.length === rightBuffer.length && crypto.timingSafeEqual(leftBuffer, rightBuffer);
+}
+
+function edgeKey(edge: TopologyEdge): string {
+  return edge.a < edge.b ? `${edge.a}\u0000${edge.b}` : `${edge.b}\u0000${edge.a}`;
 }
 
 function publicPeer(session: Session): Peer {
@@ -117,6 +125,8 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
       createdAt: Date.now(),
       sessions: new Map([[hostPeerId, session]]),
       joins: new Map(),
+      edges: [],
+      links: new Map(),
     };
     rooms.set(roomId, room);
     tokenIndex.set(session.token, { room, session });
@@ -184,6 +194,9 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
     join.session = session;
     room.sessions.set(peerId, session);
     tokenIndex.set(session.token, { room, session });
+    const host = [...room.sessions.values()].find((item) => item.peer.role === "host")!;
+    room.edges.push({ a: host.peer.id, b: peerId });
+    broadcast(room, { type: "topology-updated", edges: room.edges, changedByPeerId: host.peer.id });
     return { status: "approved", peer: session.peer };
   });
 
@@ -211,7 +224,7 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
     const { room, session } = indexed;
     if (session.socket?.readyState === WebSocket.OPEN) session.socket.close(4001, "Replaced by a newer connection");
     session.socket = socket;
-    send(socket, { type: "room-snapshot", selfPeerId: session.peer.id, peers: [...room.sessions.values()].map(publicPeer) });
+    send(socket, { type: "room-snapshot", selfPeerId: session.peer.id, peers: [...room.sessions.values()].map(publicPeer), edges: room.edges, links: [...room.links.values()] });
     broadcast(room, { type: "peer-joined", peer: publicPeer(session) }, session.peer.id);
 
     socket.on("message", (raw) => {
@@ -223,6 +236,40 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
       if (!parsed.success) return send(socket, { type: "error", code: "INVALID_MESSAGE", message: "Message does not match protocol." });
       if (parsed.data.type === "heartbeat") {
         return send(socket, { type: "heartbeat-ack", sentAt: parsed.data.sentAt, coordinatorAt: Date.now() });
+      }
+      if (parsed.data.type === "set-topology") {
+        if (session.peer.role !== "host") return send(socket, { type: "error", code: "HOST_AUTH_REQUIRED", message: "Only the room host can change the overlay topology." });
+        const seen = new Set<string>();
+        for (const edge of parsed.data.edges) {
+          const key = edgeKey(edge);
+          if (edge.a === edge.b || seen.has(key) || !room.sessions.has(edge.a) || !room.sessions.has(edge.b)) {
+            return send(socket, { type: "error", code: "INVALID_TOPOLOGY", message: "Topology contains an invalid or duplicate edge." });
+          }
+          seen.add(key);
+        }
+        room.edges = parsed.data.edges;
+        const permitted = new Set(room.edges.map(edgeKey));
+        for (const key of room.links.keys()) if (!permitted.has(key)) room.links.delete(key);
+        broadcast(room, { type: "topology-updated", edges: room.edges, changedByPeerId: session.peer.id });
+        return;
+      }
+      if (parsed.data.type === "link-state") {
+        const candidate: TopologyEdge = { a: session.peer.id, b: parsed.data.peerId };
+        const key = edgeKey(candidate);
+        if (!room.edges.some((edge) => edgeKey(edge) === key)) {
+          return send(socket, { type: "error", code: "UNPERMITTED_LINK", message: "Link state does not belong to the permitted overlay." });
+        }
+        const link: OverlayLink = {
+          a: candidate.a < candidate.b ? candidate.a : candidate.b,
+          b: candidate.a < candidate.b ? candidate.b : candidate.a,
+          state: parsed.data.state,
+          reportedByPeerId: session.peer.id,
+          rttMs: parsed.data.rttMs,
+          updatedAt: Date.now(),
+        };
+        room.links.set(key, link);
+        broadcast(room, { type: "link-state-updated", link });
+        return;
       }
       const target = room.sessions.get(parsed.data.targetPeerId);
       if (!target?.socket || target.socket.readyState !== WebSocket.OPEN) {

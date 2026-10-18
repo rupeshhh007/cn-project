@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import WebSocket from "ws";
 import { buildApp } from "../src/app.ts";
 
 test("room admission requires both invitation and host authorization", async (t) => {
@@ -27,4 +28,38 @@ test("room admission requires both invitation and host authorization", async (t)
   assert.equal(claimed.statusCode, 200);
   assert.equal(claimed.json().status, "approved");
   assert.ok(claimed.json().sessionToken);
+});
+
+test("participant sessions cannot author the overlay topology", async (t) => {
+  process.env.NODE_ENV = "test";
+  const app = await buildApp({ serveWeb: false });
+  await app.listen({ host: "127.0.0.1", port: 0 });
+  t.after(() => app.close());
+  const created = await app.inject({ method: "POST", url: "/api/rooms", payload: { displayName: "Host", deviceCategory: "laptop" } });
+  const room = created.json();
+  const requested = await app.inject({ method: "POST", url: `/api/rooms/${room.roomId}/join`, payload: { displayName: "Peer", deviceCategory: "phone", inviteSecret: room.inviteSecret } });
+  const join = requested.json();
+  await app.inject({ method: "POST", url: `/api/rooms/${room.roomId}/approve`, headers: { authorization: `Bearer ${room.hostToken}` }, payload: { requestId: join.requestId } });
+  const claimed = await app.inject({ method: "GET", url: `/api/rooms/${room.roomId}/join/${join.requestId}`, headers: { "x-hopnet-claim": join.claimToken } });
+  const participantToken = claimed.json().sessionToken;
+  const address = app.server.address();
+  assert.ok(address && typeof address === "object");
+  const socket = new WebSocket(`ws://127.0.0.1:${address.port}/signal?token=${participantToken}`);
+  await new Promise<void>((resolve, reject) => { socket.once("open", resolve); socket.once("error", reject); });
+  const response = new Promise<Record<string, unknown>>((resolve, reject) => {
+    const timeout = setTimeout(() => reject(new Error("Timed out waiting for topology authorization response.")), 2_000);
+    socket.on("message", (raw) => {
+      const value = JSON.parse(raw.toString()) as Record<string, unknown>;
+      if (value.type === "error") {
+        clearTimeout(timeout);
+        resolve(value);
+      }
+    });
+  });
+  socket.send(JSON.stringify({ type: "set-topology", edges: [] }));
+  const error = await response;
+  assert.equal(error.code, "HOST_AUTH_REQUIRED");
+  const closed = new Promise<void>((resolve) => socket.once("close", () => resolve()));
+  socket.close();
+  await closed;
 });

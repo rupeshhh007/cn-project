@@ -108,6 +108,10 @@ export class PeerManager {
     this.send(remotePeerId, { protocolVersion: PROTOCOL_VERSION, kind: "message", messageId: crypto.randomUUID(), sentAt: Date.now(), body });
   }
 
+  sendPacket(remotePeerId: string, packet: DataPacket): void {
+    this.send(remotePeerId, packet);
+  }
+
   close(remotePeerId: string): void {
     const managed = this.peers.get(remotePeerId);
     managed?.channel?.close();

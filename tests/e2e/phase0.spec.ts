@@ -41,3 +41,49 @@ test("host admits a participant and exchanges data over WebRTC", async ({ browse
   await participantContext.close();
   await hostContext.close();
 });
+
+test("routes a message through a real intermediate browser without an endpoint channel", async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  const host = await context.newPage();
+  await host.goto("/");
+  await host.getByLabel("Device name").fill("Relay Mac");
+  await host.getByRole("button", { name: "Create private room" }).click();
+  await expect(host.getByText("Your room is ready.")).toBeVisible();
+
+  const qrSource = await host.getByRole("img", { name: "QR code to join this HOPNET room" }).getAttribute("src");
+  const parsed = qrSource!.match(/\/rooms\/([^/]+)\/qr\?invite=(.+)$/)!;
+  const joinUrl = `/?room=${encodeURIComponent(parsed[1])}&invite=${encodeURIComponent(parsed[2])}`;
+
+  const phoneA = await context.newPage();
+  await phoneA.goto(joinUrl);
+  await phoneA.getByLabel("Device name").fill("Phone A");
+  await phoneA.getByLabel("Device type").selectOption("phone");
+  await phoneA.getByRole("button", { name: "Request to join" }).click();
+  await expect(host.getByText("Phone A")).toBeVisible();
+  await host.getByRole("button", { name: "Admit" }).click();
+  await expect(phoneA.getByText("Direct WebRTC", { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+
+  const phoneB = await context.newPage();
+  await phoneB.goto(joinUrl);
+  await phoneB.getByLabel("Device name").fill("Phone B");
+  await phoneB.getByLabel("Device type").selectOption("phone");
+  await phoneB.getByRole("button", { name: "Request to join" }).click();
+  await expect(host.getByText("Phone B")).toBeVisible();
+  await host.getByRole("button", { name: "Admit" }).click();
+  await expect(phoneB.getByText("Direct WebRTC", { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+
+  await phoneA.getByRole("button", { name: /Phone B/ }).click();
+  await expect(phoneA.getByText("2-hop overlay", { exact: true })).toBeVisible({ timeout: 15_000 });
+  await expect(phoneA.getByText("not selected", { exact: true })).toBeVisible();
+  await phoneA.getByPlaceholder("Message this peer…").fill("forward this through the relay");
+  await phoneA.getByRole("button", { name: "Send", exact: true }).click();
+
+  await expect(phoneB.getByText("Routed message delivered")).toBeAttached({ timeout: 10_000 });
+  await expect(phoneB.getByText(/forward this through the relay/)).toBeAttached();
+  await expect(host.getByText("Payload forwarded").first()).toBeAttached();
+  await expect(phoneA.getByText("Route receipt returned")).toBeAttached();
+  await phoneA.evaluate(() => window.scrollTo(0, 0));
+  await phoneA.screenshot({ path: screenshotPath("hopnet-phase2-multihop-proof.png") });
+
+  await context.close();
+});

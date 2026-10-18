@@ -15,7 +15,13 @@ The `hopnet-control` reliable ordered RTCDataChannel carries v1 packets:
 - `message`: UUID, timestamp and bounded UTF-8 body.
 - `message-ack`: receiver confirmation for the same UUID. A sender does not call a message delivered merely because `RTCDataChannel.send()` returned.
 
-Unknown protocol versions and malformed packets are rejected. Phase 2 will extend the envelope with source, destination, path, hop index, TTL and route proof while preserving versioned validation.
+Unknown protocol versions and malformed packets are rejected. Routed envelopes add source, destination, path, hop index, TTL and route proof while preserving the same versioned validation boundary.
+
+## Routed v1 messages
+
+`routed-message` and `route-receipt` carry `messageId`, `sourcePeerId`, `destinationPeerId`, `routeId`, `nextHop`, full `path`, `hopIndex`, `ttl`, and `createdAt`. Each receiver verifies that it is the declared current hop, that the next forwarding edge is permitted, and that TTL remains. A bounded 60-second duplicate cache rejects repeated route/hop tuples. The destination returns a receipt over the reversed path. Every forwarding browser records the event locally.
+
+The central coordinator carries signaling and topology state only. Routed payload envelopes move over the selected RTCDataChannels; the WebSocket relay remains a separately selected fallback.
 
 ## Security properties
 

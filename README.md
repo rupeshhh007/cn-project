@@ -18,6 +18,13 @@ Phase 0 is implemented:
 - explicit, visibly labeled WebSocket fallback
 - responsive atmospheric desktop and participant UI driven only by live state
 
+The next routing slice is also executable in automated Chrome:
+
+- operator-owned permitted overlay graph
+- minimum-hop BFS, latency-weighted Dijkstra, adaptive cost, and two node-disjoint path computation
+- routed message envelopes with path, hop index, next hop, TTL, duplicate suppression, per-hop forwarding events, and reverse receipts
+- enforced three-peer `Phone A → Relay Mac → Phone B` delivery with no Phone A–Phone B DataChannel
+
 Automated verification covers two isolated Chrome browser contexts on one machine. The required two-physical-device gate is intentionally not claimed until it is run using `docs/DEVICE_TESTING.md`.
 
 ## Run
@@ -41,7 +48,7 @@ npm run test:e2e
 npm audit --audit-level=high
 ```
 
-The end-to-end test uses locally installed Chrome and writes inspected screenshots to `docs/screenshots/`.
+The end-to-end tests use locally installed Chrome and write inspected direct and multi-hop screenshots to `docs/screenshots/`.
 
 ## Documentation
 

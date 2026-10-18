@@ -15,6 +15,20 @@ export const peerSchema = z.object({
 });
 export type Peer = z.infer<typeof peerSchema>;
 
+export const topologyEdgeSchema = z.object({
+  a: z.string().min(8).max(80),
+  b: z.string().min(8).max(80),
+});
+export type TopologyEdge = z.infer<typeof topologyEdgeSchema>;
+
+export const overlayLinkSchema = topologyEdgeSchema.extend({
+  state: z.enum(["connecting", "direct", "degraded", "closed"]),
+  reportedByPeerId: z.string(),
+  rttMs: z.number().nonnegative().optional(),
+  updatedAt: z.number().finite(),
+});
+export type OverlayLink = z.infer<typeof overlayLinkSchema>;
+
 const rtcSignalSchema = z.object({
   description: z
     .object({ type: z.enum(["offer", "answer", "pranswer", "rollback"]), sdp: z.string().optional() })
@@ -39,17 +53,26 @@ export const clientSocketMessageSchema = z.discriminatedUnion("type", [
     payload: z.string().max(65_536),
   }),
   z.object({ type: z.literal("heartbeat"), sentAt: z.number().finite() }),
+  z.object({ type: z.literal("set-topology"), edges: z.array(topologyEdgeSchema).max(20) }),
+  z.object({
+    type: z.literal("link-state"),
+    peerId: z.string(),
+    state: z.enum(["connecting", "direct", "degraded", "closed"]),
+    rttMs: z.number().nonnegative().optional(),
+  }),
 ]);
 export type ClientSocketMessage = z.infer<typeof clientSocketMessageSchema>;
 
 export const serverSocketMessageSchema = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("room-snapshot"), selfPeerId: z.string(), peers: z.array(peerSchema) }),
+  z.object({ type: z.literal("room-snapshot"), selfPeerId: z.string(), peers: z.array(peerSchema), edges: z.array(topologyEdgeSchema), links: z.array(overlayLinkSchema) }),
   z.object({ type: z.literal("peer-joined"), peer: peerSchema }),
   z.object({ type: z.literal("peer-left"), peerId: z.string() }),
   z.object({ type: z.literal("join-requested"), requestId: z.string(), displayName: z.string(), deviceCategory: deviceCategorySchema }),
   z.object({ type: z.literal("signal"), sourcePeerId: z.string(), signal: rtcSignalSchema }),
   z.object({ type: z.literal("relay-data"), sourcePeerId: z.string(), payload: z.string() }),
   z.object({ type: z.literal("heartbeat-ack"), sentAt: z.number(), coordinatorAt: z.number() }),
+  z.object({ type: z.literal("topology-updated"), edges: z.array(topologyEdgeSchema), changedByPeerId: z.string() }),
+  z.object({ type: z.literal("link-state-updated"), link: overlayLinkSchema }),
   z.object({ type: z.literal("error"), code: z.string(), message: z.string() }),
 ]);
 export type ServerSocketMessage = z.infer<typeof serverSocketMessageSchema>;
@@ -80,6 +103,35 @@ export const dataPacketSchema = z.discriminatedUnion("kind", [
     kind: z.literal("message-ack"),
     messageId: z.string().uuid(),
     receivedAt: z.number().finite(),
+  }),
+  z.object({
+    protocolVersion: z.literal(PROTOCOL_VERSION),
+    kind: z.literal("routed-message"),
+    messageId: z.string().uuid(),
+    sourcePeerId: z.string(),
+    destinationPeerId: z.string(),
+    routeId: z.string().uuid(),
+    nextHop: z.string(),
+    path: z.array(z.string()).min(2).max(8),
+    hopIndex: z.number().int().min(1).max(7),
+    ttl: z.number().int().min(1).max(16),
+    createdAt: z.number().finite(),
+    payloadType: z.literal("text"),
+    body: z.string().min(1).max(8_192),
+  }),
+  z.object({
+    protocolVersion: z.literal(PROTOCOL_VERSION),
+    kind: z.literal("route-receipt"),
+    messageId: z.string().uuid(),
+    sourcePeerId: z.string(),
+    destinationPeerId: z.string(),
+    routeId: z.string().uuid(),
+    nextHop: z.string(),
+    path: z.array(z.string()).min(2).max(8),
+    hopIndex: z.number().int().min(1).max(7),
+    ttl: z.number().int().min(1).max(16),
+    createdAt: z.number().finite(),
+    status: z.literal("delivered"),
   }),
 ]);
 export type DataPacket = z.infer<typeof dataPacketSchema>;

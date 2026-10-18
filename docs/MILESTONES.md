@@ -6,6 +6,8 @@
 - [ ] Phase 0 physical two-device RTCDataChannel gate passes.
 - [ ] Phase 1 five-device presence and messaging gate passes.
 - [ ] Phase 2 enforced application-level multi-hop and reroute gate passes.
+  - [x] Automated three-browser A → relay → B delivery and reverse receipt pass without an A–B channel.
+  - [ ] Physical three-device forwarding and alternate-route failure recovery pass.
 - [ ] Phase 3 accepted, verified direct and multi-hop file transfer gate passes.
 - [ ] Phase 4 disjoint multipath and mid-transfer recovery gate passes.
 - [ ] Phase 5 experiment/replay/export gate passes.
