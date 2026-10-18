@@ -1,0 +1,27 @@
+{
+  "name": "hopnet",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "npm run build -w @hopnet/web",
+    "start": "npm run build && node --import tsx apps/coordinator/src/server.ts",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:e2e": "playwright test",
+    "check": "npm run typecheck && npm test && npm run build"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}

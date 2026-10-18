@@ -1,0 +1,31 @@
+# HOPNET architecture
+
+## Planes
+
+```text
+Browser peer A ───── RTCDataChannel ───── Browser peer B
+      │                                         │
+      └──── authenticated WebSocket signaling ──┘
+                         │
+                 Coordinator on Mac A
+```
+
+The coordinator is the control plane: room membership, host admission, presence, WebRTC signaling and an explicitly selected fallback relay. Normal peer payloads use native WebRTC DataChannels. A coordinator connection is never displayed as a direct peer link.
+
+## Modules
+
+- `packages/protocol`: runtime-validated wire contracts shared by browser and coordinator.
+- `apps/coordinator`: in-memory short-lived rooms, authorization, QR invitations, signaling, presence and bounded fallback messages.
+- `apps/web`: room entry, host admission, live peer space, perfect-negotiation WebRTC manager, RTC ping/echo and truthful diagnostics.
+- Future `packages/routing`: pure graph algorithms and envelope invariants.
+- Future `packages/transfer`: manifests, chunk scheduling, backpressure, receipts and integrity.
+
+Room state is intentionally ephemeral in Phase 0. Private payloads are not stored or silently uploaded. The coordinator binds to the LAN only when the operator starts it.
+
+## Phase 0 failure boundaries
+
+- Invalid or expired invitation: join is rejected without revealing room state.
+- Missing host bearer token: admission is rejected.
+- Coordinator loss: established DataChannels may continue, but presence and new negotiation stop.
+- ICE failure: the UI reports degraded state. A user may deliberately use the separately labeled WebSocket fallback.
+- Mobile background suspension: the participant may become unavailable; HOPNET does not claim otherwise.
