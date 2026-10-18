@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
 import { PROTOCOL_VERSION, serverSocketMessageSchema, type DataPacket, type DeviceCategory, type OverlayLink, type Peer, type TopologyEdge } from "@hopnet/protocol";
 import { canonicalEdge, selectPath, type GraphEdge, type RouteStrategy } from "@hopnet/routing";
 import { PeerManager, type LinkState } from "./lib/peer-manager.ts";
+import { RoomSurface, type NetworkEvent } from "./components/RoomSurface.tsx";
 
 type Credentials = { roomId: string; inviteSecret: string; hostToken?: string; peer: Peer; sessionToken: string };
 type JoinRequest = { requestId: string; displayName: string; deviceCategory: DeviceCategory };
-type EventItem = { id: string; at: Date; title: string; detail: string; provenance: "REAL" | "EMULATED" | "INFERRED" };
+type EventItem = NetworkEvent;
 
 const query = new URLSearchParams(location.search);
 const invitedRoom = query.get("room") ?? "";
@@ -162,8 +162,6 @@ function App() {
   if (credentials && selectedPeer) {
     try { selectedRoute = selectPath(peers.map((peer) => peer.id), activeGraphEdges, credentials.peer.id, selectedPeer.id, routeStrategy); } catch { selectedRoute = undefined; }
   }
-  const adjacentPeers = remotePeers.filter((peer) => topologyEdges.some((edge) => (edge.a === credentials?.peer.id && edge.b === peer.id) || (edge.b === credentials?.peer.id && edge.a === peer.id)));
-
   const createRoom = async (displayName: string, deviceCategory: DeviceCategory) => {
     setError("");
     const response = await fetch("/api/rooms", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ displayName, deviceCategory }) });
@@ -251,59 +249,7 @@ function App() {
   if (!credentials) return <Entry invited={Boolean(invitedRoom && invitedSecret)} pending={joinPending} onCreate={createRoom} onJoin={joinRoom} error={error} />;
 
   const inviteUrl = `${location.origin}/?room=${encodeURIComponent(credentials.roomId)}&invite=${encodeURIComponent(credentials.inviteSecret)}`;
-  return (
-    <main className="app-shell">
-      <header className="brand-bar"><span className="brand">HOPNET</span><span className="brand-note">The Network You Can Touch</span><span className={`coordinator-state ${coordinatorState}`}>{coordinatorState}</span></header>
-      <section className="command-capsule">
-        <p>{credentials.peer.role === "host" ? "A network you can touch." : "You’re part of the route."}</p>
-        <span><i /> {peers.filter((peer) => peer.coordinatorConnected).length} peers present <b>·</b> {Object.values(links).filter((link) => link.state === "direct").length} direct WebRTC</span>
-      </section>
-
-      <section className="network-stage" aria-label="Live network peers">
-        <svg className="filaments" viewBox="0 0 1000 560" preserveAspectRatio="none" aria-hidden="true">
-          {remotePeers.map((peer, index) => adjacentPeers.some((adjacent) => adjacent.id === peer.id) ? <line key={peer.id} x1="500" y1="280" x2={remotePeers.length === 1 ? 750 : 180 + (index % 3) * 320} y2={remotePeers.length === 1 ? 300 : 170 + Math.floor(index / 3) * 260} className={links[peer.id]?.state === "direct" ? "live" : "pending"} /> : null)}
-        </svg>
-        <Device peer={credentials.peer} self state="direct" index={-1} selected={false} />
-        <AnimatePresence>
-          {remotePeers.map((peer, index) => <Device key={peer.id} peer={peer} state={links[peer.id]?.state ?? (adjacentPeers.some((adjacent) => adjacent.id === peer.id) ? "connecting" : "overlay")} index={index} solo={remotePeers.length === 1} selected={selectedPeer?.id === peer.id} onClick={() => setSelectedPeerId(peer.id)} />)}
-        </AnimatePresence>
-        {remotePeers.length === 0 && <div className="empty-network"><span>Your room is ready.</span><p>Invite another physical device. It will appear here only after host approval.</p></div>}
-      </section>
-
-      {credentials.hostToken && <aside className={`invite-pane glass-pane ${selectedPeer ? "has-inspector" : ""}`}>
-        <span className="technical-label">PRIVATE LAN INVITE</span>
-        <img src={`/api/rooms/${credentials.roomId}/qr?invite=${encodeURIComponent(credentials.inviteSecret)}`} alt="QR code to join this HOPNET room" />
-        <button className="text-button" onClick={() => navigator.clipboard.writeText(inviteUrl)}>Copy invitation</button>
-        {joinRequests.map((request) => <div className="join-request" key={request.requestId}><span>{request.displayName}<small>{request.deviceCategory}</small></span><button onClick={() => approve(request.requestId)}>Admit</button></div>)}
-        {peers.length > 1 && <div className="topology-editor"><span className="technical-label">PERMITTED LINKS</span>{peerPairs(peers).map(([a, b]) => { const active = topologyEdges.some((edge) => canonicalEdge(edge.a, edge.b) === canonicalEdge(a.id, b.id)); return <button key={canonicalEdge(a.id, b.id)} className={active ? "active" : ""} onClick={() => toggleTopologyEdge(a.id, b.id)}>{a.displayName} ↔ {b.displayName}</button>; })}</div>}
-      </aside>}
-
-      {selectedPeer && <aside className="inspector glass-pane">
-        <span className="technical-label">PEER INSPECTOR · REAL STATE</span>
-        <h2>{selectedPeer.displayName}</h2>
-        <p className="device-kind">{selectedPeer.deviceCategory}</p>
-        <dl>
-          <div><dt>Coordinator</dt><dd>{selectedPeer.coordinatorConnected ? "connected" : "offline"}</dd></div>
-          <div><dt>Data plane</dt><dd>{selectedLink?.state === "direct" ? "direct" : selectedRoute ? `${selectedRoute.length - 1}-hop overlay` : "unavailable"}</dd></div>
-          <div><dt>Candidate pair</dt><dd>{selectedLink?.candidateType ?? "not selected"}</dd></div>
-          <div><dt>Measured RTT</dt><dd>{selectedLink?.rttMs !== undefined ? `${selectedLink.rttMs} ms` : "run ping"}</dd></div>
-          <div><dt>App bytes</dt><dd>{selectedLink ? `${selectedLink.bytesSent} ↑ ${selectedLink.bytesReceived} ↓` : "0"}</dd></div>
-        </dl>
-        <button className="primary-button" onClick={ping} disabled={selectedLink?.state !== "direct"}>Ping over WebRTC</button>
-        <label className="route-policy">Route policy<select value={routeStrategy} onChange={(event) => setRouteStrategy(event.target.value as RouteStrategy)}><option value="minimum-hops">Minimum hops</option><option value="lowest-latency">Lowest observed RTT</option><option value="adaptive">Adaptive resilience</option></select></label>
-        {selectedRoute && <p className="route-preview">{selectedRoute.map((peerId) => peers.find((peer) => peer.id === peerId)?.displayName ?? "peer").join(" → ")}</p>}
-        <div className="composer"><input value={message} maxLength={8192} onChange={(event) => setMessage(event.target.value)} placeholder="Message this peer…" /><button onClick={sendMessage} disabled={!selectedRoute}>Send</button></div>
-        <button className="fallback-button" onClick={relayFallback} disabled={!message.trim()}>Use explicit coordinator fallback</button>
-        {selectedLink?.error && <p className="error-text">{selectedLink.error}</p>}
-      </aside>}
-
-      <section className="event-ribbon" aria-label="Recent real network events">
-        {events.slice(0, 3).map((event, index) => <article key={event.id}><span>{index + 1}</span><div><strong>{event.title}</strong><small>{event.detail}</small></div><em>{event.provenance}</em></article>)}
-        {events.length === 0 && <p>Live protocol events will appear here.</p>}
-      </section>
-      {error && <button className="error-toast" onClick={() => setError("")}>{error}</button>}
-    </main>
-  );
+  return <RoomSurface self={credentials.peer} peers={peers} links={links} observedLinks={observedLinks} topologyEdges={topologyEdges} selectedPeer={selectedPeer} selectedLink={selectedLink} selectedRoute={selectedRoute} routeStrategy={routeStrategy} events={events} coordinatorState={coordinatorState} inviteUrl={inviteUrl} inviteQrUrl={`/api/rooms/${credentials.roomId}/qr?invite=${encodeURIComponent(credentials.inviteSecret)}`} joinRequests={joinRequests} message={message} error={error} onSelectPeer={(id) => setSelectedPeerId(id || undefined)} onApprove={(id) => void approve(id)} onToggleEdge={toggleTopologyEdge} onRouteStrategy={setRouteStrategy} onMessage={setMessage} onSend={sendMessage} onPing={ping} onFallback={relayFallback} onClearError={() => setError("")} />;
 }
 
 function Entry({ invited, pending, onCreate, onJoin, error }: { invited: boolean; pending: boolean; onCreate: (name: string, category: DeviceCategory) => Promise<void>; onJoin: (name: string, category: DeviceCategory) => Promise<void>; error: string }) {
@@ -324,21 +270,6 @@ function Entry({ invited, pending, onCreate, onJoin, error }: { invited: boolean
       {error && <p className="error-text">{error}</p>}
     </section>
   </main>;
-}
-
-function Device({ peer, state, index, self, solo, selected, onClick }: { peer: Peer; state: LinkState["state"] | "overlay"; index: number; self?: boolean; solo?: boolean; selected: boolean; onClick?: () => void }) {
-  const positions = ["peer-one", "peer-two", "peer-three", "peer-four"];
-  return <motion.button layoutId={`peer-${peer.id}`} initial={{ opacity: 0, scale: .8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: .8 }} className={`device-object ${self ? "self-device" : positions[index % positions.length]} ${solo ? "solo-peer" : ""} ${selected ? "selected" : ""}`} onClick={onClick} disabled={self}>
-    <span className={`device-glyph ${peer.deviceCategory}`}><i /></span><strong>{self ? `${peer.displayName} · you` : peer.displayName}</strong><small><i className={state} />{state === "direct" ? "Direct WebRTC" : state === "overlay" ? "Overlay peer" : state}</small>
-  </motion.button>;
-}
-
-function peerPairs(peers: Peer[]): Array<[Peer, Peer]> {
-  const pairs: Array<[Peer, Peer]> = [];
-  for (let left = 0; left < peers.length; left += 1) {
-    for (let right = left + 1; right < peers.length; right += 1) pairs.push([peers[left], peers[right]]);
-  }
-  return pairs;
 }
 
 export default App;
