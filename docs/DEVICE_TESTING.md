@@ -28,6 +28,8 @@ HOPNET_TLS_CERT="$PWD/.certs/hopnet.pem" HOPNET_TLS_KEY="$PWD/.certs/hopnet-key.
 
 Replace `YOUR_LAN_IP` with the address printed by `npm run doctor`; regenerate the certificate when that address changes. Trust the generated local CA on Mac B. On iOS, transfer only the CA certificate, install the profile, then enable full trust under **Settings → General → About → Certificate Trust Settings**. On Android, install the CA certificate from the device security settings. Remove the test CA from mobile devices after the demonstration. Never transfer the private key.
 
+To locate the CA certificate on the host, run `mkcert -CAROOT`; copy only the resulting `rootCA.pem` to the phones using AirDrop or a local cable.
+
 Each browser must show a valid HTTPS origin with no certificate warning and the HOPNET onboarding card must say **Secure browser context**.
 
 ## 3. Two-device WebRTC gate
@@ -50,6 +52,16 @@ Evidence required:
 ## 4. Five-device gate
 
 Repeat admission for Mac B and the remaining phones. Verify every displayed device corresponds to an approved physical browser. Do not count stale/offline peers as present. Run a direct ping on every permitted link before starting multi-hop or file tests.
+
+## 5. Accepted file and relay gate
+
+1. With two devices connected, choose a small file from the sender. Confirm the receiver sees its name and size and must press **Accept** before bytes move.
+2. Save the received file. Compare its SHA-256 with the sender's original using `shasum -a 256 FILE` on macOS.
+3. Admit a third device and use the default sender → relay → receiver route. Repeat with a unique file.
+4. Capture the sender's receiver-verified completion, the receiver's SHA-256 verified state, and the intermediate peer's real forwarding event.
+5. Record file size, acknowledged bytes/chunks, start/end time, and any retry or route-change event. Do not infer throughput from animation time.
+
+The browser E2E suite verifies these flows with isolated Chrome contexts. Physical transfer, secure-certificate trust on the phones, and relay-failure recovery remain separate manual gates.
 
 ## Failure isolation
 

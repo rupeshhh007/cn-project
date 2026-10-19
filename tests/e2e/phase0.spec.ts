@@ -86,8 +86,42 @@ test("routes a message through a real intermediate browser without an endpoint c
   await expect(phoneB.getByText(/forward this through the relay/)).toBeAttached();
   await expect(host.getByText("Payload forwarded").first()).toBeAttached();
   await expect(phoneA.getByText("Route receipt returned")).toBeAttached();
+  await phoneA.getByLabel("Choose file to send").setInputFiles({ name: "relay-proof.bin", mimeType: "application/octet-stream", buffer: Buffer.from("verified through the intermediate browser") });
+  await expect(phoneB.getByRole("button", { name: "Accept relay-proof.bin" })).toBeVisible();
+  await phoneB.getByRole("button", { name: "Accept relay-proof.bin" }).click();
+  await expect(phoneA.getByText("File integrity verified")).toBeAttached({ timeout: 15_000 });
+  await expect(host.getByText("Transfer packet forwarded").first()).toBeAttached();
+  await expect(phoneB.getByText("SHA-256 verified")).toBeVisible();
+  await expect(phoneA.getByText("SHA-256 verified")).toBeVisible();
   await phoneA.evaluate(() => window.scrollTo(0, 0));
   await phoneA.screenshot({ path: screenshotPath("hopnet-phase2-multihop-proof.png") });
 
+  await context.close();
+});
+
+test("sends a consented file over a direct WebRTC data channel and verifies its digest", async ({ browser }) => {
+  test.setTimeout(45_000);
+  const context = await browser.newContext({ viewport: { width: 1280, height: 800 }, acceptDownloads: true });
+  const host = await context.newPage();
+  await host.goto("/");
+  await host.getByLabel("Device name").fill("File Sender");
+  await host.getByRole("button", { name: "Create private room" }).click();
+  const qrSource = await host.getByRole("img", { name: "QR code to join this HOPNET room" }).getAttribute("src");
+  const parsed = qrSource!.match(/\/rooms\/([^/]+)\/qr\?invite=([^&]+)/)!;
+  const participant = await context.newPage();
+  await participant.goto(`/?room=${encodeURIComponent(parsed[1])}&invite=${encodeURIComponent(parsed[2])}`);
+  await participant.getByLabel("Device name").fill("File Receiver");
+  await participant.getByLabel("Device type").selectOption("phone");
+  await participant.getByRole("button", { name: "Request to join" }).click();
+  await expect(host.getByText("File Receiver")).toBeVisible();
+  await host.getByRole("button", { name: "Admit" }).click();
+  await expect(host.getByText("Direct WebRTC", { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+
+  await host.getByLabel("Choose file to send").setInputFiles({ name: "proof.txt", mimeType: "text/plain", buffer: Buffer.from("integrity checked through the application data channel") });
+  await expect(participant.getByText("Incoming file offer")).toBeAttached();
+  await participant.getByRole("button", { name: "Accept proof.txt" }).click();
+  await expect(host.getByText("File integrity verified")).toBeAttached({ timeout: 15_000 });
+  await expect(participant.getByText("SHA-256 verified")).toBeVisible();
+  await expect(participant.getByRole("link", { name: "Save file" })).toHaveAttribute("download", "proof.txt");
   await context.close();
 });

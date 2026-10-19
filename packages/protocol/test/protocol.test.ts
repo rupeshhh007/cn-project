@@ -31,6 +31,29 @@ test("accepts application delivery acknowledgements", () => {
   assert.equal(result.success, true);
 });
 
+test("validates transfer chunk size, hash, and bounded encoding fields", () => {
+  const valid = {
+    protocolVersion: 1,
+    kind: "transfer-chunk",
+    transferId: crypto.randomUUID(),
+    sourcePeerId: "peer-source-123",
+    destinationPeerId: "peer-destination-456",
+    routeId: crypto.randomUUID(),
+    nextHop: "peer-relay-789",
+    path: ["peer-source-123", "peer-relay-789", "peer-destination-456"],
+    hopIndex: 1,
+    ttl: 5,
+    createdAt: Date.now(),
+    chunkIndex: 0,
+    byteLength: 3,
+    chunkHash: "a".repeat(64),
+    bytes: "YWJj",
+  };
+  assert.equal(dataPacketSchema.safeParse(valid).success, true);
+  assert.equal(dataPacketSchema.safeParse({ ...valid, bytes: "x".repeat(22_001) }).success, false);
+  assert.equal(dataPacketSchema.safeParse({ ...valid, chunkHash: "nope" }).success, false);
+});
+
 test("sanitizes untrusted display labels", () => {
   assert.equal(safeDisplayName("  <Phone>\nA  "), "PhoneA");
 });

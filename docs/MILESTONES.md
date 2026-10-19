@@ -10,6 +10,7 @@
   - [x] Automated three-browser A → relay → B delivery and reverse receipt pass without an A–B channel.
   - [ ] Physical three-device forwarding and alternate-route failure recovery pass.
 - [ ] Phase 3 accepted, verified direct and multi-hop file transfer gate passes.
+- [x] Automated direct and multi-hop WebRTC file offers require receiver consent, verify chunk and whole-file SHA-256, and return a receiver-confirmed completion receipt.
 - [ ] Phase 4 disjoint multipath and mid-transfer recovery gate passes.
 - [ ] Phase 5 experiment/replay/export gate passes.
 - [ ] Phase 6 desktop/mobile visual and accessibility acceptance passes.

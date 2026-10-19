@@ -8,10 +8,10 @@
 
 ## Verified automatically
 
-- Strict TypeScript checks pass for coordinator, web, protocol, and routing packages.
-- 18 unit/integration tests pass, including LAN-origin allow-listing, admission authorization, protocol validation, three routing strategies, and disjoint-path selection.
+- Strict TypeScript checks pass for coordinator, web, protocol, routing, and transfer packages.
+- 23 unit/integration tests pass, including LAN-origin allow-listing, admission authorization, packet bounds, transfer chunk and whole-file hashing, three routing strategies, and disjoint-path selection.
 - Production Vite build passes.
-- Two Playwright flows pass in Chrome: admitted two-browser direct WebRTC messaging/acknowledgement and three-browser application relay with a receiver receipt.
+- Three Playwright flows pass in Chrome: admitted two-browser direct WebRTC messaging/acknowledgement, three-browser application relay with a receiver receipt, and both direct and three-browser relayed accepted file transfers with receiver verified SHA-256 completion.
 - The invitation regression verifies that the QR advertises a non-loopback coordinator interface even when Playwright opens the host at `127.0.0.1`.
 
 ## Physical status
@@ -20,4 +20,4 @@
 
 ## Next ordered slice
 
-Implement the transfer protocol while preserving the passing onboarding gate: offer/accept/decline, manifest limits, ordered chunk framing, backpressure, per-chunk and whole-file SHA-256 verification, receiver acknowledgement, then multi-hop forwarding. After the single-path transfer is proven automatically, add two disjoint paths, missing-chunk recovery, relay-failure rerouting, event replay, measurement export, and the controlled laboratory.
+Extend transfer recovery tests with two disjoint live data paths, missing-chunk injection, and relay disconnection; then complete the controlled laboratory, event replay, measurement export, reproducible paper, and five-device physical demonstration.

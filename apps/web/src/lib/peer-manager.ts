@@ -113,6 +113,12 @@ export class PeerManager {
     this.send(remotePeerId, packet);
   }
 
+  async sendPacketAsync(remotePeerId: string, packet: DataPacket): Promise<void> {
+    const managed = this.requireOpen(remotePeerId);
+    await this.waitForWritable(managed);
+    this.send(remotePeerId, packet);
+  }
+
   close(remotePeerId: string): void {
     const managed = this.peers.get(remotePeerId);
     managed?.channel?.close();
@@ -140,6 +146,7 @@ export class PeerManager {
   private bindChannel(remotePeerId: string, managed: ManagedPeer, channel: RTCDataChannel): void {
     managed.channel = channel;
     channel.binaryType = "arraybuffer";
+    channel.bufferedAmountLowThreshold = 64 * 1024;
     channel.onopen = () => { this.emit(managed, { state: "direct", channelState: channel.readyState }); void this.inspectCandidate(managed); };
     channel.onclose = () => this.emit(managed, { state: "closed", channelState: channel.readyState });
     channel.onerror = () => this.emit(managed, { state: "degraded", channelState: channel.readyState, error: "DataChannel error" });
@@ -164,6 +171,32 @@ export class PeerManager {
       }
       this.onMessage(remotePeerId, packet);
     };
+  }
+
+  private async waitForWritable(managed: ManagedPeer): Promise<void> {
+    const channel = managed.channel;
+    if (!channel || channel.readyState !== "open") throw new Error("Direct WebRTC channel is not open.");
+    if (channel.bufferedAmount < 256 * 1024) return;
+    await new Promise<void>((resolve, reject) => {
+      const timeout = window.setTimeout(() => {
+        channel.removeEventListener("bufferedamountlow", ready);
+        reject(new Error("WebRTC send queue remained congested."));
+      }, 5_000);
+      const ready = () => {
+        window.clearTimeout(timeout);
+        channel.removeEventListener("bufferedamountlow", ready);
+        resolve();
+      };
+      channel.addEventListener("bufferedamountlow", ready, { once: true });
+      // The queue may drain between the initial check and listener registration.
+      if (channel.readyState !== "open") {
+        window.clearTimeout(timeout);
+        channel.removeEventListener("bufferedamountlow", ready);
+        reject(new Error("Direct WebRTC channel closed while waiting for backpressure."));
+      } else if (channel.bufferedAmount < 256 * 1024) {
+        ready();
+      }
+    });
   }
 
   private emit(managed: ManagedPeer, patch: Partial<LinkState>): void {

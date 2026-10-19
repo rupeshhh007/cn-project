@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "motion/react";
 import type { DeviceCategory, OverlayLink, Peer, TopologyEdge } from "@hopnet/protocol";
 import { canonicalEdge, type RouteStrategy } from "@hopnet/routing";
 import type { LinkState } from "../lib/peer-manager.ts";
+import type { TransferView } from "../lib/transfer-manager.ts";
 import type { NetworkInfo } from "../App.tsx";
 
 export type NetworkEvent = { id: string; at: Date; title: string; detail: string; provenance: "REAL" | "EMULATED" | "INFERRED" };
@@ -18,6 +19,7 @@ type Props = {
   selectedRoute?: string[];
   routeStrategy: RouteStrategy;
   events: NetworkEvent[];
+  transfers: TransferView[];
   coordinatorState: string;
   networkInfo?: NetworkInfo;
   invitationOrigin: string;
@@ -33,6 +35,8 @@ type Props = {
   onRouteStrategy: (strategy: RouteStrategy) => void;
   onMessage: (message: string) => void;
   onSend: () => void;
+  onFile: (file: File) => Promise<void>;
+  onTransferResponse: (transferId: string, accepted: boolean) => Promise<void>;
   onPing: () => void;
   onFallback: () => void;
   onClearError: () => void;
@@ -119,6 +123,7 @@ function DesktopRoom(props: Props) {
         {props.networkInfo?.interfaces.length ? <label className="invitation-origin">Invitation address<select aria-label="Invitation address" value={props.invitationOrigin} onChange={(event) => props.onInvitationOrigin(event.target.value)}>{props.networkInfo.interfaces.map((item) => <option key={item.id} value={item.origin}>{item.address} · {item.name}{item.recommended ? " · recommended" : ""}</option>)}</select></label> : null}
         <button className="soft-button" onClick={() => { void navigator.clipboard.writeText(props.inviteUrl); setInviteCopied(true); window.setTimeout(() => setInviteCopied(false), 1600); }}>{inviteCopied ? "Invitation copied" : "Copy invitation"}</button>
         <NetworkDoctor {...props} />
+        <TransferShelf transfers={props.transfers} peers={props.peers} self={props.self} onResponse={props.onTransferResponse} />
         {props.joinRequests.map((request) => <div className="admission" key={request.requestId}><span>{request.displayName}<small>{request.deviceCategory} requests entry</small></span><button onClick={() => props.onApprove(request.requestId)}>Admit</button></div>)}
         {orderedPeers.length > 1 && <Topology peers={orderedPeers} edges={props.topologyEdges} onToggle={props.onToggleEdge} />}
       </motion.aside> : props.selectedPeer ? <motion.aside key={props.selectedPeer.id} className="peer-inspector" initial={{ opacity: 0, x: 28, scale: .96 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 28 }} transition={{ type: "spring", stiffness: 340, damping: 30 }}>
@@ -130,8 +135,10 @@ function DesktopRoom(props: Props) {
         </div>
         <label className="policy-control">Path strategy<select value={props.routeStrategy} onChange={(event) => props.onRouteStrategy(event.target.value as RouteStrategy)}><option value="minimum-hops">Minimum hops</option><option value="lowest-latency">Lowest observed RTT</option><option value="adaptive">Adaptive resilience</option></select></label>
         {props.selectedRoute && <div className="route-chip">{props.selectedRoute.map((id) => orderedPeers.find((peer) => peer.id === id)?.displayName ?? "peer").join(" → ")}</div>}
+        <TransferShelf transfers={props.transfers} peers={props.peers} self={props.self} onResponse={props.onTransferResponse} />
         <button className="inspector-action" onClick={props.onPing} disabled={props.selectedLink?.state !== "direct"}><Icon name="pulse"/>Ping over WebRTC</button>
         <Composer className="desktop-composer" message={props.message} onMessage={props.onMessage} onSend={props.onSend} disabled={!props.selectedRoute} />
+        <FilePicker disabled={!props.selectedRoute} onFile={props.onFile} />
         <button className="fallback-action" onClick={props.onFallback} disabled={!props.message.trim()}>Use explicit coordinator fallback</button>
         {props.selectedLink?.error && <p className="inline-error">{props.selectedLink.error}</p>}
       </motion.aside> : null}
@@ -155,7 +162,9 @@ function MobileRoom(props: Props) {
       <div className="mobile-route"><span /><b>{routeNames?.join("  →  ") ?? "No route available"}</b><span /></div>
       <div className="mobile-measure"><div><small>DATA PLANE</small><strong>{props.selectedLink?.state === "direct" ? "Direct WebRTC" : props.selectedRoute ? `${props.selectedRoute.length - 1}-hop overlay` : "Unavailable"}</strong></div><div><small>MEASURED RTT</small><strong>{props.selectedLink?.rttMs !== undefined ? `${props.selectedLink.rttMs} ms` : "Not measured"}</strong></div></div>
       <div className="mobile-peer-actions"><button onClick={props.onPing} disabled={props.selectedLink?.state !== "direct"}>Ping over WebRTC</button><select aria-label="Selected peer" value={props.selectedPeer?.id} onChange={(event) => props.onSelectPeer(event.target.value)}>{remotePeers.map((peer) => <option key={peer.id} value={peer.id}>{peer.displayName}</option>)}</select></div>
+      <FilePicker disabled={!props.selectedRoute} onFile={props.onFile} />
     </section> : props.self.role === "host" ? <section className="mobile-peer-card mobile-invite"><img src={props.inviteQrUrl} alt="QR code to join this HOPNET room"/><div><h2>Your room is ready.</h2><p>Scan this on another physical device, then approve its request here.</p><small>{new URL(props.invitationOrigin).host}</small></div>{props.joinRequests.map((request) => <button key={request.requestId} onClick={() => props.onApprove(request.requestId)}>Admit {request.displayName}</button>)}</section> : <section className="mobile-peer-card"><h2>Waiting for another peer.</h2><p>The room will update from real coordinator state.</p></section>}
+    <TransferShelf transfers={props.transfers} peers={props.peers} self={props.self} onResponse={props.onTransferResponse} />
     <section className="mobile-activity-log" aria-label="Live protocol activity">{props.events.map((event) => <article key={event.id}><strong>{event.title}</strong><span>{event.detail}</span></article>)}</section>
     <div className="mobile-controls"><Composer message={props.message} onMessage={props.onMessage} onSend={props.onSend} disabled={!props.selectedRoute}/><nav><button><Icon name="space"/><span>Room</span></button><button className="active"><Icon name="send"/><span>Messages</span></button><button><Icon name="replay"/><span>Activity</span></button></nav></div>
     {props.error && <button className="error-toast" onClick={props.onClearError}>{props.error}</button>}
@@ -185,6 +194,25 @@ function InfoRow({ icon, label, value }: { icon: string; label: string; value: s
 
 function Composer({ message, onMessage, onSend, disabled, className = "" }: { message: string; onMessage: (value: string) => void; onSend: () => void; disabled?: boolean; className?: string }) {
   return <div className={`premium-composer ${className}`}><span><Icon name="attach"/></span><input value={message} maxLength={8192} onChange={(event) => onMessage(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !disabled) onSend(); }} placeholder="Message this peer…"/><button onClick={onSend} disabled={disabled || !message.trim()} aria-label="Send"><Icon name="send"/></button></div>;
+}
+
+function FilePicker({ disabled, onFile }: { disabled: boolean; onFile: (file: File) => Promise<void> }) {
+  return <label className={`file-picker ${disabled ? "disabled" : ""}`}><Icon name="attach"/><span>Choose file to send</span><input aria-label="Choose file to send" type="file" disabled={disabled} onChange={(event) => { const file = event.target.files?.[0]; if (file) void onFile(file); event.target.value = ""; }}/></label>;
+}
+
+function TransferShelf({ transfers, peers, self, onResponse }: { transfers: TransferView[]; peers: Peer[]; self: Peer; onResponse: (transferId: string, accepted: boolean) => Promise<void> }) {
+  const visible = transfers.filter((transfer) => transfer.status === "awaiting-acceptance" || transfer.status === "transferring" || transfer.status === "verifying" || transfer.status === "verified" || transfer.status === "failed").slice(0, 2);
+  if (!visible.length) return null;
+  return <section className="transfer-shelf" aria-label="File transfers">{visible.map((transfer) => {
+    const peer = peers.find((item) => item.id === transfer.peerId)?.displayName ?? "peer";
+    const percentage = Math.min(100, Math.round(transfer.acknowledgedBytes / Math.max(1, transfer.size) * 100));
+    const path = transfer.paths[0]?.map((id) => id === self.id ? "This device" : peers.find((item) => item.id === id)?.displayName ?? "peer").join(" → ");
+    return <motion.article key={transfer.id} initial={{ opacity: 0, y: 18, scale: .98 }} animate={{ opacity: 1, y: 0, scale: 1 }}>
+      <div className="transfer-file-icon"><Icon name="file"/></div>
+      <div className="transfer-copy"><small>{transfer.direction === "receive" ? `FROM ${peer}` : `TO ${peer}`}</small><strong>{transfer.fileName}</strong><span>{formatBytes(transfer.size)} · {transfer.paths.length > 1 ? `${transfer.paths.length} disjoint paths` : path ?? "finding route"}</span></div>
+      {transfer.status === "awaiting-acceptance" ? <div className="transfer-consent"><button onClick={() => void onResponse(transfer.id, true)} aria-label={`Accept ${transfer.fileName}`}>Accept</button><button onClick={() => void onResponse(transfer.id, false)} aria-label={`Decline ${transfer.fileName}`}>Decline</button></div> : <div className="transfer-progress"><div><i style={{ width: `${percentage}%` }}/></div><span>{transfer.status === "verified" ? "SHA-256 verified" : transfer.status === "failed" ? transfer.error : transfer.status === "verifying" ? "Verifying whole file…" : `${percentage}% receiver acknowledged`}</span>{transfer.downloadUrl && <a href={transfer.downloadUrl} download={transfer.fileName}>Save file</a>}</div>}
+    </motion.article>;
+  })}</section>;
 }
 
 function EventRibbon({ events, expanded }: { events: NetworkEvent[]; expanded: boolean }) {
@@ -221,6 +249,7 @@ function Icon({ name }: { name: string }) {
     pulse: <path d="M3 12h4l2-5 4 10 2-5h6"/>,
     attach: <path d="M8 12l6-6a4 4 0 015.7 5.7l-8 8a6 6 0 01-8.5-8.5l8-8"/>,
     check: <path d="M5 12l4 4L19 6"/>,
+    file: <><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></>,
   };
   return <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{paths[name] ?? paths.space}</svg>;
 }
@@ -235,3 +264,5 @@ function curve(a: Point, b: Point) {
 }
 
 function peerPairs(peers: Peer[]): Array<[Peer, Peer]> { const pairs: Array<[Peer, Peer]> = []; for (let left = 0; left < peers.length; left += 1) for (let right = left + 1; right < peers.length; right += 1) pairs.push([peers[left], peers[right]]); return pairs; }
+
+function formatBytes(bytes: number): string { return bytes < 1_024 ? `${bytes} B` : bytes < 1_048_576 ? `${(bytes / 1_024).toFixed(1)} KB` : `${(bytes / 1_048_576).toFixed(1)} MB`; }

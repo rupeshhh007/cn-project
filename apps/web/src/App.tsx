@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { PROTOCOL_VERSION, serverSocketMessageSchema, type DataPacket, type DeviceCategory, type OverlayLink, type Peer, type TopologyEdge } from "@hopnet/protocol";
-import { canonicalEdge, selectPath, type GraphEdge, type RouteStrategy } from "@hopnet/routing";
+import { PROTOCOL_VERSION, serverSocketMessageSchema, type DataPacket, type DeviceCategory, type OverlayLink, type Peer, type TopologyEdge, type TransferDataPacket } from "@hopnet/protocol";
+import { canonicalEdge, selectPath, twoNodeDisjointPaths, type GraphEdge, type RouteStrategy } from "@hopnet/routing";
 import { PeerManager, type LinkState } from "./lib/peer-manager.ts";
 import { createUuid } from "./lib/id.ts";
+import { TransferManager, type TransferView } from "./lib/transfer-manager.ts";
 import { RoomSurface, type NetworkEvent } from "./components/RoomSurface.tsx";
 
 type Credentials = { roomId: string; inviteSecret: string; hostToken?: string; peer: Peer; sessionToken: string };
@@ -36,16 +37,26 @@ function App() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [joinPending, setJoinPending] = useState(false);
+  const [transfers, setTransfers] = useState<TransferView[]>([]);
   const [networkInfo, setNetworkInfo] = useState<NetworkInfo>();
   const [invitationOrigin, setInvitationOrigin] = useState(location.origin);
   const socketRef = useRef<WebSocket | undefined>(undefined);
   const managerRef = useRef<PeerManager | undefined>(undefined);
   const peersRef = useRef<Peer[]>([]);
   const topologyRef = useRef<TopologyEdge[]>([]);
+  const graphRef = useRef<GraphEdge[]>([]);
+  const routeStrategyRef = useRef<RouteStrategy>(routeStrategy);
+  const transferManagerRef = useRef<TransferManager | undefined>(undefined);
   const seenPacketsRef = useRef(new Map<string, number>());
 
   useEffect(() => { peersRef.current = peers; }, [peers]);
   useEffect(() => { topologyRef.current = topologyEdges; }, [topologyEdges]);
+  useEffect(() => {
+    graphRef.current = observedLinks
+      .filter((link) => link.state === "direct" && topologyEdges.some((edge) => canonicalEdge(edge.a, edge.b) === canonicalEdge(link.a, link.b)))
+      .map((link) => ({ a: link.a, b: link.b, metrics: { rttMs: link.rttMs, measuredAt: link.updatedAt } }));
+  }, [observedLinks, topologyEdges]);
+  useEffect(() => { routeStrategyRef.current = routeStrategy; }, [routeStrategy]);
   useEffect(() => {
     let active = true;
     void fetch("/api/network", { cache: "no-store" })
@@ -81,6 +92,7 @@ function App() {
         if (!adjacent.has(peer.id)) manager.close(peer.id);
       }
     };
+    let transferManager: TransferManager;
     const manager = new PeerManager(
       credentials.peer.id,
       (targetPeerId, signal) => socket.send(JSON.stringify({ type: "signal", targetPeerId, signal })),
@@ -93,8 +105,21 @@ function App() {
       (peerId, packet) => onDataPacket(peerId, packet),
     );
     managerRef.current = manager;
+    transferManager = new TransferManager({
+      selfPeerId: credentials.peer.id,
+      getPaths: (destinationPeerId) => twoNodeDisjointPaths(peersRef.current.map((peer) => peer.id), graphRef.current, credentials.peer.id, destinationPeerId, routeStrategyRef.current),
+      isPermittedEdge: (a, b) => topologyRef.current.some((edge) => canonicalEdge(edge.a, edge.b) === canonicalEdge(a, b)),
+      send: (nextHop, packet) => manager.sendPacketAsync(nextHop, packet),
+      onUpdate: (transfer) => setTransfers((current) => [transfer, ...current.filter((item) => item.id !== transfer.id)].slice(0, 12)),
+      onEvent: (title, detail) => addEvent(title, detail),
+    });
+    transferManagerRef.current = transferManager;
     const onDataPacket = (peerId: string, packet: DataPacket) => {
       const source = peersRef.current.find((peer) => peer.id === peerId)?.displayName ?? `peer …${peerId.slice(-5)}`;
+      if (isTransferPacket(packet)) {
+        void transferManager.handle(peerId, packet).catch((cause) => addEvent("Transfer forwarding failed", cause instanceof Error ? cause.message : "Unknown transfer error", "INFERRED"));
+        return;
+      }
       if (packet.kind === "pong") addEvent("Direct echo returned", `${source} replied over RTCDataChannel`);
       if (packet.kind === "message") addEvent(`Message from ${source}`, packet.body);
       if (packet.kind === "message-ack") addEvent("Message acknowledged", `${source} confirmed application receipt`);
@@ -176,7 +201,7 @@ function App() {
         setError(item.message);
       }
     };
-    return () => { socket.close(); manager.closeAll(); };
+    return () => { socket.close(); manager.closeAll(); transferManagerRef.current = undefined; };
   }, [credentials]);
 
   const remotePeers = peers.filter((peer) => peer.id !== credentials?.peer.id);
@@ -273,11 +298,28 @@ function App() {
     socketRef.current.send(JSON.stringify({ type: "set-topology", edges: next }));
   };
 
+  const offerFile = async (file: File) => {
+    if (!selectedPeer) return;
+    setError("");
+    try { await transferManagerRef.current?.offer(file, selectedPeer.id); }
+    catch (cause) { setError(cause instanceof Error ? cause.message : "File offer failed."); }
+  };
+
+  const respondToTransfer = async (transferId: string, accepted: boolean) => {
+    setError("");
+    try { await transferManagerRef.current?.respond(transferId, accepted); }
+    catch (cause) { setError(cause instanceof Error ? cause.message : "Transfer response failed."); }
+  };
+
   if (!credentials) return <Entry invited={Boolean(invitedRoom && invitedSecret)} pending={joinPending} networkInfo={networkInfo} onCreate={createRoom} onJoin={joinRoom} error={error} />;
 
   const inviteUrl = `${invitationOrigin}/?room=${encodeURIComponent(credentials.roomId)}&invite=${encodeURIComponent(credentials.inviteSecret)}`;
   const inviteQrUrl = `/api/rooms/${credentials.roomId}/qr?invite=${encodeURIComponent(credentials.inviteSecret)}&origin=${encodeURIComponent(invitationOrigin)}`;
-  return <RoomSurface self={credentials.peer} peers={peers} links={links} observedLinks={observedLinks} topologyEdges={topologyEdges} selectedPeer={selectedPeer} selectedLink={selectedLink} selectedRoute={selectedRoute} routeStrategy={routeStrategy} events={events} coordinatorState={coordinatorState} networkInfo={networkInfo} invitationOrigin={invitationOrigin} inviteUrl={inviteUrl} inviteQrUrl={inviteQrUrl} joinRequests={joinRequests} message={message} error={error} onInvitationOrigin={setInvitationOrigin} onSelectPeer={(id) => setSelectedPeerId(id || undefined)} onApprove={(id) => void approve(id)} onToggleEdge={toggleTopologyEdge} onRouteStrategy={setRouteStrategy} onMessage={setMessage} onSend={sendMessage} onPing={ping} onFallback={relayFallback} onClearError={() => setError("")} />;
+  return <RoomSurface self={credentials.peer} peers={peers} links={links} observedLinks={observedLinks} topologyEdges={topologyEdges} selectedPeer={selectedPeer} selectedLink={selectedLink} selectedRoute={selectedRoute} routeStrategy={routeStrategy} events={events} transfers={transfers} coordinatorState={coordinatorState} networkInfo={networkInfo} invitationOrigin={invitationOrigin} inviteUrl={inviteUrl} inviteQrUrl={inviteQrUrl} joinRequests={joinRequests} message={message} error={error} onInvitationOrigin={setInvitationOrigin} onSelectPeer={(id) => setSelectedPeerId(id || undefined)} onApprove={(id) => void approve(id)} onToggleEdge={toggleTopologyEdge} onRouteStrategy={setRouteStrategy} onMessage={setMessage} onSend={sendMessage} onFile={offerFile} onTransferResponse={respondToTransfer} onPing={ping} onFallback={relayFallback} onClearError={() => setError("")} />;
+}
+
+function isTransferPacket(packet: DataPacket): packet is TransferDataPacket {
+  return packet.kind === "transfer-offer" || packet.kind === "transfer-response" || packet.kind === "transfer-chunk" || packet.kind === "transfer-chunk-ack" || packet.kind === "transfer-complete";
 }
 
 function Entry({ invited, pending, networkInfo, onCreate, onJoin, error }: { invited: boolean; pending: boolean; networkInfo?: NetworkInfo; onCreate: (name: string, category: DeviceCategory) => Promise<void>; onJoin: (name: string, category: DeviceCategory) => Promise<void>; error: string }) {
