@@ -151,23 +151,62 @@ function DesktopRoom(props: Props) {
 }
 
 function MobileRoom(props: Props) {
+  const [tab, setTab] = useState<"room" | "messages" | "activity">("messages");
   const directCount = Object.values(props.links).filter((link) => link.state === "direct").length;
   const remotePeers = props.peers.filter((peer) => peer.id !== props.self.id);
   const routeNames = props.selectedRoute?.map((id) => props.peers.find((peer) => peer.id === id)?.displayName ?? "peer");
+  const secureFiles = window.isSecureContext && Boolean(crypto.subtle);
   return <main className="hopnet-shell mobile-room">
     <Atmosphere />
     <header className="mobile-header"><div><strong>HOPNET</strong><span>The Network You Can Touch</span></div><div className="mobile-status"><span><i className="green"/>Coordinator {props.coordinatorState}</span><span><i/> {directCount ? "Direct WebRTC ready" : "Waiting for direct WebRTC"}</span></div></header>
-    <section className="relay-hero"><div className="relay-symbol"><Icon name="route"/></div><div><h1>You’re part of the route.</h1><strong>Keep HOPNET open while relaying.</strong><p>Your phone helps forward messages and files between approved peers in this room.</p></div></section>
-    {remotePeers.length ? <section className="mobile-peer-card">
-      <div className="mobile-peer-head"><DeviceAsset category={props.selectedPeer?.deviceCategory ?? "other"}/><div><h2>{props.selectedPeer?.displayName}</h2><p><i />{props.selectedPeer?.coordinatorConnected ? "Available on this room" : "Signaling offline"}</p></div></div>
-      <div className="mobile-route"><span /><b>{routeNames?.join("  →  ") ?? "No route available"}</b><span /></div>
-      <div className="mobile-measure"><div><small>DATA PLANE</small><strong>{props.selectedLink?.state === "direct" ? "Direct WebRTC" : props.selectedRoute ? `${props.selectedRoute.length - 1}-hop overlay` : "Unavailable"}</strong></div><div><small>MEASURED RTT</small><strong>{props.selectedLink?.rttMs !== undefined ? `${props.selectedLink.rttMs} ms` : "Not measured"}</strong></div></div>
-      <div className="mobile-peer-actions"><button onClick={props.onPing} disabled={props.selectedLink?.state !== "direct"}>Ping over WebRTC</button><select aria-label="Selected peer" value={props.selectedPeer?.id} onChange={(event) => props.onSelectPeer(event.target.value)}>{remotePeers.map((peer) => <option key={peer.id} value={peer.id}>{peer.displayName}</option>)}</select></div>
-      <FilePicker disabled={!props.selectedRoute} onFile={props.onFile} />
-    </section> : props.self.role === "host" ? <section className="mobile-peer-card mobile-invite"><img src={props.inviteQrUrl} alt="QR code to join this HOPNET room"/><div><h2>Your room is ready.</h2><p>Scan this on another physical device, then approve its request here.</p><small>{new URL(props.invitationOrigin).host}</small></div>{props.joinRequests.map((request) => <button key={request.requestId} onClick={() => props.onApprove(request.requestId)}>Admit {request.displayName}</button>)}</section> : <section className="mobile-peer-card"><h2>Waiting for another peer.</h2><p>The room will update from real coordinator state.</p></section>}
-    <TransferShelf transfers={props.transfers} peers={props.peers} self={props.self} onResponse={props.onTransferResponse} />
-    <section className="mobile-activity-log" aria-label="Live protocol activity">{props.events.map((event) => <article key={event.id}><strong>{event.title}</strong><span>{event.detail}</span></article>)}</section>
-    <div className="mobile-controls"><Composer message={props.message} onMessage={props.onMessage} onSend={props.onSend} disabled={!props.selectedRoute}/><nav><button><Icon name="space"/><span>Room</span></button><button className="active"><Icon name="send"/><span>Messages</span></button><button><Icon name="replay"/><span>Activity</span></button></nav></div>
+
+    {tab === "room" && <>
+      <section className="relay-hero"><div className="relay-symbol"><Icon name="route"/></div><div><h1>You’re part of the route.</h1><strong>Keep HOPNET open while relaying.</strong><p>Your phone can forward permitted messages and files between other peers.</p></div></section>
+      <section className="mobile-peer-card mobile-room-list">
+        <h2>Room participants</h2>
+        <p>{props.peers.filter((peer) => peer.coordinatorConnected || peer.id === props.self.id).length} peers present</p>
+        {props.peers.map((peer) => <div className="mobile-room-peer" key={peer.id}>
+          <DeviceAsset category={peer.deviceCategory}/>
+          <div><strong>{peer.displayName}{peer.id === props.self.id ? " · you" : ""}</strong><small>{peer.id === props.self.id ? props.coordinatorState : peer.coordinatorConnected ? "Coordinator connected" : "Disconnected"}</small></div>
+          {peer.id !== props.self.id && <button onClick={() => { props.onSelectPeer(peer.id); setTab("messages"); }}>Open</button>}
+        </div>)}
+        {props.self.role === "host" && <div className="mobile-room-invite">
+          <img src={props.inviteQrUrl} alt="QR code to join this HOPNET room"/>
+          <small>Scan to request admission</small>
+          {props.joinRequests.map((request) => <button key={request.requestId} onClick={() => props.onApprove(request.requestId)}>Admit {request.displayName}</button>)}
+        </div>}
+        <NetworkDoctor {...props}/>
+      </section>
+    </>}
+
+    {tab === "messages" && <>
+      {remotePeers.length ? <section className="mobile-peer-card">
+        <div className="mobile-peer-head"><DeviceAsset category={props.selectedPeer?.deviceCategory ?? "other"}/><div><h2>{props.selectedPeer?.displayName}</h2><p><i />{props.selectedPeer?.coordinatorConnected ? "Coordinator connected" : "Signaling offline"}</p></div></div>
+        <div className="mobile-route"><span /><b>{routeNames?.join(" → ") ?? "No data route available"}</b><span /></div>
+        <div className="mobile-measure"><div><small>DATA PLANE</small><strong>{props.selectedLink?.state === "direct" ? "Direct WebRTC" : props.selectedRoute ? `${props.selectedRoute.length - 1}-hop overlay` : "Unavailable"}</strong></div><div><small>MEASURED RTT</small><strong>{props.selectedLink?.rttMs !== undefined ? `${props.selectedLink.rttMs} ms` : "Not measured"}</strong></div></div>
+        <div className="mobile-peer-actions"><button onClick={props.onPing} disabled={props.selectedLink?.state !== "direct"}>Ping over WebRTC</button><select aria-label="Selected peer" value={props.selectedPeer?.id} onChange={(event) => props.onSelectPeer(event.target.value)}>{remotePeers.map((peer) => <option key={peer.id} value={peer.id}>{peer.displayName}</option>)}</select></div>
+        <FilePicker disabled={!props.selectedRoute || !secureFiles} onFile={props.onFile}/>
+        {!secureFiles && <p className="secure-transfer-note mobile">Verified file transfer requires trusted HTTPS on this device. Ask the host for the HTTPS LAN address and install the trusted local CA certificate.</p>}
+      </section> : <section className="mobile-peer-card mobile-invite">
+        <h2>Waiting for another peer.</h2><p>Join or admit another device to begin messaging.</p>
+        {props.self.role === "host" && <><img src={props.inviteQrUrl} alt="QR code to join this HOPNET room"/>{props.joinRequests.map((request) => <button key={request.requestId} onClick={() => props.onApprove(request.requestId)}>Admit {request.displayName}</button>)}</>}
+      </section>}
+      <TransferShelf transfers={props.transfers} peers={props.peers} self={props.self} onResponse={props.onTransferResponse}/>
+    </>}
+
+    {tab === "activity" && <section className="mobile-activity-log active" aria-label="Live protocol activity">
+      <h2>Network activity</h2><p>Events observed by this device. Full state replay is not yet available.</p>
+      {props.events.length ? props.events.map((event) => <article key={event.id}><time>{event.at.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</time><strong>{event.title}</strong><span>{event.detail}</span><em>{event.provenance}</em></article>) : <p>No events yet. Ping or message a peer to record activity.</p>}
+    </section>}
+
+    <div className="mobile-controls">
+      {tab === "messages" && <Composer message={props.message} onMessage={props.onMessage} onSend={props.onSend} disabled={!props.selectedRoute} onFile={props.onFile} fileDisabled={!props.selectedRoute || !secureFiles}/>}
+      <nav aria-label="Mobile navigation">
+        <button aria-current={tab === "room" ? "page" : undefined} className={tab === "room" ? "active" : ""} onClick={() => setTab("room")}><Icon name="space"/><span>Room</span></button>
+        <button aria-current={tab === "messages" ? "page" : undefined} className={tab === "messages" ? "active" : ""} onClick={() => setTab("messages")}><Icon name="send"/><span>Messages</span></button>
+        <button aria-current={tab === "activity" ? "page" : undefined} className={tab === "activity" ? "active" : ""} onClick={() => setTab("activity")}><Icon name="replay"/><span>Activity</span></button>
+      </nav>
+    </div>
     {props.error && <button className="error-toast" onClick={props.onClearError}>{props.error}</button>}
   </main>;
 }
