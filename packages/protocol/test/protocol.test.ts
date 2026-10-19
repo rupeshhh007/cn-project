@@ -50,7 +50,9 @@ test("validates transfer chunk size, hash, and bounded encoding fields", () => {
     bytes: "YWJj",
   };
   assert.equal(dataPacketSchema.safeParse(valid).success, true);
-  assert.equal(dataPacketSchema.safeParse({ ...valid, bytes: "x".repeat(22_001) }).success, false);
+  assert.equal(dataPacketSchema.safeParse({ ...valid, byteLength: 32 * 1024, bytes: "x".repeat(43_692) }).success, true);
+  assert.equal(dataPacketSchema.safeParse({ ...valid, byteLength: 32 * 1024 + 1 }).success, false);
+  assert.equal(dataPacketSchema.safeParse({ ...valid, bytes: "x".repeat(44_001) }).success, false);
   assert.equal(dataPacketSchema.safeParse({ ...valid, chunkHash: "nope" }).success, false);
 });
 

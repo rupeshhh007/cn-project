@@ -98,7 +98,6 @@ test("routes a message through a real intermediate browser without an endpoint c
 
   await context.close();
 });
-
 test("sends a consented file over a direct WebRTC data channel and verifies its digest", async ({ browser }) => {
   test.setTimeout(45_000);
   const context = await browser.newContext({ viewport: { width: 1280, height: 800 }, acceptDownloads: true });

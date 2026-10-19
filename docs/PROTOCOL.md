@@ -26,7 +26,7 @@ The central coordinator carries signaling and topology state only. Routed payloa
 
 ## File transfer limits and integrity
 
-The protocol caps file size at 32 MiB, chunk payloads at 16 KiB before encoding, and path length at 8 peers. The current sender uses 12 KiB chunks to keep the complete JSON/base64 packet comfortably below RTCDataChannel limits. Chunks are individually SHA-256 checked before receiver acknowledgement; final assembly must match the manifest hash before a download URL or verified completion is emitted. Integrity relies on browser Web Crypto and therefore requires a secure context on the physical device.
+The protocol caps file size at 32 MiB, chunk payloads at 32 KiB before encoding, and path length at 8 peers. The current sender uses 32 KiB chunks, encoded within a 44 KB schema bound, to reduce per-chunk verification and forwarding overhead while staying within conservative RTCDataChannel message limits. Chunks are individually SHA-256 checked before receiver acknowledgement; final assembly must match the manifest hash before a download URL or verified completion is emitted. Integrity relies on browser Web Crypto and therefore requires a secure context on the physical device.
 
 ## Security properties
 

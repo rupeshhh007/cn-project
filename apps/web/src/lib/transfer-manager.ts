@@ -52,6 +52,7 @@ type Dependencies = {
 
 const RETRY_AFTER_MS = 1_400;
 const MAX_ATTEMPTS = 8;
+const MAX_IN_FLIGHT_CHUNKS = 8;
 const TRANSFER_TIMEOUT_MS = 90_000;
 
 export class TransferManager {
@@ -259,7 +260,13 @@ export class TransferManager {
           await delay(250);
           continue;
         }
-        const due = transfer.chunks.map((_, index) => index).filter((index) => !transfer.acknowledged.has(index) && Date.now() - (transfer.sentAt.get(index) ?? 0) >= RETRY_AFTER_MS).slice(0, 8);
+        const now = Date.now();
+        const inFlight = transfer.chunks.reduce((count, _, index) => {
+          const sentAt = transfer.sentAt.get(index);
+          return count + Number(!transfer.acknowledged.has(index) && (transfer.attempts.get(index) ?? 0) > 0 && sentAt !== undefined && now - sentAt < RETRY_AFTER_MS);
+        }, 0);
+        const availableSlots = Math.max(0, MAX_IN_FLIGHT_CHUNKS - inFlight);
+        const due = transfer.chunks.map((_, index) => index).filter((index) => !transfer.acknowledged.has(index) && now - (transfer.sentAt.get(index) ?? 0) >= RETRY_AFTER_MS).slice(0, availableSlots);
         if (!due.length) { await delay(100); continue; }
         for (const index of due) {
           const attempts = (transfer.attempts.get(index) ?? 0) + 1;

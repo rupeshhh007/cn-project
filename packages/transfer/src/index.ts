@@ -1,5 +1,6 @@
-export const DEFAULT_CHUNK_BYTES = 12 * 1024;
+export const DEFAULT_CHUNK_BYTES = 32 * 1024;
 export const MAX_FILE_BYTES = 32 * 1024 * 1024;
+export const MAX_CHUNK_BYTES = 32 * 1024;
 export const MAX_CHUNKS = Math.ceil(MAX_FILE_BYTES / DEFAULT_CHUNK_BYTES);
 
 export type TransferManifest = {
@@ -20,7 +21,7 @@ export async function sha256(bytes: Uint8Array): Promise<string> {
 }
 
 export function splitBytes(bytes: Uint8Array, chunkSize = DEFAULT_CHUNK_BYTES): Uint8Array[] {
-  if (!Number.isInteger(chunkSize) || chunkSize < 1 || chunkSize > 16 * 1024) throw new Error("Chunk size must be between 1 and 16384 bytes.");
+  if (!Number.isInteger(chunkSize) || chunkSize < 1 || chunkSize > MAX_CHUNK_BYTES) throw new Error(`Chunk size must be between 1 and ${MAX_CHUNK_BYTES} bytes.`);
   const chunks: Uint8Array[] = [];
   for (let offset = 0; offset < bytes.byteLength; offset += chunkSize) chunks.push(bytes.slice(offset, Math.min(bytes.byteLength, offset + chunkSize)));
   return chunks;
@@ -51,7 +52,7 @@ export class TransferAssembler {
 
   constructor(readonly manifest: TransferManifest) {
     if (manifest.size < 1 || manifest.size > MAX_FILE_BYTES) throw new Error("Manifest file size is outside the accepted limit.");
-    if (!Number.isInteger(manifest.chunkSize) || manifest.chunkSize < 1 || manifest.chunkSize > 16 * 1024) throw new Error("Manifest chunk size is outside the accepted limit.");
+    if (!Number.isInteger(manifest.chunkSize) || manifest.chunkSize < 1 || manifest.chunkSize > MAX_CHUNK_BYTES) throw new Error("Manifest chunk size is outside the accepted limit.");
     if (manifest.chunkCount !== Math.ceil(manifest.size / manifest.chunkSize)) throw new Error("Manifest chunk count does not match the file size.");
     if (manifest.chunkCount < 1 || manifest.chunkCount > MAX_CHUNKS || manifest.chunkHashes.length !== manifest.chunkCount) throw new Error("Manifest chunk metadata is invalid.");
     if (!/^[0-9a-f]{64}$/.test(manifest.fileHash) || manifest.chunkHashes.some((hash) => !/^[0-9a-f]{64}$/.test(hash))) throw new Error("Manifest contains an invalid SHA-256 hash.");
