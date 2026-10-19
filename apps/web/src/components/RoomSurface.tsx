@@ -88,9 +88,9 @@ function DesktopRoom(props: Props) {
       <button className={`status-orb ${props.coordinatorState}`} onClick={() => chooseView("lab")} aria-label={`Coordinator ${props.coordinatorState}`}><span /><span /></button>
     </header>
 
-    <motion.section className="hero-command" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .65, ease: [0.16, 1, 0.3, 1] }}>
+    <motion.section className={`hero-command ${orderedPeers.length > 1 ? "compact" : ""}`} initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .65, ease: [0.16, 1, 0.3, 1] }}>
       <h1>Touch a device. See the route.</h1>
-      <p><i />{orderedPeers.filter((peer) => peer.coordinatorConnected).length} peers present <span /> {Object.values(props.links).filter((link) => link.state === "direct").length ? "Direct WebRTC" : "Awaiting a peer"}</p>
+      <p><i />{orderedPeers.filter((peer) => peer.id === props.self.id ? props.coordinatorState === "connected" : peer.coordinatorConnected).length} peers present <span /> {Object.values(props.links).filter((link) => link.state === "direct").length ? "Direct WebRTC" : "Awaiting a peer"}</p>
     </motion.section>
 
     <section className={`spatial-board ${panelOpen ? "with-panel" : ""}`} aria-label="Live network peers">
@@ -104,7 +104,7 @@ function DesktopRoom(props: Props) {
           const route = routeEdges.has(key); const live = liveEdges.has(key);
           return <g key={key} className={route ? "route-line" : live ? "live-line" : "planned-line"}>
             <path d={curve(a, b)} />
-            {route && <circle r="6" className="route-packet"><animateMotion dur="1.8s" repeatCount="indefinite" path={curve(a, b)} /></circle>}
+            
           </g>;
         })}
       </svg>
@@ -137,14 +137,15 @@ function DesktopRoom(props: Props) {
         {props.selectedRoute && <div className="route-chip">{props.selectedRoute.map((id) => orderedPeers.find((peer) => peer.id === id)?.displayName ?? "peer").join(" → ")}</div>}
         <TransferShelf transfers={props.transfers} peers={props.peers} self={props.self} onResponse={props.onTransferResponse} />
         <button className="inspector-action" onClick={props.onPing} disabled={props.selectedLink?.state !== "direct"}><Icon name="pulse"/>Ping over WebRTC</button>
-        <Composer className="desktop-composer" message={props.message} onMessage={props.onMessage} onSend={props.onSend} disabled={!props.selectedRoute} />
-        <FilePicker disabled={!props.selectedRoute} onFile={props.onFile} />
+        <Composer className="desktop-composer" message={props.message} onMessage={props.onMessage} onSend={props.onSend} disabled={!props.selectedRoute} onFile={props.onFile} fileDisabled={!props.selectedRoute || !window.isSecureContext || !crypto.subtle} />
+        <FilePicker disabled={!props.selectedRoute || !window.isSecureContext || !crypto.subtle} onFile={props.onFile} />
+        {!window.isSecureContext && <p className="secure-transfer-note">Verified files require trusted LAN HTTPS on both devices. See Network Doctor under Lab.</p>}
         <button className="fallback-action" onClick={props.onFallback} disabled={!props.message.trim()}>Use explicit coordinator fallback</button>
         {props.selectedLink?.error && <p className="inline-error">{props.selectedLink.error}</p>}
       </motion.aside> : null}
     </AnimatePresence>
 
-    <EventRibbon events={props.events} expanded={view === "replay"} />
+    {view === "replay" ? <ReplayPanel events={props.events} onClose={() => setView("space")} /> : <EventRibbon events={props.events} expanded={false} />}
     {props.error && <button className="error-toast" onClick={props.onClearError}>{props.error}</button>}
   </main>;
 }
@@ -192,8 +193,12 @@ function DeviceAsset({ category }: { category: DeviceCategory }) {
 
 function InfoRow({ icon, label, value }: { icon: string; label: string; value: string }) { return <div className="info-row"><Icon name={icon}/><div><strong>{label}</strong><span>{value}</span></div><b>›</b></div>; }
 
-function Composer({ message, onMessage, onSend, disabled, className = "" }: { message: string; onMessage: (value: string) => void; onSend: () => void; disabled?: boolean; className?: string }) {
-  return <div className={`premium-composer ${className}`}><span><Icon name="attach"/></span><input value={message} maxLength={8192} onChange={(event) => onMessage(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !disabled) onSend(); }} placeholder="Message this peer…"/><button onClick={onSend} disabled={disabled || !message.trim()} aria-label="Send"><Icon name="send"/></button></div>;
+function Composer({ message, onMessage, onSend, disabled, className = "", onFile, fileDisabled = false }: { message: string; onMessage: (value: string) => void; onSend: () => void; disabled?: boolean; className?: string; onFile?: (file: File) => Promise<void>; fileDisabled?: boolean }) {
+  return <div className={`premium-composer ${className}`}>
+    {onFile ? <label className={`composer-attach ${fileDisabled ? "disabled" : ""}`} title={fileDisabled ? "A usable route and trusted HTTPS are required for verified files" : "Attach a file"}><Icon name="attach"/><input aria-label="Attach a file" type="file" disabled={fileDisabled} onChange={(event) => { const file = event.target.files?.[0]; if (file) void onFile(file); event.target.value = ""; }}/></label> : <span aria-hidden="true"><Icon name="attach"/></span>}
+    <input value={message} maxLength={8192} onChange={(event) => onMessage(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !disabled) onSend(); }} placeholder="Message this peer…"/>
+    <button onClick={onSend} disabled={disabled || !message.trim()} aria-label="Send"><Icon name="send"/></button>
+  </div>;
 }
 
 function FilePicker({ disabled, onFile }: { disabled: boolean; onFile: (file: File) => Promise<void> }) {
@@ -213,6 +218,13 @@ function TransferShelf({ transfers, peers, self, onResponse }: { transfers: Tran
       {transfer.status === "awaiting-acceptance" ? <div className="transfer-consent"><button onClick={() => void onResponse(transfer.id, true)} aria-label={`Accept ${transfer.fileName}`}>Accept</button><button onClick={() => void onResponse(transfer.id, false)} aria-label={`Decline ${transfer.fileName}`}>Decline</button></div> : <div className="transfer-progress"><div><i style={{ width: `${percentage}%` }}/></div><span>{transfer.status === "verified" ? "SHA-256 verified" : transfer.status === "failed" ? transfer.error : transfer.status === "verifying" ? "Verifying whole file…" : `${percentage}% receiver acknowledged`}</span>{transfer.downloadUrl && <a href={transfer.downloadUrl} download={transfer.fileName}>Save file</a>}</div>}
     </motion.article>;
   })}</section>;
+}
+
+function ReplayPanel({ events, onClose }: { events: NetworkEvent[]; onClose: () => void }) {
+  return <section className="replay-panel" aria-label="Recent network activity">
+    <header><div><small>RECORDED LOCAL EVENTS</small><h2>Network activity</h2><p>Actual events observed by this browser. Full historical network-state replay is not implemented yet.</p></div><button onClick={onClose} aria-label="Close activity panel">×</button></header>
+    <div className="replay-feed">{events.length ? events.map((event) => <article key={event.id}><time>{event.at.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</time><div><strong>{event.title}</strong><p>{event.detail}</p></div><span>{event.provenance}</span></article>) : <p>No activity recorded yet. Send a message or ping a connected peer to begin.</p>}</div>
+  </section>;
 }
 
 function EventRibbon({ events, expanded }: { events: NetworkEvent[]; expanded: boolean }) {
