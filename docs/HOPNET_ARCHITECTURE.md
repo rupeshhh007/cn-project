@@ -20,6 +20,12 @@ The coordinator is the control plane: room membership, host admission, presence,
 - `packages/routing`: validated undirected overlay graphs, BFS, weighted Dijkstra, adaptive edge cost and node-disjoint path selection.
 - Future `packages/transfer`: manifests, chunk scheduling, backpressure, receipts and integrity.
 
+## LAN origin selection
+
+The coordinator discovers non-loopback IPv4 interfaces, ranks ordinary private Wi-Fi/Ethernet addresses ahead of tunnel and link-local adapters, and publishes them through `/api/network`. The browser uses the preferred origin for copyable invitations and QR codes even when the host UI was opened at `localhost`. The QR endpoint accepts only exact origins from that server-generated allow-list; it never trusts the HTTP `Host` header or an arbitrary query origin.
+
+`npm run doctor` exposes the same decision before a room is created. Trusted HTTPS remains a deployment property: the certificate must cover the selected LAN address and its CA must be trusted by every physical browser.
+
 Room state is intentionally ephemeral in Phase 0. Private payloads are not stored or silently uploaded. The coordinator binds to the LAN only when the operator starts it.
 
 ## Phase 0 failure boundaries

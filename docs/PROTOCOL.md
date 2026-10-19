@@ -32,3 +32,5 @@ The central coordinator carries signaling and topology state only. Routed payloa
 - WebSocket payloads and REST bodies are bounded.
 - Display labels are sanitized and rendered as React text.
 - Explicit fallback is size-limited and visibly classified; it is never described as peer-to-peer.
+- Invitation QR origins are restricted to coordinator-discovered interfaces and never inferred from an untrusted `Host` header.
+- Network-discovery and QR responses are `no-store`; invitation secrets remain bearer capabilities and must be redacted from evidence.

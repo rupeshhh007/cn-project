@@ -1,4 +1,5 @@
 import { dataPacketSchema, PROTOCOL_VERSION, type DataPacket, type RtcSignal } from "@hopnet/protocol";
+import { createUuid } from "./id.ts";
 
 export type LinkState = {
   peerId: string;
@@ -97,7 +98,7 @@ export class PeerManager {
   }
 
   ping(remotePeerId: string): string {
-    const messageId = crypto.randomUUID();
+    const messageId = createUuid();
     const managed = this.requireOpen(remotePeerId);
     managed.pendingPings.set(messageId, performance.now());
     this.send(remotePeerId, { protocolVersion: PROTOCOL_VERSION, kind: "ping", messageId, sentAt: performance.timeOrigin + performance.now() });
@@ -105,7 +106,7 @@ export class PeerManager {
   }
 
   sendMessage(remotePeerId: string, body: string): void {
-    this.send(remotePeerId, { protocolVersion: PROTOCOL_VERSION, kind: "message", messageId: crypto.randomUUID(), sentAt: Date.now(), body });
+    this.send(remotePeerId, { protocolVersion: PROTOCOL_VERSION, kind: "message", messageId: createUuid(), sentAt: Date.now(), body });
   }
 
   sendPacket(remotePeerId: string, packet: DataPacket): void {

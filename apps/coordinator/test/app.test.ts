@@ -2,6 +2,37 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import WebSocket from "ws";
 import { buildApp } from "../src/app.ts";
+import { normalizeLanInterfaces } from "../src/network.ts";
+
+test("network discovery and QR invitations use an allow-listed LAN origin", async (t) => {
+  process.env.NODE_ENV = "test";
+  const networkInterfaces = normalizeLanInterfaces([{ name: "en0", address: "192.168.40.12" }], "http", 4173);
+  const app = await buildApp({ serveWeb: false, port: 4173, networkInterfaces });
+  t.after(() => app.close());
+
+  const network = await app.inject({ method: "GET", url: "/api/network" });
+  assert.equal(network.statusCode, 200);
+  assert.equal(network.headers["cache-control"], "no-store");
+  assert.equal(network.json().preferredOrigin, "http://192.168.40.12:4173");
+
+  const created = await app.inject({ method: "POST", url: "/api/rooms", payload: { displayName: "Mac A", deviceCategory: "laptop" } });
+  const room = created.json();
+  const qr = await app.inject({
+    method: "GET",
+    url: `/api/rooms/${room.roomId}/qr?invite=${encodeURIComponent(room.inviteSecret)}`,
+    headers: { host: "localhost:4173" },
+  });
+  assert.equal(qr.statusCode, 200);
+  assert.equal(qr.headers["x-hopnet-invitation-origin"], "http://192.168.40.12:4173");
+  assert.match(qr.body, /<svg/);
+
+  const rejected = await app.inject({
+    method: "GET",
+    url: `/api/rooms/${room.roomId}/qr?invite=${encodeURIComponent(room.inviteSecret)}&origin=${encodeURIComponent("http://attacker.invalid:4173")}`,
+  });
+  assert.equal(rejected.statusCode, 400);
+  assert.equal(rejected.json().error, "INVALID_PUBLIC_ORIGIN");
+});
 
 test("room admission requires both invitation and host authorization", async (t) => {
   process.env.NODE_ENV = "test";

@@ -1,39 +1,63 @@
-# Phase 0 physical-device verification
+# Physical-device LAN verification
 
-## Start the LAN host
+Automated browser tests are not a substitute for this gate. Record every device, browser, OS, network, and result. Do not mark a step passed without evidence from the physical devices.
+
+## 1. Preflight the host
+
+On Mac A, from the repository:
 
 ```bash
 npm install
+npm run doctor
 npm start
 ```
 
-Open the printed `http://localhost:4173` address on Mac A. Create a room, then scan the displayed QR code from Phone A or open the printed LAN origin and invitation URL on Mac B. Enter a real device label, request admission, and press **Admit** on the host.
+Use the `LAN*`/`USE` address printed by HOPNET, not `localhost`. Open that address on Mac A, create a room, and confirm the QR code uses the same IP. If more than one interface is listed, choose the Wi-Fi or hotspot address in **Invitation address**.
 
-Keep both browser tabs foregrounded. Select the admitted peer. Wait for **Data plane: direct**, then press **Ping over WebRTC** and send a short message. Record the peer inspector and event ribbon on both devices.
+## 2. Establish trusted LAN HTTPS
 
-## Evidence to return
-
-- Device/browser/OS pairs and Wi-Fi or hotspot topology.
-- Screenshot from each device after admission.
-- Sender screenshot after direct ping, including RTT and candidate type.
-- Receiver screenshot containing the message event.
-- Coordinator terminal output from startup through the test, with secrets redacted.
-- Any errors from the browser console.
-
-## If direct WebRTC does not open
-
-1. Confirm both devices are on the same non-isolated LAN and the phone is not using cellular/VPN/private relay for the local URL.
-2. Keep both tabs foregrounded and reload the participant once.
-3. Check macOS Firewall permission for Node and verify the LAN URL itself loads.
-4. Try a personal hotspot; campus/client-isolated Wi-Fi commonly blocks peer host candidates.
-5. Report each inspector's state and console error. The explicit coordinator fallback can verify room communication, but it does **not** pass the direct WebRTC gate.
-
-## Optional trusted LAN HTTPS
-
-Some optional browser APIs require a secure context at a LAN IP. HOPNET accepts a locally trusted certificate and key:
+HTTP is sufficient for basic room and DataChannel diagnosis, but the verified-transfer milestone requires a secure browser context. One reproducible local setup is `mkcert`:
 
 ```bash
-HOPNET_TLS_CERT=/absolute/path/to/cert.pem HOPNET_TLS_KEY=/absolute/path/to/key.pem npm start
+brew install mkcert
+mkcert -install
+mkcert -cert-file .certs/hopnet.pem -key-file .certs/hopnet-key.pem localhost 127.0.0.1 YOUR_LAN_IP
+HOPNET_TLS_CERT="$PWD/.certs/hopnet.pem" HOPNET_TLS_KEY="$PWD/.certs/hopnet-key.pem" npm run doctor
+HOPNET_TLS_CERT="$PWD/.certs/hopnet.pem" HOPNET_TLS_KEY="$PWD/.certs/hopnet-key.pem" npm start
 ```
 
-The certificate must contain the Mac's current LAN IP or hostname and its issuing local CA must be trusted on every test device. WebRTC DataChannels themselves do not require camera or microphone permission, so test HTTP first and introduce HTTPS only when the target browser requires it.
+Replace `YOUR_LAN_IP` with the address printed by `npm run doctor`; regenerate the certificate when that address changes. Trust the generated local CA on Mac B. On iOS, transfer only the CA certificate, install the profile, then enable full trust under **Settings → General → About → Certificate Trust Settings**. On Android, install the CA certificate from the device security settings. Remove the test CA from mobile devices after the demonstration. Never transfer the private key.
+
+Each browser must show a valid HTTPS origin with no certificate warning and the HOPNET onboarding card must say **Secure browser context**.
+
+## 3. Two-device WebRTC gate
+
+1. Put Mac A and Phone A on the same Wi-Fi or personal hotspot. Disable VPN, Private Relay, and cellular fallback for the test.
+2. Scan the QR code on Phone A. The URL must contain Mac A's LAN IP, never `localhost` or `127.0.0.1`.
+3. Request admission and press **Admit** on Mac A.
+4. Keep both tabs foregrounded until **Direct WebRTC** appears.
+5. Press **Ping over WebRTC**, then send a unique message.
+6. Record the candidate pair, measured RTT, sender acknowledgement, and receiver message event.
+
+Evidence required:
+
+- One screenshot per device after admission, with secrets cropped or redacted.
+- Sender evidence showing direct state, candidate type, RTT, and receiver acknowledgement.
+- Receiver evidence showing the unique message.
+- Coordinator terminal output from startup through the test, with invitation/session secrets redacted.
+- Browser console errors and the exact browser/OS versions.
+
+## 4. Five-device gate
+
+Repeat admission for Mac B and the remaining phones. Verify every displayed device corresponds to an approved physical browser. Do not count stale/offline peers as present. Run a direct ping on every permitted link before starting multi-hop or file tests.
+
+## Failure isolation
+
+1. Confirm the participant can load the selected LAN origin before testing the QR.
+2. Run `npm run doctor` again after changing Wi-Fi or hotspot.
+3. Check macOS Firewall permission for Node.
+4. Disable guest/client isolation; campus Wi-Fi commonly blocks peer host candidates.
+5. Keep mobile browsers foregrounded. iOS and Android may suspend relay work in the background.
+6. Try a personal hotspot and record whether the failure changes.
+
+The explicit coordinator fallback proves only control-plane reachability. It does not pass the direct WebRTC gate.

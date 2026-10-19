@@ -2,11 +2,21 @@ import { useEffect, useRef, useState } from "react";
 import { PROTOCOL_VERSION, serverSocketMessageSchema, type DataPacket, type DeviceCategory, type OverlayLink, type Peer, type TopologyEdge } from "@hopnet/protocol";
 import { canonicalEdge, selectPath, type GraphEdge, type RouteStrategy } from "@hopnet/routing";
 import { PeerManager, type LinkState } from "./lib/peer-manager.ts";
+import { createUuid } from "./lib/id.ts";
 import { RoomSurface, type NetworkEvent } from "./components/RoomSurface.tsx";
 
 type Credentials = { roomId: string; inviteSecret: string; hostToken?: string; peer: Peer; sessionToken: string };
 type JoinRequest = { requestId: string; displayName: string; deviceCategory: DeviceCategory };
 type EventItem = NetworkEvent;
+export type NetworkInfo = {
+  protocol: "http" | "https";
+  port: number;
+  interfaces: Array<{ id: string; name: string; address: string; origin: string; kind: "private" | "link-local" | "other"; recommended: boolean }>;
+  preferredOrigin: string | null;
+  localOrigin: string;
+  secure: boolean;
+  currentOriginHint: string;
+};
 
 const query = new URLSearchParams(location.search);
 const invitedRoom = query.get("room") ?? "";
@@ -26,6 +36,8 @@ function App() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [joinPending, setJoinPending] = useState(false);
+  const [networkInfo, setNetworkInfo] = useState<NetworkInfo>();
+  const [invitationOrigin, setInvitationOrigin] = useState(location.origin);
   const socketRef = useRef<WebSocket | undefined>(undefined);
   const managerRef = useRef<PeerManager | undefined>(undefined);
   const peersRef = useRef<Peer[]>([]);
@@ -34,9 +46,24 @@ function App() {
 
   useEffect(() => { peersRef.current = peers; }, [peers]);
   useEffect(() => { topologyRef.current = topologyEdges; }, [topologyEdges]);
+  useEffect(() => {
+    let active = true;
+    void fetch("/api/network", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Network discovery failed.");
+        return response.json() as Promise<NetworkInfo>;
+      })
+      .then((info) => {
+        if (!active) return;
+        setNetworkInfo(info);
+        if (!invitedRoom && info.preferredOrigin) setInvitationOrigin(info.preferredOrigin);
+      })
+      .catch(() => { if (active) setError("HOPNET could not discover a LAN invitation address."); });
+    return () => { active = false; };
+  }, []);
 
   const addEvent = (title: string, detail: string, provenance: EventItem["provenance"] = "REAL") => {
-    setEvents((current) => [{ id: crypto.randomUUID(), at: new Date(), title, detail, provenance }, ...current].slice(0, 30));
+    setEvents((current) => [{ id: createUuid(), at: new Date(), title, detail, provenance }, ...current].slice(0, 30));
   };
 
   useEffect(() => {
@@ -209,11 +236,11 @@ function App() {
         managerRef.current?.sendMessage(selectedPeer.id, message.trim());
         addEvent("Message sent on direct channel", `${selectedPeer.displayName}: ${message.trim()}`);
       } else {
-        const routeId = crypto.randomUUID();
+        const routeId = createUuid();
         managerRef.current?.sendPacket(selectedRoute[1], {
           protocolVersion: PROTOCOL_VERSION,
           kind: "routed-message",
-          messageId: crypto.randomUUID(),
+          messageId: createUuid(),
           sourcePeerId: credentials.peer.id,
           destinationPeerId: selectedPeer.id,
           routeId,
@@ -246,13 +273,14 @@ function App() {
     socketRef.current.send(JSON.stringify({ type: "set-topology", edges: next }));
   };
 
-  if (!credentials) return <Entry invited={Boolean(invitedRoom && invitedSecret)} pending={joinPending} onCreate={createRoom} onJoin={joinRoom} error={error} />;
+  if (!credentials) return <Entry invited={Boolean(invitedRoom && invitedSecret)} pending={joinPending} networkInfo={networkInfo} onCreate={createRoom} onJoin={joinRoom} error={error} />;
 
-  const inviteUrl = `${location.origin}/?room=${encodeURIComponent(credentials.roomId)}&invite=${encodeURIComponent(credentials.inviteSecret)}`;
-  return <RoomSurface self={credentials.peer} peers={peers} links={links} observedLinks={observedLinks} topologyEdges={topologyEdges} selectedPeer={selectedPeer} selectedLink={selectedLink} selectedRoute={selectedRoute} routeStrategy={routeStrategy} events={events} coordinatorState={coordinatorState} inviteUrl={inviteUrl} inviteQrUrl={`/api/rooms/${credentials.roomId}/qr?invite=${encodeURIComponent(credentials.inviteSecret)}`} joinRequests={joinRequests} message={message} error={error} onSelectPeer={(id) => setSelectedPeerId(id || undefined)} onApprove={(id) => void approve(id)} onToggleEdge={toggleTopologyEdge} onRouteStrategy={setRouteStrategy} onMessage={setMessage} onSend={sendMessage} onPing={ping} onFallback={relayFallback} onClearError={() => setError("")} />;
+  const inviteUrl = `${invitationOrigin}/?room=${encodeURIComponent(credentials.roomId)}&invite=${encodeURIComponent(credentials.inviteSecret)}`;
+  const inviteQrUrl = `/api/rooms/${credentials.roomId}/qr?invite=${encodeURIComponent(credentials.inviteSecret)}&origin=${encodeURIComponent(invitationOrigin)}`;
+  return <RoomSurface self={credentials.peer} peers={peers} links={links} observedLinks={observedLinks} topologyEdges={topologyEdges} selectedPeer={selectedPeer} selectedLink={selectedLink} selectedRoute={selectedRoute} routeStrategy={routeStrategy} events={events} coordinatorState={coordinatorState} networkInfo={networkInfo} invitationOrigin={invitationOrigin} inviteUrl={inviteUrl} inviteQrUrl={inviteQrUrl} joinRequests={joinRequests} message={message} error={error} onInvitationOrigin={setInvitationOrigin} onSelectPeer={(id) => setSelectedPeerId(id || undefined)} onApprove={(id) => void approve(id)} onToggleEdge={toggleTopologyEdge} onRouteStrategy={setRouteStrategy} onMessage={setMessage} onSend={sendMessage} onPing={ping} onFallback={relayFallback} onClearError={() => setError("")} />;
 }
 
-function Entry({ invited, pending, onCreate, onJoin, error }: { invited: boolean; pending: boolean; onCreate: (name: string, category: DeviceCategory) => Promise<void>; onJoin: (name: string, category: DeviceCategory) => Promise<void>; error: string }) {
+function Entry({ invited, pending, networkInfo, onCreate, onJoin, error }: { invited: boolean; pending: boolean; networkInfo?: NetworkInfo; onCreate: (name: string, category: DeviceCategory) => Promise<void>; onJoin: (name: string, category: DeviceCategory) => Promise<void>; error: string }) {
   const [name, setName] = useState("");
   const [category, setCategory] = useState<DeviceCategory>(/iPhone|Android/i.test(navigator.userAgent) ? "phone" : "laptop");
   const [busy, setBusy] = useState(false);
@@ -266,6 +294,7 @@ function Entry({ invited, pending, onCreate, onJoin, error }: { invited: boolean
       <label>Device name<input autoFocus value={name} maxLength={40} onChange={(event) => setName(event.target.value)} placeholder={category === "phone" ? "Rupesh’s phone" : "Lab MacBook"} /></label>
       <label>Device type<select value={category} onChange={(event) => setCategory(event.target.value as DeviceCategory)}><option value="laptop">Laptop</option><option value="phone">Phone</option><option value="tablet">Tablet</option><option value="other">Other</option></select></label>
       <button className="primary-button" disabled={!name.trim() || busy || pending} onClick={() => void submit()}>{pending ? "Waiting for host approval…" : busy ? "Connecting…" : invited ? "Request to join" : "Create private room"}</button>
+      <div className="entry-network"><i className={window.isSecureContext ? "secure" : "warning"}/><span>{invited ? `Coordinator ${location.host}` : networkInfo?.preferredOrigin ? `Invites use ${new URL(networkInfo.preferredOrigin).host}` : "Discovering your LAN address…"}<small>{window.isSecureContext ? "Secure browser context" : "Trusted HTTPS required for verified file transfer"}</small></span></div>
       <p className="entry-note">Only devices you approve can enter. HOPNET does not scan your LAN.</p>
       {error && <p className="error-text">{error}</p>}
     </section>

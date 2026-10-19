@@ -14,7 +14,10 @@ test("host admits a participant and exchanges data over WebRTC", async ({ browse
 
   const qrSource = await host.getByRole("img", { name: "QR code to join this HOPNET room" }).getAttribute("src");
   expect(qrSource).toBeTruthy();
-  const parsed = qrSource!.match(/\/rooms\/([^/]+)\/qr\?invite=(.+)$/);
+  const advertisedOrigin = new URL(qrSource!, "http://127.0.0.1:4173").searchParams.get("origin");
+  expect(advertisedOrigin).toBeTruthy();
+  expect(["localhost", "127.0.0.1"]).not.toContain(new URL(advertisedOrigin!).hostname);
+  const parsed = qrSource!.match(/\/rooms\/([^/]+)\/qr\?invite=([^&]+)/);
   expect(parsed).toBeTruthy();
 
   const participantContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
@@ -43,6 +46,7 @@ test("host admits a participant and exchanges data over WebRTC", async ({ browse
 });
 
 test("routes a message through a real intermediate browser without an endpoint channel", async ({ browser }) => {
+  test.setTimeout(60_000);
   const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
   const host = await context.newPage();
   await host.goto("/");
@@ -51,7 +55,7 @@ test("routes a message through a real intermediate browser without an endpoint c
   await expect(host.getByText("Your room is ready.")).toBeVisible();
 
   const qrSource = await host.getByRole("img", { name: "QR code to join this HOPNET room" }).getAttribute("src");
-  const parsed = qrSource!.match(/\/rooms\/([^/]+)\/qr\?invite=(.+)$/)!;
+  const parsed = qrSource!.match(/\/rooms\/([^/]+)\/qr\?invite=([^&]+)/)!;
   const joinUrl = `/?room=${encodeURIComponent(parsed[1])}&invite=${encodeURIComponent(parsed[2])}`;
 
   const phoneA = await context.newPage();

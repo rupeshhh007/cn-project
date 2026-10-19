@@ -1,6 +1,5 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import Fastify, { type FastifyInstance } from "fastify";
@@ -17,6 +16,7 @@ import {
   type ServerSocketMessage,
   type TopologyEdge,
 } from "@hopnet/protocol";
+import { buildInvitationUrl, createNetworkConfig, discoverLanInterfaces, selectPublicOrigin, type LanInterface } from "./network.ts";
 
 const createRoomSchema = z.object({
   displayName: z.string().min(1).max(80),
@@ -82,25 +82,24 @@ function bearer(value: string | string[] | undefined): string | undefined {
   return value.slice(7);
 }
 
-function getLanAddresses(): string[] {
-  return Object.values(os.networkInterfaces())
-    .flatMap((entries) => entries ?? [])
-    .filter((entry) => entry.family === "IPv4" && !entry.internal)
-    .map((entry) => entry.address);
-}
-
-export type BuildOptions = { serveWeb?: boolean };
+export type BuildOptions = { serveWeb?: boolean; port?: number; networkInterfaces?: LanInterface[] };
 
 export async function buildApp(options: BuildOptions = {}): Promise<FastifyInstance> {
   const certPath = process.env.HOPNET_TLS_CERT;
   const keyPath = process.env.HOPNET_TLS_KEY;
   const https = certPath && keyPath ? { cert: fs.readFileSync(certPath), key: fs.readFileSync(keyPath) } : undefined;
+  const protocol = https ? "https" : "http";
+  const configuredPort = options.port ?? Number(process.env.PORT ?? 4173);
+  const network = createNetworkConfig(protocol, configuredPort, options.networkInterfaces ?? discoverLanInterfaces(protocol, configuredPort));
   // Fastify's overloads cannot express a server that is selected between HTTP and
   // HTTPS at runtime. The returned API remains the common FastifyInstance surface.
   const app = Fastify({ logger: process.env.NODE_ENV !== "test", bodyLimit: 96 * 1024, ...(https ? { https } : {}) } as never) as unknown as FastifyInstance;
 
   app.get("/api/health", async () => ({ status: "ok", service: "hopnet-coordinator", rooms: rooms.size }));
-  app.get("/api/network", async () => ({ addresses: getLanAddresses(), secure: Boolean(https) }));
+  app.get("/api/network", async (_request, reply) => reply.header("cache-control", "no-store").send({
+    ...network,
+    currentOriginHint: "Use the selected LAN origin on other devices; localhost is reachable only from this computer.",
+  }));
 
   app.post("/api/rooms", async (request, reply) => {
     const parsed = createRoomSchema.safeParse(request.body);
@@ -202,13 +201,13 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
 
   app.get("/api/rooms/:roomId/qr", async (request, reply) => {
     const room = rooms.get((request.params as { roomId: string }).roomId);
-    const invite = (request.query as { invite?: string }).invite;
+    const { invite, origin } = request.query as { invite?: string; origin?: string };
     if (!room || invite !== room.inviteSecret) return reply.code(404).send({ error: "ROOM_NOT_FOUND" });
-    const forwarded = request.headers["x-forwarded-proto"];
-    const protocol = typeof forwarded === "string" ? forwarded : https ? "https" : "http";
-    const joinUrl = `${protocol}://${request.headers.host}/?room=${encodeURIComponent(room.id)}&invite=${encodeURIComponent(room.inviteSecret)}`;
+    const selectedOrigin = selectPublicOrigin(network, origin);
+    if (!selectedOrigin) return reply.code(400).send({ error: "INVALID_PUBLIC_ORIGIN", message: "Choose one of the coordinator's detected LAN addresses." });
+    const joinUrl = buildInvitationUrl(selectedOrigin, room.id, room.inviteSecret);
     const svg = await QRCode.toString(joinUrl, { type: "svg", margin: 1, color: { dark: "#171C29", light: "#0000" } });
-    return reply.type("image/svg+xml").send(svg);
+    return reply.header("cache-control", "no-store").header("x-hopnet-invitation-origin", selectedOrigin).type("image/svg+xml").send(svg);
   });
 
   const wss = new WebSocketServer({ noServer: true, maxPayload: 96 * 1024 });
@@ -316,5 +315,3 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
   app.addHook("onClose", async () => clearInterval(cleanup));
   return app;
 }
-
-export { getLanAddresses };

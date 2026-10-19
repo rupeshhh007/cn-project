@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "motion/react";
 import type { DeviceCategory, OverlayLink, Peer, TopologyEdge } from "@hopnet/protocol";
 import { canonicalEdge, type RouteStrategy } from "@hopnet/routing";
 import type { LinkState } from "../lib/peer-manager.ts";
+import type { NetworkInfo } from "../App.tsx";
 
 export type NetworkEvent = { id: string; at: Date; title: string; detail: string; provenance: "REAL" | "EMULATED" | "INFERRED" };
 
@@ -18,11 +19,14 @@ type Props = {
   routeStrategy: RouteStrategy;
   events: NetworkEvent[];
   coordinatorState: string;
+  networkInfo?: NetworkInfo;
+  invitationOrigin: string;
   inviteUrl: string;
   inviteQrUrl: string;
   joinRequests: Array<{ requestId: string; displayName: string; deviceCategory: DeviceCategory }>;
   message: string;
   error: string;
+  onInvitationOrigin: (origin: string) => void;
   onSelectPeer: (peerId: string) => void;
   onApprove: (requestId: string) => void;
   onToggleEdge: (a: string, b: string) => void;
@@ -47,9 +51,9 @@ const positions: Point[] = [
 ];
 
 export function RoomSurface(props: Props) {
-  const [mobile, setMobile] = useState(() => matchMedia("(max-width: 680px)").matches);
+  const [mobile, setMobile] = useState(() => window.matchMedia("(max-width: 680px)").matches);
   useEffect(() => {
-    const media = matchMedia("(max-width: 680px)");
+    const media = window.matchMedia("(max-width: 680px)");
     const update = () => setMobile(media.matches);
     media.addEventListener("change", update);
     return () => media.removeEventListener("change", update);
@@ -112,7 +116,9 @@ function DesktopRoom(props: Props) {
         <div className="panel-heading"><span>PRIVATE LAN ROOM</span><button onClick={() => setView("space")} aria-label="Close room panel">×</button></div>
         <img src={props.inviteQrUrl} alt="QR code to join this HOPNET room" />
         <strong>Bring another device into the space.</strong>
+        {props.networkInfo?.interfaces.length ? <label className="invitation-origin">Invitation address<select aria-label="Invitation address" value={props.invitationOrigin} onChange={(event) => props.onInvitationOrigin(event.target.value)}>{props.networkInfo.interfaces.map((item) => <option key={item.id} value={item.origin}>{item.address} · {item.name}{item.recommended ? " · recommended" : ""}</option>)}</select></label> : null}
         <button className="soft-button" onClick={() => { void navigator.clipboard.writeText(props.inviteUrl); setInviteCopied(true); window.setTimeout(() => setInviteCopied(false), 1600); }}>{inviteCopied ? "Invitation copied" : "Copy invitation"}</button>
+        <NetworkDoctor {...props} />
         {props.joinRequests.map((request) => <div className="admission" key={request.requestId}><span>{request.displayName}<small>{request.deviceCategory} requests entry</small></span><button onClick={() => props.onApprove(request.requestId)}>Admit</button></div>)}
         {orderedPeers.length > 1 && <Topology peers={orderedPeers} edges={props.topologyEdges} onToggle={props.onToggleEdge} />}
       </motion.aside> : props.selectedPeer ? <motion.aside key={props.selectedPeer.id} className="peer-inspector" initial={{ opacity: 0, x: 28, scale: .96 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 28 }} transition={{ type: "spring", stiffness: 340, damping: 30 }}>
@@ -149,7 +155,7 @@ function MobileRoom(props: Props) {
       <div className="mobile-route"><span /><b>{routeNames?.join("  →  ") ?? "No route available"}</b><span /></div>
       <div className="mobile-measure"><div><small>DATA PLANE</small><strong>{props.selectedLink?.state === "direct" ? "Direct WebRTC" : props.selectedRoute ? `${props.selectedRoute.length - 1}-hop overlay` : "Unavailable"}</strong></div><div><small>MEASURED RTT</small><strong>{props.selectedLink?.rttMs !== undefined ? `${props.selectedLink.rttMs} ms` : "Not measured"}</strong></div></div>
       <div className="mobile-peer-actions"><button onClick={props.onPing} disabled={props.selectedLink?.state !== "direct"}>Ping over WebRTC</button><select aria-label="Selected peer" value={props.selectedPeer?.id} onChange={(event) => props.onSelectPeer(event.target.value)}>{remotePeers.map((peer) => <option key={peer.id} value={peer.id}>{peer.displayName}</option>)}</select></div>
-    </section> : props.self.role === "host" ? <section className="mobile-peer-card mobile-invite"><img src={props.inviteQrUrl} alt="QR code to join this HOPNET room"/><div><h2>Your room is ready.</h2><p>Scan this on another physical device, then approve its request here.</p></div>{props.joinRequests.map((request) => <button key={request.requestId} onClick={() => props.onApprove(request.requestId)}>Admit {request.displayName}</button>)}</section> : <section className="mobile-peer-card"><h2>Waiting for another peer.</h2><p>The room will update from real coordinator state.</p></section>}
+    </section> : props.self.role === "host" ? <section className="mobile-peer-card mobile-invite"><img src={props.inviteQrUrl} alt="QR code to join this HOPNET room"/><div><h2>Your room is ready.</h2><p>Scan this on another physical device, then approve its request here.</p><small>{new URL(props.invitationOrigin).host}</small></div>{props.joinRequests.map((request) => <button key={request.requestId} onClick={() => props.onApprove(request.requestId)}>Admit {request.displayName}</button>)}</section> : <section className="mobile-peer-card"><h2>Waiting for another peer.</h2><p>The room will update from real coordinator state.</p></section>}
     <section className="mobile-activity-log" aria-label="Live protocol activity">{props.events.map((event) => <article key={event.id}><strong>{event.title}</strong><span>{event.detail}</span></article>)}</section>
     <div className="mobile-controls"><Composer message={props.message} onMessage={props.onMessage} onSend={props.onSend} disabled={!props.selectedRoute}/><nav><button><Icon name="space"/><span>Room</span></button><button className="active"><Icon name="send"/><span>Messages</span></button><button><Icon name="replay"/><span>Activity</span></button></nav></div>
     {props.error && <button className="error-toast" onClick={props.onClearError}>{props.error}</button>}
@@ -186,6 +192,19 @@ function EventRibbon({ events, expanded }: { events: NetworkEvent[]; expanded: b
   return <section className={`event-ribbon-premium ${expanded ? "expanded" : ""}`} aria-label="Recent real network events">{shown.length ? shown.map((event, index) => <article key={event.id}><div className="event-icon"><Icon name={index === 0 ? "check" : "route"}/></div><div><strong>{index + 1}. {event.title}</strong><span>{event.detail}</span></div><time>{event.at.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</time><em className={event.provenance.toLowerCase()}>{event.provenance}</em></article>) : <p>Live protocol events will appear here.</p>}</section>;
 }
 
+function NetworkDoctor(props: Props) {
+  const direct = Object.values(props.links).some((link) => link.state === "direct");
+  const measured = Object.values(props.links).some((link) => link.rttMs !== undefined);
+  const checks = [
+    { label: "LAN invitation", detail: new URL(props.invitationOrigin).host, ready: Boolean(props.networkInfo?.interfaces.length) },
+    { label: "Coordinator", detail: props.coordinatorState, ready: props.coordinatorState === "connected" },
+    { label: "Direct data channel", detail: direct ? "RTCDataChannel open" : "Needs a second device", ready: direct },
+    { label: "Measured echo", detail: measured ? "Receiver response observed" : "Run a WebRTC ping", ready: measured },
+    { label: "Secure context", detail: window.isSecureContext ? "Trusted by this browser" : "Configure trusted HTTPS", ready: window.isSecureContext },
+  ];
+  return <details className="network-doctor"><summary>Network Doctor <span>{checks.filter((check) => check.ready).length}/{checks.length}</span></summary><div>{checks.map((check) => <p key={check.label} className={check.ready ? "ready" : "pending"}><i/><span><strong>{check.label}</strong><small>{check.detail}</small></span></p>)}<em>VPNs, client isolation, cellular fallback, firewalls, and background suspension can block peer connectivity.</em></div></details>;
+}
+
 function Topology({ peers, edges, onToggle }: { peers: Peer[]; edges: TopologyEdge[]; onToggle: (a: string, b: string) => void }) {
   return <div className="topology"><span>PERMITTED LINKS</span>{peerPairs(peers).map(([a, b]) => { const active = edges.some((edge) => canonicalEdge(edge.a, edge.b) === canonicalEdge(a.id, b.id)); return <button key={canonicalEdge(a.id, b.id)} className={active ? "active" : ""} onClick={() => onToggle(a.id, b.id)}><i/>{a.displayName} ↔ {b.displayName}</button>; })}</div>;
 }
@@ -206,6 +225,13 @@ function Icon({ name }: { name: string }) {
   return <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{paths[name] ?? paths.space}</svg>;
 }
 
-function curve(a: Point, b: Point) { const x1 = a.x * 10, y1 = a.y * 6.2, x2 = b.x * 10, y2 = b.y * 6.2; const bend = Math.min(80, Math.abs(x2 - x1) * .12 + 24); return `M ${x1} ${y1} C ${x1 + (x2 - x1) * .34} ${y1 - bend}, ${x1 + (x2 - x1) * .66} ${y2 - bend}, ${x2} ${y2}`; }
+function curve(a: Point, b: Point) {
+  const x1 = a.x * 10, y1 = a.y * 6.2, x2 = b.x * 10, y2 = b.y * 6.2;
+  const dx = x2 - x1, dy = y2 - y1, length = Math.max(1, Math.hypot(dx, dy));
+  const offset = Math.min(64, length * .11);
+  const cx = Math.max(24, Math.min(976, (x1 + x2) / 2 - (dy / length) * offset));
+  const cy = Math.max(24, Math.min(596, (y1 + y2) / 2 + (dx / length) * offset));
+  return `M ${x1} ${y1} Q ${cx} ${cy}, ${x2} ${y2}`;
+}
 
 function peerPairs(peers: Peer[]): Array<[Peer, Peer]> { const pairs: Array<[Peer, Peer]> = []; for (let left = 0; left < peers.length; left += 1) for (let right = left + 1; right < peers.length; right += 1) pairs.push([peers[left], peers[right]]); return pairs; }

@@ -11,6 +11,7 @@
     "dev": "node scripts/dev.mjs",
     "build": "npm run build -w @hopnet/web",
     "start": "npm run build && node --import tsx apps/coordinator/src/server.ts",
+    "doctor": "node --import tsx scripts/network-doctor.ts",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "test:e2e": "playwright test",
