@@ -77,10 +77,10 @@ function DesktopRoom(props: Props) {
 
   const chooseView = (next: View) => {
     setView(next);
-    if (next === "send") window.setTimeout(() => document.querySelector<HTMLInputElement>(".desktop-composer input")?.focus(), 120);
+    if (next === "send") window.setTimeout(() => document.querySelector<HTMLInputElement>(".desktop-composer input:not([type=file])")?.focus(), 120);
   };
 
-  return <main className="hopnet-shell desktop-room">
+  return <main className={`hopnet-shell desktop-room ${view === "replay" ? "replay-active" : ""}`}>
     <Atmosphere />
     <header className="top-bar">
       <div className="wordmark"><strong>HOPNET</strong><i /><span>The Network You Can Touch</span></div>
