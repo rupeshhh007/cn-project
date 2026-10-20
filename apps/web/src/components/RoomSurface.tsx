@@ -251,10 +251,11 @@ function TransferShelf({ transfers, peers, self, onResponse }: { transfers: Tran
     const peer = peers.find((item) => item.id === transfer.peerId)?.displayName ?? "peer";
     const percentage = Math.min(100, Math.round(transfer.acknowledgedBytes / Math.max(1, transfer.size) * 100));
     const path = transfer.paths[0]?.map((id) => id === self.id ? "This device" : peers.find((item) => item.id === id)?.displayName ?? "peer").join(" → ");
-    return <motion.article key={transfer.id} initial={{ opacity: 0, y: 18, scale: .98 }} animate={{ opacity: 1, y: 0, scale: 1 }}>
+    return <motion.article key={transfer.id} data-testid={`transfer-${transfer.direction}`} data-status={transfer.status} initial={{ opacity: 0, y: 18, scale: .98 }} animate={{ opacity: 1, y: 0, scale: 1 }}>
       <div className="transfer-file-icon"><Icon name="file"/></div>
       <div className="transfer-copy"><small>{transfer.direction === "receive" ? `FROM ${peer}` : `TO ${peer}`}</small><strong>{transfer.fileName}</strong><span>{formatBytes(transfer.size)} · {transfer.paths.length > 1 ? `${transfer.paths.length} disjoint paths` : path ?? "finding route"}</span></div>
       {transfer.status === "awaiting-acceptance" ? <div className="transfer-consent"><button onClick={() => void onResponse(transfer.id, true)} aria-label={`Accept ${transfer.fileName}`}>Accept</button><button onClick={() => void onResponse(transfer.id, false)} aria-label={`Decline ${transfer.fileName}`}>Decline</button></div> : <div className="transfer-progress"><div><i style={{ width: `${percentage}%` }}/></div><span>{transfer.status === "verified" ? "SHA-256 verified" : transfer.status === "failed" ? transfer.error : transfer.status === "verifying" ? "Verifying whole file…" : `${percentage}% receiver acknowledged`}</span>{transfer.downloadUrl && <a href={transfer.downloadUrl} download={transfer.fileName}>Save file</a>}</div>}
+      <details className="transfer-evidence"><summary>Receiver evidence · {transfer.acknowledgedChunks}/{transfer.totalChunks} chunks</summary><pre data-testid="transfer-evidence">{JSON.stringify({ ...transfer, downloadUrl: undefined, history: transfer.history?.filter((event) => !["chunk-scheduled", "receiver-ack", "chunk-received"].includes(event.type)) }, null, 2)}</pre></details>
     </motion.article>;
   })}</section>;
 }

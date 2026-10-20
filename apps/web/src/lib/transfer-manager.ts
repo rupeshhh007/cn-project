@@ -2,7 +2,10 @@ import { PROTOCOL_VERSION, type TransferDataPacket } from "@hopnet/protocol";
 import { TransferAssembler, base64ToBytes, bytesToBase64, createManifest, type TransferManifest } from "@hopnet/transfer";
 import { createUuid } from "./id.ts";
 
-export type TransferStatus = "preparing" | "offered" | "awaiting-acceptance" | "transferring" | "verifying" | "verified" | "declined" | "failed";
+export type TransferStatus = "preparing" | "offered" | "awaiting-acceptance" | "transferring" | "verifying" | "verified" | "declined" | "failed" | "cancelled";
+
+export type PathAccounting = { path: string[]; attemptedChunks: number; acknowledgedChunks: number; deliveredBytes: number; retries: number; failures: number; rttMs?: number };
+export type TransferEvent = { type: string; transferId: string; at: number; path?: string[]; chunkIndex?: number; detail?: string };
 
 export type TransferView = {
   id: string;
@@ -20,6 +23,11 @@ export type TransferView = {
   verifiedHash?: string;
   downloadUrl?: string;
   error?: string;
+  pathStats?: PathAccounting[];
+  history?: TransferEvent[];
+  startedAt?: number;
+  completedAt?: number;
+  duplicateChunks?: number;
 };
 
 type Outbound = {
@@ -30,6 +38,11 @@ type Outbound = {
   attempts: Map<number, number>;
   sentAt: Map<number, number>;
   running: boolean;
+  sends: Map<string, { index: number; path: string[]; at: number }>;
+  lastRoute: Map<number, string>;
+  progressAt: number;
+  srtt?: number;
+  variance: number;
 };
 
 type Inbound = {
@@ -39,6 +52,7 @@ type Inbound = {
   accepted: boolean;
   offerPath: string[];
   lastPath: string[];
+  queue: Promise<void>;
 };
 
 type Dependencies = {
@@ -48,12 +62,14 @@ type Dependencies = {
   send: (nextHop: string, packet: TransferDataPacket) => Promise<void>;
   onUpdate: (transfer: TransferView) => void;
   onEvent: (title: string, detail: string) => void;
+  onProtocolEvent?: (event: TransferEvent) => void;
 };
 
-const RETRY_AFTER_MS = 1_400;
 const MAX_ATTEMPTS = 8;
 const MAX_IN_FLIGHT_CHUNKS = 8;
-const TRANSFER_TIMEOUT_MS = 90_000;
+const NO_PROGRESS_TIMEOUT_MS = 60_000;
+const TRANSFER_TIMEOUT_MS = 15 * 60_000;
+const terminal = (status: TransferStatus) => ["verified", "failed", "declined", "cancelled"].includes(status);
 
 function canVerifyWithWebCrypto(): boolean {
   return (typeof window === "undefined" || window.isSecureContext) && typeof crypto !== "undefined" && Boolean(crypto.subtle);
@@ -64,11 +80,16 @@ const SECURE_FILE_ERROR = "Verified file transfers require trusted HTTPS on both
 export class TransferManager {
   private readonly outbound = new Map<string, Outbound>();
   private readonly inbound = new Map<string, Inbound>();
+  private disposed = false;
+  private readonly pendingViews = new Map<string, TransferView>();
+  private updateTimer?: ReturnType<typeof setTimeout>;
 
   constructor(private readonly dependencies: Dependencies) {}
 
   async offer(file: File, destinationPeerId: string): Promise<string> {
     if (!canVerifyWithWebCrypto()) throw new Error(SECURE_FILE_ERROR);
+    if (file.size < 1 || file.size > 32 * 1024 * 1024) throw new Error("Choose a file between 1 byte and 32 MiB.");
+    this.reserve();
     const transferId = createUuid();
     const view: TransferView = {
       id: transferId,
@@ -83,8 +104,9 @@ export class TransferManager {
       acknowledgedBytes: 0,
       paths: [],
       recoveryCount: 0,
+      pathStats: [], history: [],
     };
-    const transfer: Outbound = { view, acknowledged: new Set(), attempts: new Map(), sentAt: new Map(), running: false };
+    const transfer: Outbound = { view, acknowledged: new Set(), attempts: new Map(), sentAt: new Map(), running: false, sends: new Map(), lastRoute: new Map(), progressAt: performance.now(), variance: 0 };
     this.outbound.set(transferId, transfer);
     this.emit(view);
     try {
@@ -95,6 +117,7 @@ export class TransferManager {
       transfer.chunks = chunks;
       transfer.view = { ...view, fileName: manifest.name, mime: manifest.mime, size: manifest.size, totalChunks: manifest.chunkCount, status: "offered", paths };
       this.emit(transfer.view);
+      this.record(transfer.view, "offer", paths[0]);
       await this.sendAlong(paths[0]!, {
         protocolVersion: PROTOCOL_VERSION,
         kind: "transfer-offer",
@@ -154,9 +177,25 @@ export class TransferManager {
     }
     if (packet.kind === "transfer-offer") return this.receiveOffer(packet);
     if (packet.kind === "transfer-response") return this.receiveResponse(packet);
-    if (packet.kind === "transfer-chunk") return this.receiveChunk(packet);
+    if (packet.kind === "transfer-chunk") {
+      const transfer = this.inbound.get(packet.transferId);
+      if (!transfer) return;
+      // Serialize hashing and assembly: RTC message callbacks can overlap across
+      // channels while Web Crypto yields, including duplicate final chunks.
+      transfer.queue = transfer.queue.then(() => this.receiveChunk(packet));
+      return transfer.queue;
+    }
     if (packet.kind === "transfer-chunk-ack") return this.receiveAck(packet);
     if (packet.kind === "transfer-complete") return this.receiveComplete(packet);
+    if (packet.kind === "transfer-cancel") {
+      const transfer = this.outbound.get(packet.transferId) ?? this.inbound.get(packet.transferId);
+      if (transfer && transfer.view.peerId === packet.sourcePeerId && !terminal(transfer.view.status)) {
+        transfer.view = { ...transfer.view, status: "cancelled", error: "Cancelled by the other device." };
+        if ("accepted" in transfer) transfer.accepted = false;
+        this.record(transfer.view, "cancelled");
+        this.emit(transfer.view);
+      }
+    }
   }
 
   private receiveOffer(packet: Extract<TransferDataPacket, { kind: "transfer-offer" }>): void {
@@ -182,6 +221,7 @@ export class TransferManager {
       return;
     }
     try {
+      this.reserve();
       const assembler = new TransferAssembler(packet.manifest);
       const view: TransferView = {
         id: packet.transferId,
@@ -196,8 +236,10 @@ export class TransferManager {
         acknowledgedBytes: 0,
         paths: [packet.path],
         recoveryCount: 0,
+        pathStats: [], history: [], duplicateChunks: 0,
       };
-      this.inbound.set(packet.transferId, { view, manifest: packet.manifest, assembler, accepted: false, offerPath: packet.path, lastPath: packet.path });
+      this.inbound.set(packet.transferId, { view, manifest: packet.manifest, assembler, accepted: false, offerPath: packet.path, lastPath: packet.path, queue: Promise.resolve() });
+      this.record(view, "offer-received", packet.path);
       this.emit(view);
       this.dependencies.onEvent("Incoming file offer", `${packet.manifest.name} · ${formatBytes(packet.manifest.size)} · consent required`);
     } catch (error) {
@@ -214,7 +256,9 @@ export class TransferManager {
       this.dependencies.onEvent("File offer declined", transfer.view.fileName);
       return;
     }
-    transfer.view = { ...transfer.view, status: "transferring" };
+    transfer.progressAt = performance.now();
+    transfer.view = { ...transfer.view, status: "transferring", startedAt: performance.now() };
+    this.record(transfer.view, "accepted");
     this.emit(transfer.view);
     this.dependencies.onEvent("Verified transfer started", `${transfer.view.fileName} · receiver accepted`);
     void this.pump(transfer);
@@ -222,21 +266,29 @@ export class TransferManager {
 
   private async receiveChunk(packet: Extract<TransferDataPacket, { kind: "transfer-chunk" }>): Promise<void> {
     const transfer = this.inbound.get(packet.transferId);
-    if (!transfer || !transfer.accepted || packet.sourcePeerId !== transfer.view.peerId) return;
+    if (!transfer || !transfer.accepted || packet.sourcePeerId !== transfer.view.peerId || ["failed", "cancelled"].includes(transfer.view.status)) return;
     try {
       const bytes = base64ToBytes(packet.bytes);
       if (bytes.byteLength !== packet.byteLength) throw new Error("Encoded chunk length is invalid.");
-      await transfer.assembler.add(packet.chunkIndex, bytes, packet.chunkHash);
+      const result = await transfer.assembler.add(packet.chunkIndex, bytes, packet.chunkHash);
       transfer.lastPath = packet.path;
       transfer.view = {
         ...transfer.view,
         acknowledgedChunks: transfer.assembler.receivedCount,
         acknowledgedBytes: transfer.assembler.bytesReceived,
         paths: mergePath(transfer.view.paths, packet.path),
+        duplicateChunks: (transfer.view.duplicateChunks ?? 0) + Number(result === "duplicate"),
       };
+      this.record(transfer.view, result === "duplicate" ? "duplicate-chunk" : "chunk-received", packet.path, packet.chunkIndex);
       this.emit(transfer.view);
-      await this.sendChunkAck(transfer, packet);
-      if (transfer.assembler.complete && transfer.view.status !== "verifying" && transfer.view.status !== "verified") await this.finishInbound(transfer);
+      // A failed reverse path must not turn a correctly stored chunk into a
+      // rejected file. The sender can retry it over a surviving route.
+      await this.sendChunkAck(transfer, packet).catch(() => undefined);
+      if (transfer.view.status === "verified") {
+        await this.sendCompletion(transfer, "verified", transfer.view.verifiedHash).catch(() => undefined);
+        return;
+      }
+      if (transfer.assembler.complete && transfer.view.status !== "verifying") await this.finishInbound(transfer);
     } catch (error) {
       transfer.view = { ...transfer.view, status: "failed", error: errorMessage(error) };
       this.emit(transfer.view);
@@ -246,8 +298,22 @@ export class TransferManager {
 
   private receiveAck(packet: Extract<TransferDataPacket, { kind: "transfer-chunk-ack" }>): void {
     const transfer = this.outbound.get(packet.transferId);
-    if (!transfer?.manifest || transfer.view.status === "verified" || packet.sourcePeerId !== transfer.view.peerId || packet.chunkIndex >= transfer.manifest.chunkCount) return;
+    if (!transfer?.manifest || terminal(transfer.view.status) || packet.sourcePeerId !== transfer.view.peerId || packet.chunkIndex >= transfer.manifest.chunkCount) return;
+    const sent = transfer.sends.get(packet.routeId);
+    if (!sent || sent.index !== packet.chunkIndex || packet.path.join() !== [...sent.path].reverse().join() || transfer.acknowledged.has(packet.chunkIndex)) return;
+    const elapsed = performance.now() - sent.at;
+    const stats = this.stats(transfer.view, sent.path);
+    stats.acknowledgedChunks += 1;
+    stats.deliveredBytes += transfer.chunks![packet.chunkIndex]!.byteLength;
+    stats.rttMs = elapsed;
+    // Karn's rule: do not estimate RTT from retransmitted chunks.
+    if (transfer.attempts.get(packet.chunkIndex) === 1) {
+      transfer.variance = transfer.srtt === undefined ? elapsed / 2 : .75 * transfer.variance + .25 * Math.abs(transfer.srtt - elapsed);
+      transfer.srtt = transfer.srtt === undefined ? elapsed : .875 * transfer.srtt + .125 * elapsed;
+    }
+    transfer.progressAt = performance.now();
     transfer.acknowledged.add(packet.chunkIndex);
+    this.record(transfer.view, "receiver-ack", sent.path, packet.chunkIndex);
     transfer.view = {
       ...transfer.view,
       acknowledgedChunks: transfer.acknowledged.size,
@@ -259,7 +325,7 @@ export class TransferManager {
 
   private receiveComplete(packet: Extract<TransferDataPacket, { kind: "transfer-complete" }>): void {
     const transfer = this.outbound.get(packet.transferId);
-    if (!transfer?.manifest || packet.sourcePeerId !== transfer.view.peerId) return;
+    if (!transfer?.manifest || terminal(transfer.view.status) || packet.sourcePeerId !== transfer.view.peerId || transfer.view.status === "offered") return;
     const verified = packet.status === "verified" && packet.verifiedHash === transfer.manifest.fileHash && packet.receivedBytes === transfer.manifest.size;
     if (verified) for (let index = 0; index < transfer.manifest.chunkCount; index += 1) transfer.acknowledged.add(index);
     transfer.view = {
@@ -269,7 +335,10 @@ export class TransferManager {
       acknowledgedBytes: verified ? transfer.manifest.size : acknowledgedBytes(transfer.manifest, transfer.acknowledged),
       verifiedHash: verified ? packet.verifiedHash : undefined,
       error: verified ? undefined : packet.reason ?? "Receiver did not verify the file.",
+      completedAt: performance.now(),
     };
+    this.record(transfer.view, verified ? "verified" : "rejected", [...packet.path].reverse());
+    transfer.chunks = undefined;
     this.emit(transfer.view);
     this.dependencies.onEvent(verified ? "File integrity verified" : "File verification failed", verified ? `${transfer.view.fileName} · receiver SHA-256 matched` : transfer.view.error!);
   }
@@ -277,10 +346,11 @@ export class TransferManager {
   private async pump(transfer: Outbound): Promise<void> {
     if (transfer.running || !transfer.manifest || !transfer.chunks) return;
     transfer.running = true;
-    const startedAt = Date.now();
+    const startedAt = performance.now();
     try {
-      while (transfer.acknowledged.size < transfer.manifest.chunkCount) {
-        if (Date.now() - startedAt > TRANSFER_TIMEOUT_MS) throw new Error("Transfer timed out before all receiver acknowledgements arrived.");
+      while (!terminal(transfer.view.status) && !this.disposed) {
+        if (performance.now() - startedAt > TRANSFER_TIMEOUT_MS) throw new Error("Transfer exceeded its 15-minute resource limit.");
+        if (performance.now() - transfer.progressAt > NO_PROGRESS_TIMEOUT_MS) throw new Error("No receiver progress for 60 seconds. No usable alternate route or receiver response remains.");
         let paths: string[][];
         try {
           paths = this.validPaths(transfer.view.peerId);
@@ -288,24 +358,55 @@ export class TransferManager {
           await delay(250);
           continue;
         }
-        const now = Date.now();
+        const now = performance.now();
+        const keys = new Set(paths.map((path) => path.join("\u0000")));
+        for (const stats of transfer.view.pathStats ?? []) {
+          if (!keys.has(stats.path.join("\u0000")) && stats.failures === 0) {
+            stats.failures += 1;
+            this.record(transfer.view, "path-unavailable", stats.path);
+            this.dependencies.onEvent("Transfer path unavailable", "Continuing over established alternate routes");
+          }
+        }
+        const retryAfter = (index: number) => Math.min(30_000, Math.max(3_000, (transfer.srtt ?? 750) + 4 * transfer.variance) * 2 ** Math.max(0, (transfer.attempts.get(index) ?? 1) - 1));
+        const routeLost = (index: number) => {
+          const route = transfer.sends.get(transfer.lastRoute.get(index) ?? "");
+          return route && !keys.has(route.path.join("\u0000"));
+        };
         const inFlight = transfer.chunks.reduce((count, _, index) => {
           const sentAt = transfer.sentAt.get(index);
-          return count + Number(!transfer.acknowledged.has(index) && (transfer.attempts.get(index) ?? 0) > 0 && sentAt !== undefined && now - sentAt < RETRY_AFTER_MS);
+          return count + Number(!transfer.acknowledged.has(index) && sentAt !== undefined && !routeLost(index) && now - sentAt < retryAfter(index));
         }, 0);
         const availableSlots = Math.max(0, MAX_IN_FLIGHT_CHUNKS - inFlight);
-        const due = transfer.chunks.map((_, index) => index).filter((index) => !transfer.acknowledged.has(index) && now - (transfer.sentAt.get(index) ?? 0) >= RETRY_AFTER_MS).slice(0, availableSlots);
+        const due = transfer.chunks.map((_, index) => index).filter((index) => !transfer.acknowledged.has(index) && (!transfer.sentAt.has(index) || routeLost(index) || now - transfer.sentAt.get(index)! >= retryAfter(index))).slice(0, availableSlots);
+        if (transfer.acknowledged.size === transfer.manifest.chunkCount) {
+          if (transfer.view.status !== "verifying") {
+            transfer.view = { ...transfer.view, status: "verifying" };
+            this.emit(transfer.view);
+          }
+          // Probe with only the last chunk if its completion receipt was lost.
+          // A verified receiver responds idempotently with the stored digest.
+          const last = transfer.manifest.chunkCount - 1;
+          if (now - transfer.sentAt.get(last)! >= retryAfter(last)) due.push(last);
+        }
         if (!due.length) { await delay(100); continue; }
         for (const index of due) {
+          if (terminal(transfer.view.status) || this.disposed) return;
           const attempts = (transfer.attempts.get(index) ?? 0) + 1;
           if (attempts > MAX_ATTEMPTS) throw new Error(`Chunk ${index} exceeded the recovery retry limit.`);
           const path = paths[(index + attempts - 1) % paths.length]!;
+          const stats = this.stats(transfer.view, path);
+          stats.attemptedChunks += 1;
+          stats.retries += Number(attempts > 1);
           if (attempts > 1) {
             transfer.view = { ...transfer.view, recoveryCount: transfer.view.recoveryCount + 1 };
             this.dependencies.onEvent("Missing chunk retried", `Chunk ${index + 1} · attempt ${attempts}`);
           }
           transfer.attempts.set(index, attempts);
-          transfer.sentAt.set(index, Date.now());
+          const routeId = createUuid();
+          transfer.sentAt.set(index, performance.now());
+          transfer.sends.set(routeId, { index, path, at: performance.now() });
+          transfer.lastRoute.set(index, routeId);
+          this.record(transfer.view, attempts > 1 ? "retry-scheduled" : "chunk-scheduled", path, index);
           transfer.view = { ...transfer.view, paths: mergePath(transfer.view.paths, path) };
           const chunk = transfer.chunks[index]!;
           try {
@@ -315,7 +416,7 @@ export class TransferManager {
               transferId: transfer.view.id,
               sourcePeerId: this.dependencies.selfPeerId,
               destinationPeerId: transfer.view.peerId,
-              routeId: createUuid(),
+              routeId,
               nextHop: path[1]!,
               path,
               hopIndex: 1,
@@ -327,16 +428,13 @@ export class TransferManager {
               bytes: bytesToBase64(chunk),
             });
           } catch {
-            transfer.sentAt.set(index, Date.now() - RETRY_AFTER_MS + 500);
+            // Wait for topology updates or the bounded RTO, never spin sends.
+            this.record(transfer.view, "send-failed", path, index);
           }
         }
         this.emit(transfer.view);
         await delay(12);
       }
-      if (transfer.view.status === "verified") return;
-      transfer.view = { ...transfer.view, status: "verifying", acknowledgedBytes: transfer.manifest.size };
-      this.emit(transfer.view);
-      this.dependencies.onEvent("All chunks acknowledged", `${transfer.view.fileName} · waiting for whole-file SHA-256`);
     } catch (error) {
       this.failOutbound(transfer, error);
     } finally {
@@ -350,9 +448,10 @@ export class TransferManager {
     try {
       const { bytes, hash } = await transfer.assembler.assemble();
       const blob = new Blob([new Uint8Array(bytes)], { type: transfer.manifest.mime || "application/octet-stream" });
-      transfer.view = { ...transfer.view, status: "verified", verifiedHash: hash, downloadUrl: URL.createObjectURL(blob), acknowledgedBytes: transfer.manifest.size };
+      transfer.view = { ...transfer.view, status: "verified", verifiedHash: hash, downloadUrl: URL.createObjectURL(blob), acknowledgedBytes: transfer.manifest.size, completedAt: performance.now() };
+      this.record(transfer.view, "verified", transfer.lastPath);
       this.emit(transfer.view);
-      await this.sendCompletion(transfer, "verified", hash);
+      await this.sendCompletion(transfer, "verified", hash).catch(() => undefined);
       this.dependencies.onEvent("File integrity verified", `${transfer.view.fileName} · SHA-256 matched · ready to save`);
     } catch (error) {
       transfer.view = { ...transfer.view, status: "failed", error: errorMessage(error) };
@@ -369,7 +468,7 @@ export class TransferManager {
       transferId: packet.transferId,
       sourcePeerId: this.dependencies.selfPeerId,
       destinationPeerId: transfer.view.peerId,
-      routeId: createUuid(),
+      routeId: packet.routeId,
       nextHop: reverse[1]!,
       path: reverse,
       hopIndex: 1,
@@ -410,6 +509,7 @@ export class TransferManager {
   }
 
   private validHop(fromPeerId: string, packet: TransferDataPacket): boolean {
+    if (this.disposed || packet.ttl < 1 || packet.hopIndex !== packet.path.indexOf(this.dependencies.selfPeerId)) return false;
     if (packet.path[0] !== packet.sourcePeerId || packet.path.at(-1) !== packet.destinationPeerId) return false;
     if (new Set(packet.path).size !== packet.path.length) return false;
     if (packet.path[packet.hopIndex] !== this.dependencies.selfPeerId || packet.nextHop !== this.dependencies.selfPeerId) return false;
@@ -434,7 +534,61 @@ export class TransferManager {
     this.dependencies.onEvent("File transfer failed", transfer.view.error!);
   }
 
-  private emit(view: TransferView): void { this.dependencies.onUpdate({ ...view, paths: view.paths.map((path) => [...path]) }); }
+  private stats(view: TransferView, path: string[]): PathAccounting {
+    view.pathStats ??= [];
+    let stats = view.pathStats.find((item) => item.path.join() === path.join());
+    if (!stats) { stats = { path: [...path], attemptedChunks: 0, acknowledgedChunks: 0, deliveredBytes: 0, retries: 0, failures: 0 }; view.pathStats.push(stats); }
+    return stats;
+  }
+
+  private record(view: TransferView, type: string, path?: string[], chunkIndex?: number): void {
+    const event: TransferEvent = { type, transferId: view.id, at: performance.now(), path, chunkIndex };
+    view.history = [...(view.history ?? []), event].slice(-4096);
+    this.dependencies.onProtocolEvent?.(event);
+  }
+
+  private reserve(): void {
+    const all = [...this.outbound.values(), ...this.inbound.values()];
+    if (this.disposed || all.filter((item) => !terminal(item.view.status)).length >= 2) throw new Error("At most two active transfers are allowed on this device.");
+    for (const item of all.filter((item) => terminal(item.view.status)).slice(0, Math.max(0, all.length - 10))) {
+      if (item.view.downloadUrl) URL.revokeObjectURL(item.view.downloadUrl);
+      this.inbound.delete(item.view.id); this.outbound.delete(item.view.id);
+    }
+  }
+
+  async cancel(transferId: string): Promise<void> {
+    const transfer = this.outbound.get(transferId) ?? this.inbound.get(transferId);
+    if (!transfer || terminal(transfer.view.status)) return;
+    transfer.view = { ...transfer.view, status: "cancelled", error: "Cancelled on this device." };
+    if ("accepted" in transfer) transfer.accepted = false;
+    this.record(transfer.view, "cancelled"); this.emit(transfer.view);
+    const path = this.validPaths(transfer.view.peerId)[0]!;
+    await this.sendAlong(path, { protocolVersion: PROTOCOL_VERSION, kind: "transfer-cancel", transferId, sourcePeerId: this.dependencies.selfPeerId, destinationPeerId: transfer.view.peerId, routeId: createUuid(), nextHop: path[1]!, path, hopIndex: 1, ttl: path.length + 2, createdAt: Date.now() });
+  }
+
+  dispose(): void {
+    this.disposed = true;
+    clearTimeout(this.updateTimer);
+    this.pendingViews.clear();
+    for (const item of this.inbound.values()) if (item.view.downloadUrl) URL.revokeObjectURL(item.view.downloadUrl);
+    this.inbound.clear(); this.outbound.clear();
+  }
+
+  private emit(view: TransferView): void {
+    if (this.disposed) return;
+    if (view.status !== "transferring") {
+      this.pendingViews.delete(view.id);
+      this.dependencies.onUpdate(structuredClone(view));
+      return;
+    }
+    this.pendingViews.set(view.id, view);
+    if (this.updateTimer !== undefined) return;
+    this.updateTimer = setTimeout(() => {
+      this.updateTimer = undefined;
+      for (const pending of this.pendingViews.values()) this.dependencies.onUpdate(structuredClone(pending));
+      this.pendingViews.clear();
+    }, 100);
+  }
 }
 
 function mergePath(paths: string[][], path: string[]): string[][] {

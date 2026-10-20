@@ -20,6 +20,7 @@ type ManagedPeer = {
   polite: boolean;
   state: LinkState;
   pendingPings: Map<string, number>;
+  lastByteUpdate?: number;
 };
 
 export class PeerManager {
@@ -54,7 +55,7 @@ export class PeerManager {
       this.signal(remotePeerId, { candidate: { ...json, candidate: json.candidate } });
     };
     pc.onconnectionstatechange = () => {
-      const next = pc.connectionState === "connected" ? "direct" : pc.connectionState === "failed" || pc.connectionState === "disconnected" ? "degraded" : pc.connectionState === "closed" ? "closed" : "connecting";
+      const next = pc.connectionState === "connected" && managed.channel?.readyState === "open" ? "direct" : pc.connectionState === "failed" || pc.connectionState === "disconnected" ? "degraded" : pc.connectionState === "closed" ? "closed" : "connecting";
       this.emit(managed, { state: next, error: pc.connectionState === "failed" ? "ICE connection failed" : undefined });
       if (next === "direct") void this.inspectCandidate(managed);
     };
@@ -152,6 +153,7 @@ export class PeerManager {
     channel.onerror = () => this.emit(managed, { state: "degraded", channelState: channel.readyState, error: "DataChannel error" });
     channel.onmessage = ({ data }) => {
       if (typeof data !== "string") return;
+      if (data.length > 96 * 1024) return;
       this.emit(managed, { bytesReceived: managed.state.bytesReceived + new TextEncoder().encode(data).byteLength });
       let value: unknown;
       try { value = JSON.parse(data); } catch { return; }
@@ -179,15 +181,21 @@ export class PeerManager {
     if (channel.bufferedAmount < 256 * 1024) return;
     await new Promise<void>((resolve, reject) => {
       const timeout = window.setTimeout(() => {
-        channel.removeEventListener("bufferedamountlow", ready);
+        cleanup();
         reject(new Error("WebRTC send queue remained congested."));
       }, 5_000);
-      const ready = () => {
+      const cleanup = () => {
         window.clearTimeout(timeout);
         channel.removeEventListener("bufferedamountlow", ready);
+        channel.removeEventListener("close", closed);
+      };
+      const closed = () => { cleanup(); reject(new Error("Direct WebRTC channel closed while waiting for backpressure.")); };
+      const ready = () => {
+        cleanup();
         resolve();
       };
       channel.addEventListener("bufferedamountlow", ready, { once: true });
+      channel.addEventListener("close", closed, { once: true });
       // The queue may drain between the initial check and listener registration.
       if (channel.readyState !== "open") {
         window.clearTimeout(timeout);
@@ -201,6 +209,10 @@ export class PeerManager {
 
   private emit(managed: ManagedPeer, patch: Partial<LinkState>): void {
     managed.state = { ...managed.state, ...patch, channelState: managed.channel?.readyState ?? managed.state.channelState };
+    if (Object.keys(patch).every((key) => key === "bytesSent" || key === "bytesReceived")) {
+      if (performance.now() - (managed.lastByteUpdate ?? 0) < 200) return;
+      managed.lastByteUpdate = performance.now();
+    }
     this.onState({ ...managed.state });
   }
 

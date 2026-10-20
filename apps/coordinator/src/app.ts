@@ -275,6 +275,8 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
         return send(socket, { type: "error", code: "PEER_UNAVAILABLE", message: "Target peer is not connected to the coordinator." });
       }
       if (parsed.data.type === "signal") {
+        const targetPeerId = parsed.data.targetPeerId;
+        if (!room.edges.some((edge) => edgeKey(edge) === edgeKey({ a: session.peer.id, b: targetPeerId }))) return send(socket, { type: "error", code: "UNPERMITTED_LINK", message: "Signaling requires a host-permitted overlay link." });
         send(target.socket, { type: "signal", sourcePeerId: session.peer.id, signal: parsed.data.signal });
       } else {
         send(target.socket, { type: "relay-data", sourcePeerId: session.peer.id, payload: parsed.data.payload });

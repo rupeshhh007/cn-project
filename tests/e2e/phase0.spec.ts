@@ -30,7 +30,9 @@ test("host admits a participant and exchanges data over WebRTC", async ({ browse
 
   await expect(host.getByText("Phone Test")).toBeVisible();
   await host.getByRole("button", { name: "Admit" }).click();
+  await participant.getByRole("button", { name: "Room", exact: true }).click();
   await expect(participant.getByText("You’re part of the route.")).toBeVisible();
+  await participant.getByRole("button", { name: "Messages", exact: true }).click();
   await expect(participant.getByText("Direct WebRTC", { exact: true }).first()).toBeVisible({ timeout: 15_000 });
   await participant.getByRole("button", { name: "Ping over WebRTC" }).click();
   await expect(participant.getByText(/ms$/)).toBeVisible();
@@ -38,6 +40,7 @@ test("host admits a participant and exchanges data over WebRTC", async ({ browse
   await participant.getByPlaceholder("Message this peer…").fill("hello over the real data channel");
   await participant.getByRole("button", { name: "Send", exact: true }).click();
   await expect(host.getByText("hello over the real data channel")).toBeAttached();
+  await participant.getByRole("button", { name: "Activity", exact: true }).click();
   await expect(participant.getByText("Message acknowledged")).toBeAttached();
   await host.screenshot({ path: screenshotPath("hopnet-phase0-live-desktop.png") });
 

@@ -93,12 +93,15 @@ function App() {
       }
     };
     let transferManager: TransferManager;
+    const reportedStates = new Map<string, string>();
     const manager = new PeerManager(
       credentials.peer.id,
       (targetPeerId, signal) => socket.send(JSON.stringify({ type: "signal", targetPeerId, signal })),
       (state) => {
         setLinks((current) => ({ ...current, [state.peerId]: state }));
-        if (socket.readyState === WebSocket.OPEN && state.state !== "new") {
+        const signature = `${state.state}:${state.rttMs}`;
+        if (socket.readyState === WebSocket.OPEN && state.state !== "new" && reportedStates.get(state.peerId) !== signature) {
+          reportedStates.set(state.peerId, signature);
           socket.send(JSON.stringify({ type: "link-state", peerId: state.peerId, state: state.state, rttMs: state.rttMs }));
         }
       },
@@ -187,7 +190,7 @@ function App() {
         setPeers((current) => current.map((peer) => peer.id === item.peerId ? { ...peer, coordinatorConnected: false } : peer));
         addEvent("Signaling disconnected", "The peer left the coordinator; an established data channel may remain active");
       } else if (item.type === "signal") {
-        void manager.receiveSignal(item.sourcePeerId, item.signal);
+        if (topologyRef.current.some((edge) => canonicalEdge(edge.a, edge.b) === canonicalEdge(credentials.peer.id, item.sourcePeerId))) void manager.receiveSignal(item.sourcePeerId, item.signal);
       } else if (item.type === "topology-updated") {
         syncTopology(item.edges, peersRef.current);
         addEvent("Overlay topology changed", `${item.edges.length} permitted links · operator control`, "EMULATED");
@@ -201,7 +204,7 @@ function App() {
         setError(item.message);
       }
     };
-    return () => { socket.close(); manager.closeAll(); transferManagerRef.current = undefined; };
+    return () => { socket.close(); manager.closeAll(); transferManager.dispose(); transferManagerRef.current = undefined; };
   }, [credentials]);
 
   const remotePeers = peers.filter((peer) => peer.id !== credentials?.peer.id);
@@ -319,7 +322,7 @@ function App() {
 }
 
 function isTransferPacket(packet: DataPacket): packet is TransferDataPacket {
-  return packet.kind === "transfer-offer" || packet.kind === "transfer-response" || packet.kind === "transfer-chunk" || packet.kind === "transfer-chunk-ack" || packet.kind === "transfer-complete";
+  return packet.kind === "transfer-offer" || packet.kind === "transfer-response" || packet.kind === "transfer-chunk" || packet.kind === "transfer-chunk-ack" || packet.kind === "transfer-complete" || packet.kind === "transfer-cancel";
 }
 
 function Entry({ invited, pending, networkInfo, onCreate, onJoin, error }: { invited: boolean; pending: boolean; networkInfo?: NetworkInfo; onCreate: (name: string, category: DeviceCategory) => Promise<void>; onJoin: (name: string, category: DeviceCategory) => Promise<void>; error: string }) {
