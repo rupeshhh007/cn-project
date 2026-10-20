@@ -152,16 +152,42 @@ export function selectPath(nodes: Iterable<NodeId>, edges: readonly GraphEdge[],
 
 export function twoNodeDisjointPaths(nodes: Iterable<NodeId>, edges: readonly GraphEdge[], source: NodeId, destination: NodeId, strategy: RouteStrategy = "minimum-hops", now = Date.now()): NodeId[][] {
   const nodeList = [...nodes];
-  const first = selectPath(nodeList, edges, source, destination, strategy, now);
-  const blocked = new Set(first.slice(1, -1));
-  const remainingNodes = nodeList.filter((node) => !blocked.has(node));
-  const remainingEdges = edges.filter((edge) => !blocked.has(edge.a) && !blocked.has(edge.b));
-  try {
-    return [first, selectPath(remainingNodes, remainingEdges, source, destination, strategy, now)];
-  } catch (error) {
-    if (error instanceof NoRouteError) return [first];
-    throw error;
+  validateGraph(nodeList, edges);
+  if (source === destination) return [[source]];
+  // The wire protocol allows at most eight peers per route; host topology is
+  // bounded to twenty edges. Enumerate this bounded domain rather than greedily
+  // consuming internal nodes of a shortest path that may block both alternatives.
+  const graph = adjacency(nodeList, edges);
+  const candidates: Array<{ path: NodeId[]; cost: number; internal: Set<NodeId>; edges: Set<string> }> = [];
+  const visit = (path: NodeId[], cost: number) => {
+    const current = path.at(-1)!;
+    if (current === destination) {
+      candidates.push({ path, cost, internal: new Set(path.slice(1, -1)), edges: new Set(pathEdges(path)) });
+      return;
+    }
+    if (path.length >= 8) return;
+    for (const neighbour of graph.get(current) ?? []) {
+      if (!path.includes(neighbour.node)) visit([...path, neighbour.node], cost + (strategy === "minimum-hops" ? 1 : edgeCost(neighbour.edge, strategy, now)));
+    }
+  };
+  if (graph.has(source) && graph.has(destination)) visit([source], 0);
+  candidates.sort((a, b) => a.cost - b.cost || a.path.join("\u0000").localeCompare(b.path.join("\u0000")));
+  if (!candidates.length) throw new NoRouteError(source, destination);
+  let best: NodeId[][] = [candidates[0]!.path];
+  let bestCost = Infinity;
+  for (let i = 0; i < candidates.length; i += 1) {
+    const a = candidates[i]!;
+    if (a.cost * 2 >= bestCost) break;
+    for (let j = i + 1; j < candidates.length; j += 1) {
+      const b = candidates[j]!;
+      if (a.cost + b.cost >= bestCost) break;
+      if ([...a.internal].some((node) => b.internal.has(node)) || [...a.edges].some((edge) => b.edges.has(edge))) continue;
+      best = [a.path, b.path];
+      bestCost = a.cost + b.cost;
+      break;
+    }
   }
+  return best;
 }
 
 export function pathEdges(path: readonly NodeId[]): string[] {

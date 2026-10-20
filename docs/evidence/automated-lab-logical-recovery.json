@@ -1,0 +1,6089 @@
+{
+  "exportedAt": "2026-10-20T07:38:30.348Z",
+  "results": [
+    {
+      "schemaVersion": 1,
+      "provenance": "LOCAL BROWSER OBSERVATIONS",
+      "experiment": {
+        "preset": "relay-recovery",
+        "mode": "multipath",
+        "strategy": "minimum-hops",
+        "peerId": "peer_mOvsY2B4Le-b",
+        "id": "146f805e-8311-483e-8aea-bc4423c145c6",
+        "createdAt": 13497,
+        "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+        "faultAt": 14325.300000190735,
+        "failedPeerId": "peer_x4ayMx8NV2yI",
+        "result": {
+          "id": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "direction": "send",
+          "peerId": "peer_mOvsY2B4Le-b",
+          "fileName": "hopnet-repeatable-4MiB.bin",
+          "mime": "application/octet-stream",
+          "size": 4194304,
+          "status": "verified",
+          "acknowledgedChunks": 128,
+          "totalChunks": 128,
+          "acknowledgedBytes": 4194304,
+          "paths": [
+            [
+              "peer_w-lXoqOLp9Q7",
+              "peer_gQ8tYo1BvV-D",
+              "peer_mOvsY2B4Le-b"
+            ],
+            [
+              "peer_w-lXoqOLp9Q7",
+              "peer_x4ayMx8NV2yI",
+              "peer_mOvsY2B4Le-b"
+            ]
+          ],
+          "recoveryCount": 4,
+          "pathStats": [
+            {
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "attemptedChunks": 122,
+              "acknowledgedChunks": 122,
+              "deliveredBytes": 3997696,
+              "retries": 4,
+              "failures": 0,
+              "rttMs": 402.8999996185303
+            },
+            {
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_x4ayMx8NV2yI",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "attemptedChunks": 10,
+              "acknowledgedChunks": 6,
+              "deliveredBytes": 196608,
+              "retries": 0,
+              "failures": 1,
+              "rttMs": 328.2999997138977
+            }
+          ],
+          "history": [
+            {
+              "type": "offer",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 13643.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ]
+            },
+            {
+              "type": "accepted",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 13759.900000095367
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 13760.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 0
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 13764.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_x4ayMx8NV2yI",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 1
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 13770.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 2
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 13775,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_x4ayMx8NV2yI",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 3
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 13779.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 4
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 13783.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_x4ayMx8NV2yI",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 5
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 13787,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 6
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 13793.800000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_x4ayMx8NV2yI",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 7
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 13843.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 0
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 13891.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 2
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 13900.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_x4ayMx8NV2yI",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 1
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 13913.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 8
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 13917.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_x4ayMx8NV2yI",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 9
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 13923.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 10
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 13994.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 4
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14027.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_x4ayMx8NV2yI",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 3
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14058.800000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_x4ayMx8NV2yI",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 11
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14065,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 12
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14091.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 6
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14095.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_x4ayMx8NV2yI",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 13
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14129.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_x4ayMx8NV2yI",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 5
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14215.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 8
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14218,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 14
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14222.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_x4ayMx8NV2yI",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 15
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14264.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_x4ayMx8NV2yI",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 7
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14275.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 10
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14286,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_x4ayMx8NV2yI",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 9
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14352.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 12
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14353.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 16
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14359.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_x4ayMx8NV2yI",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 17
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14366.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 18
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14371.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_x4ayMx8NV2yI",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 19
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14387.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_x4ayMx8NV2yI",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 11
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14390.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 20
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14541.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 14
+            },
+            {
+              "type": "path-unavailable",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14552.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_x4ayMx8NV2yI",
+                "peer_mOvsY2B4Le-b"
+              ]
+            },
+            {
+              "type": "retry-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14553.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 13
+            },
+            {
+              "type": "retry-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14561.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 15
+            },
+            {
+              "type": "retry-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14585.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 17
+            },
+            {
+              "type": "retry-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14599.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 19
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14726.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 21
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14760.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 16
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14787.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 18
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14830.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 20
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14847.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 22
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14856.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 23
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14871.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 24
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 14916.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 13
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15003.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 25
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15080.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 15
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15136.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 17
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15149.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 26
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15160,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 27
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15245.800000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 19
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15264.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 21
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15283.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 22
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15305.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 23
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15308.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 28
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15312.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 29
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15316.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 30
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15320.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 31
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15326.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 24
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15327.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 25
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15329.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 26
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15334,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 27
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15337.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 32
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15342,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 33
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15345.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 34
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15401.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 35
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15416.800000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 28
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15422.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 36
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15466.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 29
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15503.800000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 30
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15544.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 31
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15551.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 37
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15555.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 38
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15563.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 39
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15584.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 32
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15585,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 40
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15617.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 33
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15632.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 34
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15711.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 41
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15718.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 42
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15756,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 35
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15797.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 36
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15842.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 37
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15847.800000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 43
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15852.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 44
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15858.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 45
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15895.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 38
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15901.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 39
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15901.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 40
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15924.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 41
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15929.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 42
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15967,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 43
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15972.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 44
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15978.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 45
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15983.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 46
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15986.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 47
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15993.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 48
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 15998,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 49
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16005.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 50
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16015.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 51
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16038,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 52
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16177,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 53
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16210.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 46
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16247.800000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 47
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16285.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 48
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16307.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 54
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16311.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 55
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16315.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 56
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16325.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 49
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16331.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 57
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16339.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 50
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16342.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 51
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16345.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 52
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16349.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 58
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16354.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 59
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16358.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 60
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16371.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 53
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16394.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 61
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16417.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 54
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16505.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 55
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16519.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 62
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16528.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 63
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16570.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 56
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16610.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 57
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16633.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 58
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16649.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 59
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16651.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 64
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16654.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 65
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16658.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 66
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16661.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 67
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16674.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 60
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16677.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 61
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16679.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 68
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16682.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 69
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16688.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 62
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16689.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 63
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16698.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 70
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16704.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 71
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16788,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 64
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16831.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 72
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16859.800000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 65
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16954,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 73
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16963.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 66
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 16971.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 74
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17007.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 67
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17096.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 75
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17129.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 68
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17160.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 69
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17196.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 70
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17207.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 71
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17222.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 72
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17223.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 73
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17224.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 74
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17227.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 76
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17231.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 77
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17243,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 78
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17250.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 79
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17255.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 80
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17260.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 81
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17264.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 82
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17269.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 75
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17326.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 76
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17328.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 83
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17334.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 84
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17383.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 77
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17442.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 78
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17469.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 79
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17472.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 85
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17475.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 86
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17478.800000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 87
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17663.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 80
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17682.800000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 81
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17688.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 82
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17708.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 88
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17712.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 89
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17715.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 90
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17731.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 83
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17734.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 91
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17752.800000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 84
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17806.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 85
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17831.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 86
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17850.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 87
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17853.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 92
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17857.800000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 93
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17862.800000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 94
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17867.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 95
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17874.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 88
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17875.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 89
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17876.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 90
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17877.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 91
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17886.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 96
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17896.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 97
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17904.800000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 98
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17943.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 99
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17963.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 92
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 17970.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 100
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18039.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 93
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18084.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 94
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18090.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 101
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18095.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 102
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18129.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 95
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18153.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 96
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18173.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 97
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18220.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 103
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18227.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 104
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18231.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 105
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18245.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 98
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18246.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 99
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18247.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 100
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18247.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 101
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18249.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 106
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18252.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 107
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18256.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 108
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18261.800000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 109
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18274.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 102
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18336.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 110
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18350.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 103
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18352.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 111
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18377.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 104
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18420.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 105
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18445.300000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 106
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18470.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 107
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18473.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 112
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18478.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 113
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18485.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 114
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18489,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 115
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18497.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 108
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18499.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 109
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18500.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 110
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18501.800000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 111
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18504.800000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 116
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18510,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 117
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18515.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 118
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18576.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 119
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18585.400000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 112
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18601.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 120
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18725.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 113
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18750.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 121
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18789.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 114
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18829.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 115
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18856,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 116
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18867.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 122
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18874.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 123
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18878.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 124
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18981,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 117
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18986.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 118
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 18994.800000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 119
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 19006.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 125
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 19015,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 126
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 19018.200000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 127
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 19029.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 120
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 19051.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 121
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 19155.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 122
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 19329.700000286102,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 123
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 19391.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 124
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 19393.800000190735,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 125
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 19394.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 126
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 19421.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 127
+            },
+            {
+              "type": "verified",
+              "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+              "at": 19528.099999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_gQ8tYo1BvV-D",
+                "peer_mOvsY2B4Le-b"
+              ]
+            }
+          ],
+          "startedAt": 13759.900000095367,
+          "verifiedHash": "2fbca684e0459c746e5cdc438c03ff1015528500cc7a3478a936d6bb427aaa20",
+          "completedAt": 19528.099999904633
+        }
+      },
+      "status": "verified",
+      "payloadBytes": 4194304,
+      "chunkCount": 128,
+      "receiverAcknowledgedBytes": 4194304,
+      "receiverAcknowledgedChunks": 128,
+      "individuallyObservedChunkAcks": 128,
+      "attempts": 132,
+      "retries": 4,
+      "elapsedMs": 5768.199999809265,
+      "payloadBytesPerSecond": 727142.6095036046,
+      "failureDetectionMs": 227,
+      "recoveryMs": 434.7999997138977,
+      "observedAckGapMs": 474.09999990463257,
+      "offeredAtMs": 13643.200000286102,
+      "acceptedAtMs": 13759.900000095367,
+      "completedAtMs": 19528.099999904633,
+      "verifiedHash": "2fbca684e0459c746e5cdc438c03ff1015528500cc7a3478a936d6bb427aaa20",
+      "pathStats": [
+        {
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "attemptedChunks": 122,
+          "acknowledgedChunks": 122,
+          "deliveredBytes": 3997696,
+          "retries": 4,
+          "failures": 0,
+          "rttMs": 402.8999996185303
+        },
+        {
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_x4ayMx8NV2yI",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "attemptedChunks": 10,
+          "acknowledgedChunks": 6,
+          "deliveredBytes": 196608,
+          "retries": 0,
+          "failures": 1,
+          "rttMs": 328.2999997138977
+        }
+      ],
+      "pathHistory": [
+        {
+          "type": "offer",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 13643.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ]
+        },
+        {
+          "type": "accepted",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 13759.900000095367
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 13760.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 0
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 13764.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_x4ayMx8NV2yI",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 1
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 13770.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 2
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 13775,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_x4ayMx8NV2yI",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 3
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 13779.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 4
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 13783.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_x4ayMx8NV2yI",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 5
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 13787,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 6
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 13793.800000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_x4ayMx8NV2yI",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 7
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 13843.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 0
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 13891.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 2
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 13900.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_x4ayMx8NV2yI",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 1
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 13913.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 8
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 13917.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_x4ayMx8NV2yI",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 9
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 13923.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 10
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 13994.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 4
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14027.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_x4ayMx8NV2yI",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 3
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14058.800000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_x4ayMx8NV2yI",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 11
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14065,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 12
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14091.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 6
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14095.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_x4ayMx8NV2yI",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 13
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14129.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_x4ayMx8NV2yI",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 5
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14215.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 8
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14218,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 14
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14222.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_x4ayMx8NV2yI",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 15
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14264.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_x4ayMx8NV2yI",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 7
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14275.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 10
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14286,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_x4ayMx8NV2yI",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 9
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14352.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 12
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14353.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 16
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14359.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_x4ayMx8NV2yI",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 17
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14366.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 18
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14371.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_x4ayMx8NV2yI",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 19
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14387.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_x4ayMx8NV2yI",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 11
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14390.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 20
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14541.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 14
+        },
+        {
+          "type": "path-unavailable",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14552.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_x4ayMx8NV2yI",
+            "peer_mOvsY2B4Le-b"
+          ]
+        },
+        {
+          "type": "retry-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14553.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 13
+        },
+        {
+          "type": "retry-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14561.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 15
+        },
+        {
+          "type": "retry-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14585.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 17
+        },
+        {
+          "type": "retry-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14599.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 19
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14726.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 21
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14760.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 16
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14787.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 18
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14830.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 20
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14847.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 22
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14856.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 23
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14871.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 24
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 14916.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 13
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15003.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 25
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15080.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 15
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15136.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 17
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15149.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 26
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15160,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 27
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15245.800000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 19
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15264.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 21
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15283.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 22
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15305.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 23
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15308.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 28
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15312.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 29
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15316.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 30
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15320.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 31
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15326.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 24
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15327.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 25
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15329.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 26
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15334,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 27
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15337.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 32
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15342,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 33
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15345.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 34
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15401.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 35
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15416.800000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 28
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15422.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 36
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15466.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 29
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15503.800000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 30
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15544.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 31
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15551.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 37
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15555.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 38
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15563.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 39
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15584.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 32
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15585,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 40
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15617.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 33
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15632.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 34
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15711.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 41
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15718.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 42
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15756,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 35
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15797.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 36
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15842.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 37
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15847.800000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 43
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15852.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 44
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15858.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 45
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15895.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 38
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15901.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 39
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15901.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 40
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15924.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 41
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15929.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 42
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15967,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 43
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15972.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 44
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15978.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 45
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15983.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 46
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15986.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 47
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15993.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 48
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 15998,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 49
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16005.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 50
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16015.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 51
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16038,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 52
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16177,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 53
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16210.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 46
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16247.800000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 47
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16285.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 48
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16307.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 54
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16311.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 55
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16315.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 56
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16325.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 49
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16331.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 57
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16339.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 50
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16342.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 51
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16345.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 52
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16349.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 58
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16354.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 59
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16358.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 60
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16371.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 53
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16394.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 61
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16417.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 54
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16505.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 55
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16519.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 62
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16528.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 63
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16570.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 56
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16610.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 57
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16633.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 58
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16649.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 59
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16651.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 64
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16654.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 65
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16658.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 66
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16661.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 67
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16674.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 60
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16677.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 61
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16679.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 68
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16682.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 69
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16688.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 62
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16689.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 63
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16698.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 70
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16704.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 71
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16788,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 64
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16831.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 72
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16859.800000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 65
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16954,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 73
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16963.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 66
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 16971.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 74
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17007.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 67
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17096.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 75
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17129.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 68
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17160.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 69
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17196.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 70
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17207.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 71
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17222.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 72
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17223.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 73
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17224.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 74
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17227.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 76
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17231.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 77
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17243,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 78
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17250.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 79
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17255.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 80
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17260.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 81
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17264.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 82
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17269.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 75
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17326.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 76
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17328.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 83
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17334.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 84
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17383.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 77
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17442.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 78
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17469.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 79
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17472.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 85
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17475.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 86
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17478.800000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 87
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17663.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 80
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17682.800000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 81
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17688.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 82
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17708.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 88
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17712.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 89
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17715.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 90
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17731.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 83
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17734.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 91
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17752.800000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 84
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17806.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 85
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17831.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 86
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17850.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 87
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17853.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 92
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17857.800000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 93
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17862.800000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 94
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17867.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 95
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17874.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 88
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17875.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 89
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17876.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 90
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17877.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 91
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17886.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 96
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17896.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 97
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17904.800000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 98
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17943.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 99
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17963.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 92
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 17970.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 100
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18039.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 93
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18084.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 94
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18090.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 101
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18095.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 102
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18129.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 95
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18153.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 96
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18173.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 97
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18220.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 103
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18227.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 104
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18231.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 105
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18245.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 98
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18246.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 99
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18247.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 100
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18247.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 101
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18249.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 106
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18252.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 107
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18256.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 108
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18261.800000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 109
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18274.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 102
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18336.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 110
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18350.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 103
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18352.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 111
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18377.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 104
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18420.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 105
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18445.300000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 106
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18470.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 107
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18473.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 112
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18478.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 113
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18485.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 114
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18489,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 115
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18497.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 108
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18499.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 109
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18500.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 110
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18501.800000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 111
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18504.800000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 116
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18510,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 117
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18515.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 118
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18576.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 119
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18585.400000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 112
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18601.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 120
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18725.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 113
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18750.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 121
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18789.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 114
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18829.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 115
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18856,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 116
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18867.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 122
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18874.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 123
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18878.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 124
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18981,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 117
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18986.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 118
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 18994.800000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 119
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 19006.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 125
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 19015,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 126
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 19018.200000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 127
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 19029.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 120
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 19051.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 121
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 19155.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 122
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 19329.700000286102,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 123
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 19391.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 124
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 19393.800000190735,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 125
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 19394.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 126
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 19421.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 127
+        },
+        {
+          "type": "verified",
+          "transferId": "194bf1ae-400c-4b42-bac6-01e0ab933cfd",
+          "at": 19528.099999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_gQ8tYo1BvV-D",
+            "peer_mOvsY2B4Le-b"
+          ]
+        }
+      ],
+      "error": null,
+      "limitations": "Sender-local monotonic time. ACK latency includes forwarding, hashing and browser scheduling. Fault timing is an application-level command, not physical Wi-Fi failure. Receiver byte evidence is reported by its authenticated overlay receipt; remote wall clocks are not subtracted."
+    },
+    {
+      "schemaVersion": 1,
+      "provenance": "LOCAL BROWSER OBSERVATIONS",
+      "experiment": {
+        "preset": "direct-overlay",
+        "mode": "direct",
+        "strategy": "minimum-hops",
+        "peerId": "peer_mOvsY2B4Le-b",
+        "id": "2a60df50-0113-4f0d-91c3-814d602f1549",
+        "createdAt": 11504.300000190735,
+        "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+        "result": {
+          "id": "a71e2249-edce-437d-a649-bad9002af38e",
+          "direction": "send",
+          "peerId": "peer_mOvsY2B4Le-b",
+          "fileName": "lab-proof.bin",
+          "mime": "application/octet-stream",
+          "size": 22,
+          "status": "verified",
+          "acknowledgedChunks": 1,
+          "totalChunks": 1,
+          "acknowledgedBytes": 22,
+          "paths": [
+            [
+              "peer_w-lXoqOLp9Q7",
+              "peer_mOvsY2B4Le-b"
+            ]
+          ],
+          "recoveryCount": 0,
+          "pathStats": [
+            {
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "attemptedChunks": 1,
+              "acknowledgedChunks": 1,
+              "deliveredBytes": 22,
+              "retries": 0,
+              "failures": 0,
+              "rttMs": 13.900000095367432
+            }
+          ],
+          "history": [
+            {
+              "type": "offer",
+              "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+              "at": 11513.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_mOvsY2B4Le-b"
+              ]
+            },
+            {
+              "type": "accepted",
+              "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+              "at": 12676.700000286102
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+              "at": 12677,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 0
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+              "at": 12690.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 0
+            },
+            {
+              "type": "verified",
+              "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+              "at": 12692.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_mOvsY2B4Le-b"
+              ]
+            }
+          ],
+          "startedAt": 12676.599999904633,
+          "verifiedHash": "bfdc6133033b107ec4b790cc70084cf9006d1c069edaeccffc278994d88fbac2",
+          "completedAt": 12692.5
+        }
+      },
+      "status": "verified",
+      "payloadBytes": 22,
+      "chunkCount": 1,
+      "receiverAcknowledgedBytes": 22,
+      "receiverAcknowledgedChunks": 1,
+      "individuallyObservedChunkAcks": 1,
+      "attempts": 1,
+      "retries": 0,
+      "elapsedMs": 15.900000095367432,
+      "payloadBytesPerSecond": 1383.6477904430858,
+      "failureDetectionMs": null,
+      "recoveryMs": null,
+      "observedAckGapMs": null,
+      "offeredAtMs": 11513.599999904633,
+      "acceptedAtMs": 12676.700000286102,
+      "completedAtMs": 12692.5,
+      "verifiedHash": "bfdc6133033b107ec4b790cc70084cf9006d1c069edaeccffc278994d88fbac2",
+      "pathStats": [
+        {
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "attemptedChunks": 1,
+          "acknowledgedChunks": 1,
+          "deliveredBytes": 22,
+          "retries": 0,
+          "failures": 0,
+          "rttMs": 13.900000095367432
+        }
+      ],
+      "pathHistory": [
+        {
+          "type": "offer",
+          "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+          "at": 11513.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_mOvsY2B4Le-b"
+          ]
+        },
+        {
+          "type": "accepted",
+          "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+          "at": 12676.700000286102
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+          "at": 12677,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 0
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+          "at": 12690.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 0
+        },
+        {
+          "type": "verified",
+          "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+          "at": 12692.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_mOvsY2B4Le-b"
+          ]
+        }
+      ],
+      "error": null,
+      "limitations": "Sender-local monotonic time. ACK latency includes forwarding, hashing and browser scheduling. Fault timing is an application-level command, not physical Wi-Fi failure. Receiver byte evidence is reported by its authenticated overlay receipt; remote wall clocks are not subtracted."
+    }
+  ]
+}
