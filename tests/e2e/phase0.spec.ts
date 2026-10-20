@@ -10,7 +10,7 @@ test("host admits a participant and exchanges data over WebRTC", async ({ browse
   await host.getByLabel("Device name").fill("Host Mac");
   await host.getByRole("button", { name: "Create private room" }).click();
   await expect(host.getByText("Your room is ready.")).toBeVisible();
-  await host.screenshot({ path: screenshotPath("hopnet-phase0-entry-desktop.png") });
+  await host.screenshot({ path: screenshotPath("hopnet-phase0-entry-desktop.png"), mask: [host.getByRole("img", { name: "QR code to join this HOPNET room" })] });
 
   const qrSource = await host.getByRole("img", { name: "QR code to join this HOPNET room" }).getAttribute("src");
   expect(qrSource).toBeTruthy();
@@ -81,7 +81,7 @@ test("routes a message through a real intermediate browser without an endpoint c
 
   await phoneA.getByRole("button", { name: /Phone B/ }).click();
   await expect(phoneA.getByText("2-hop overlay", { exact: true })).toBeVisible({ timeout: 15_000 });
-  await expect(phoneA.getByText("not selected", { exact: true })).toBeVisible();
+  await expect(phoneA.getByText("Established overlay links", { exact: true })).toBeVisible();
   await phoneA.getByPlaceholder("Message this peer…").fill("forward this through the relay");
   await phoneA.getByRole("button", { name: "Send", exact: true }).click();
 

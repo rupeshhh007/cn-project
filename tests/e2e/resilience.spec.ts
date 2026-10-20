@@ -1,4 +1,6 @@
 import { createHash } from "node:crypto";
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 
 test.use({ trace: "off" });
@@ -41,6 +43,7 @@ test("two real relay routes survive a mid-transfer browser failure with receiver
     // Close an actual browser participating in the data plane. No coordinator
     // fallback, fake RTC implementation, or synthesized completion is involved.
     await contexts[1]!.close();
+    await host.screenshot({ path: path.resolve("docs/screenshots/hopnet-resilience-active.png") });
     await expect(host.getByTestId("transfer-send")).toHaveAttribute("data-status", "verified", { timeout: 60_000 });
     const after = await evidence(host);
     expect(after.verifiedHash).toBe(expectedHash);
@@ -55,7 +58,10 @@ test("two real relay routes survive a mid-transfer browser failure with receiver
     const digest = createHash("sha256");
     for await (const chunk of stream!) digest.update(chunk);
     expect(digest.digest("hex")).toBe(expectedHash);
-    await testInfo.attach("actual-transfer-evidence.json", { body: JSON.stringify({ provenance: "AUTOMATED BROWSER EXPERIMENT", beforeFailure: before, completed: after }, null, 2), contentType: "application/json" });
-    await host.screenshot({ path: testInfo.outputPath("recovered-desktop.png") });
+    const proof = JSON.stringify({ provenance: "AUTOMATED BROWSER EXPERIMENT", failure: "Actual relay browser context closed", beforeFailure: before, completed: after, downloadedSha256: expectedHash }, null, 2);
+    await testInfo.attach("actual-transfer-evidence.json", { body: proof, contentType: "application/json" });
+    await mkdir(path.resolve("docs/evidence"), { recursive: true });
+    await writeFile(path.resolve("docs/evidence/automated-relay-recovery.json"), proof);
+    await host.screenshot({ path: path.resolve("docs/screenshots/hopnet-resilience-recovered.png") });
   } finally { await Promise.all(contexts.map((context) => context.close())); }
 });

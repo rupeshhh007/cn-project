@@ -13,6 +13,7 @@ export const peerSchema = z.object({
   role: z.enum(["host", "participant"]),
   coordinatorConnected: z.boolean(),
   joinedAt: z.string().datetime(),
+  receiptPublicKey: z.string().max(120).optional(),
 });
 export type Peer = z.infer<typeof peerSchema>;
 
@@ -47,6 +48,7 @@ const rtcSignalSchema = z.object({
 export type RtcSignal = z.infer<typeof rtcSignalSchema>;
 
 export const clientSocketMessageSchema = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("publish-receipt-key"), publicKey: z.string().regex(/^[A-Za-z0-9+/]{87}=$/) }),
   z.object({ type: z.literal("signal"), targetPeerId: z.string(), signal: rtcSignalSchema }),
   z.object({
     type: z.literal("relay-data"),
@@ -65,6 +67,7 @@ export const clientSocketMessageSchema = z.discriminatedUnion("type", [
 export type ClientSocketMessage = z.infer<typeof clientSocketMessageSchema>;
 
 export const serverSocketMessageSchema = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("peer-key-updated"), peerId: z.string(), publicKey: z.string().max(120) }),
   z.object({ type: z.literal("room-snapshot"), selfPeerId: z.string(), peers: z.array(peerSchema), edges: z.array(topologyEdgeSchema), links: z.array(overlayLinkSchema) }),
   z.object({ type: z.literal("peer-joined"), peer: peerSchema }),
   z.object({ type: z.literal("peer-left"), peerId: z.string() }),
@@ -234,7 +237,7 @@ export const dataPacketSchema = z.discriminatedUnion("kind", [
     completedAt: z.number().finite(),
     reason: z.string().max(160).optional(),
   }),
-]);
+]).and(z.object({ signature: z.string().regex(/^[A-Za-z0-9+/]{86}==$/).optional() }));
 export type DataPacket = z.infer<typeof dataPacketSchema>;
 export type TransferDataPacket = Extract<DataPacket, { kind: `transfer-${string}` }>;
 

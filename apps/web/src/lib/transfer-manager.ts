@@ -53,6 +53,7 @@ type Inbound = {
   offerPath: string[];
   lastPath: string[];
   queue: Promise<void>;
+  progressAt: number;
 };
 
 type Dependencies = {
@@ -63,6 +64,10 @@ type Dependencies = {
   onUpdate: (transfer: TransferView) => void;
   onEvent: (title: string, detail: string) => void;
   onProtocolEvent?: (event: TransferEvent) => void;
+  sign: (packet: TransferDataPacket) => Promise<TransferDataPacket>;
+  verify: (packet: TransferDataPacket) => Promise<boolean>;
+  canOfferTo: (peerId: string) => boolean;
+  isPathAvailable: (path: string[]) => boolean;
 };
 
 const MAX_ATTEMPTS = 8;
@@ -83,11 +88,24 @@ export class TransferManager {
   private disposed = false;
   private readonly pendingViews = new Map<string, TransferView>();
   private updateTimer?: ReturnType<typeof setTimeout>;
+  private readonly cleanupTimer: ReturnType<typeof setInterval>;
 
-  constructor(private readonly dependencies: Dependencies) {}
+  constructor(private readonly dependencies: Dependencies) {
+    this.cleanupTimer = setInterval(() => {
+      for (const transfer of this.inbound.values()) {
+        if (transfer.view.status !== "transferring") continue;
+        if (performance.now() - transfer.progressAt <= NO_PROGRESS_TIMEOUT_MS && performance.now() - (transfer.view.startedAt ?? performance.now()) <= TRANSFER_TIMEOUT_MS) continue;
+        transfer.accepted = false;
+        transfer.view = { ...transfer.view, status: "failed", error: "No sender progress for 60 seconds or the transfer resource deadline expired. Restore a route and start a new accepted transfer." };
+        this.record(transfer.view, "receiver-timeout"); this.emit(transfer.view);
+        void this.sendCompletion(transfer, "rejected", undefined, "Receiver timed out waiting for file data.").catch(() => undefined);
+      }
+    }, 5_000);
+  }
 
   async offer(file: File, destinationPeerId: string): Promise<string> {
     if (!canVerifyWithWebCrypto()) throw new Error(SECURE_FILE_ERROR);
+    if (!this.dependencies.canOfferTo(destinationPeerId)) throw new Error("The receiver has no verified-transfer identity yet. Open trusted HTTPS on that device and wait for its secure session to initialize.");
     if (file.size < 1 || file.size > 32 * 1024 * 1024) throw new Error("Choose a file between 1 byte and 32 MiB.");
     this.reserve();
     const transferId = createUuid();
@@ -145,7 +163,9 @@ export class TransferManager {
     const transfer = this.inbound.get(transferId);
     if (!transfer || transfer.view.status !== "awaiting-acceptance") throw new Error("This transfer offer is no longer pending.");
     transfer.accepted = accepted;
-    transfer.view = { ...transfer.view, status: accepted ? "transferring" : "declined" };
+    transfer.progressAt = performance.now();
+    transfer.view = { ...transfer.view, status: accepted ? "transferring" : "declined", startedAt: accepted ? performance.now() : undefined };
+    this.record(transfer.view, accepted ? "consent-accepted" : "consent-declined");
     this.emit(transfer.view);
     const reverse = [...transfer.offerPath].reverse();
     await this.sendAlong(reverse, {
@@ -173,6 +193,10 @@ export class TransferManager {
     }
     if (packet.destinationPeerId !== this.dependencies.selfPeerId) {
       await this.forward(packet);
+      return;
+    }
+    if (!await this.dependencies.verify(packet)) {
+      this.dependencies.onEvent("Transfer signature rejected", "Endpoint signature did not match the coordinator-bound peer identity.");
       return;
     }
     if (packet.kind === "transfer-offer") return this.receiveOffer(packet);
@@ -238,7 +262,7 @@ export class TransferManager {
         recoveryCount: 0,
         pathStats: [], history: [], duplicateChunks: 0,
       };
-      this.inbound.set(packet.transferId, { view, manifest: packet.manifest, assembler, accepted: false, offerPath: packet.path, lastPath: packet.path, queue: Promise.resolve() });
+      this.inbound.set(packet.transferId, { view, manifest: packet.manifest, assembler, accepted: false, offerPath: packet.path, lastPath: packet.path, queue: Promise.resolve(), progressAt: performance.now() });
       this.record(view, "offer-received", packet.path);
       this.emit(view);
       this.dependencies.onEvent("Incoming file offer", `${packet.manifest.name} · ${formatBytes(packet.manifest.size)} · consent required`);
@@ -271,6 +295,8 @@ export class TransferManager {
       const bytes = base64ToBytes(packet.bytes);
       if (bytes.byteLength !== packet.byteLength) throw new Error("Encoded chunk length is invalid.");
       const result = await transfer.assembler.add(packet.chunkIndex, bytes, packet.chunkHash);
+      if (this.disposed || !transfer.accepted || terminal(transfer.view.status) && transfer.view.status !== "verified") return;
+      transfer.progressAt = performance.now();
       transfer.lastPath = packet.path;
       transfer.view = {
         ...transfer.view,
@@ -355,13 +381,13 @@ export class TransferManager {
         try {
           paths = this.validPaths(transfer.view.peerId);
         } catch {
+          for (const stats of transfer.view.pathStats ?? []) if (stats.failures === 0) { stats.failures += 1; this.record(transfer.view, "path-unavailable", stats.path); }
           await delay(250);
           continue;
         }
         const now = performance.now();
-        const keys = new Set(paths.map((path) => path.join("\u0000")));
         for (const stats of transfer.view.pathStats ?? []) {
-          if (!keys.has(stats.path.join("\u0000")) && stats.failures === 0) {
+          if (!this.dependencies.isPathAvailable(stats.path) && stats.failures === 0) {
             stats.failures += 1;
             this.record(transfer.view, "path-unavailable", stats.path);
             this.dependencies.onEvent("Transfer path unavailable", "Continuing over established alternate routes");
@@ -370,7 +396,7 @@ export class TransferManager {
         const retryAfter = (index: number) => Math.min(30_000, Math.max(3_000, (transfer.srtt ?? 750) + 4 * transfer.variance) * 2 ** Math.max(0, (transfer.attempts.get(index) ?? 1) - 1));
         const routeLost = (index: number) => {
           const route = transfer.sends.get(transfer.lastRoute.get(index) ?? "");
-          return route && !keys.has(route.path.join("\u0000"));
+          return route && !this.dependencies.isPathAvailable(route.path);
         };
         const inFlight = transfer.chunks.reduce((count, _, index) => {
           const sentAt = transfer.sentAt.get(index);
@@ -447,6 +473,7 @@ export class TransferManager {
     this.emit(transfer.view);
     try {
       const { bytes, hash } = await transfer.assembler.assemble();
+      if (this.disposed || !transfer.accepted || transfer.view.status !== "verifying") return;
       const blob = new Blob([new Uint8Array(bytes)], { type: transfer.manifest.mime || "application/octet-stream" });
       transfer.view = { ...transfer.view, status: "verified", verifiedHash: hash, downloadUrl: URL.createObjectURL(blob), acknowledgedBytes: transfer.manifest.size, completedAt: performance.now() };
       this.record(transfer.view, "verified", transfer.lastPath);
@@ -505,6 +532,7 @@ export class TransferManager {
     const nextHop = packet.path[packet.hopIndex + 1];
     if (!nextHop || packet.ttl <= 1 || !this.dependencies.isPermittedEdge(this.dependencies.selfPeerId, nextHop)) throw new Error("No permitted next hop remains for this transfer packet.");
     await this.dependencies.send(nextHop, { ...packet, nextHop, hopIndex: packet.hopIndex + 1, ttl: packet.ttl - 1 } as TransferDataPacket);
+    this.dependencies.onProtocolEvent?.({ type: "packet-forwarded", transferId: packet.transferId, at: performance.now(), path: packet.path, chunkIndex: "chunkIndex" in packet ? packet.chunkIndex : undefined, detail: packet.kind });
     this.dependencies.onEvent("Transfer packet forwarded", `${packet.kind.replace("transfer-", "")} · chunk ${"chunkIndex" in packet ? packet.chunkIndex + 1 : "control"}`);
   }
 
@@ -525,11 +553,14 @@ export class TransferManager {
   private async sendAlong(path: string[], packet: TransferDataPacket): Promise<void> {
     const nextHop = path[1];
     if (!nextHop || !this.dependencies.isPermittedEdge(this.dependencies.selfPeerId, nextHop)) throw new Error("The first transfer hop is unavailable.");
-    await this.dependencies.send(nextHop, packet);
+    await this.dependencies.send(nextHop, await this.dependencies.sign(packet));
   }
 
   private failOutbound(transfer: Outbound, error: unknown): void {
+    if (terminal(transfer.view.status) || this.disposed) return;
     transfer.view = { ...transfer.view, status: "failed", error: errorMessage(error) };
+    this.record(transfer.view, "failed");
+    transfer.chunks = undefined;
     this.emit(transfer.view);
     this.dependencies.onEvent("File transfer failed", transfer.view.error!);
   }
@@ -568,6 +599,7 @@ export class TransferManager {
 
   dispose(): void {
     this.disposed = true;
+    clearInterval(this.cleanupTimer);
     clearTimeout(this.updateTimer);
     this.pendingViews.clear();
     for (const item of this.inbound.values()) if (item.view.downloadUrl) URL.revokeObjectURL(item.view.downloadUrl);
@@ -609,4 +641,4 @@ function formatBytes(bytes: number): string {
 }
 
 function errorMessage(error: unknown): string { return error instanceof Error ? error.message : "Unknown transfer error."; }
-function delay(milliseconds: number): Promise<void> { return new Promise((resolve) => window.setTimeout(resolve, milliseconds)); }
+function delay(milliseconds: number): Promise<void> { return new Promise((resolve) => setTimeout(resolve, milliseconds)); }

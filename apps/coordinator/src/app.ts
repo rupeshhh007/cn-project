@@ -44,6 +44,7 @@ type Room = {
   joins: Map<string, JoinRequest>;
   edges: TopologyEdge[];
   links: Map<string, OverlayLink>;
+  linkReports: Map<string, Map<string, { state: OverlayLink["state"]; rttMs?: number }>>;
 };
 
 const rooms = new Map<string, Room>();
@@ -125,6 +126,7 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
       sessions: new Map([[hostPeerId, session]]),
       joins: new Map(),
       edges: [],
+      linkReports: new Map(),
       links: new Map(),
     };
     rooms.set(roomId, room);
@@ -233,6 +235,12 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
       try { json = JSON.parse(raw.toString()); } catch { return send(socket, { type: "error", code: "INVALID_JSON", message: "Message must be JSON." }); }
       const parsed = clientSocketMessageSchema.safeParse(json);
       if (!parsed.success) return send(socket, { type: "error", code: "INVALID_MESSAGE", message: "Message does not match protocol." });
+      if (parsed.data.type === "publish-receipt-key") {
+        if (session.peer.receiptPublicKey && session.peer.receiptPublicKey !== parsed.data.publicKey) return send(socket, { type: "error", code: "KEY_ALREADY_BOUND", message: "This session already has a receipt identity. Rejoin to create a new one." });
+        session.peer.receiptPublicKey = parsed.data.publicKey;
+        broadcast(room, { type: "peer-key-updated", peerId: session.peer.id, publicKey: parsed.data.publicKey });
+        return;
+      }
       if (parsed.data.type === "heartbeat") {
         return send(socket, { type: "heartbeat-ack", sentAt: parsed.data.sentAt, coordinatorAt: Date.now() });
       }
@@ -248,7 +256,7 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
         }
         room.edges = parsed.data.edges;
         const permitted = new Set(room.edges.map(edgeKey));
-        for (const key of room.links.keys()) if (!permitted.has(key)) room.links.delete(key);
+        for (const key of room.links.keys()) if (!permitted.has(key)) { room.links.delete(key); room.linkReports.delete(key); }
         broadcast(room, { type: "topology-updated", edges: room.edges, changedByPeerId: session.peer.id });
         return;
       }
@@ -256,14 +264,23 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
         const candidate: TopologyEdge = { a: session.peer.id, b: parsed.data.peerId };
         const key = edgeKey(candidate);
         if (!room.edges.some((edge) => edgeKey(edge) === key)) {
+          // Remote close notifications may race the topology broadcast. They
+          // cannot create a link and are expected after host revocation.
+          if (parsed.data.state === "closed" || parsed.data.state === "degraded") return;
           return send(socket, { type: "error", code: "UNPERMITTED_LINK", message: "Link state does not belong to the permitted overlay." });
         }
+        const reports = room.linkReports.get(key) ?? new Map<string, { state: OverlayLink["state"]; rttMs?: number }>();
+        reports.set(session.peer.id, { state: parsed.data.state, rttMs: parsed.data.rttMs });
+        room.linkReports.set(key, reports);
+        const states = [reports.get(candidate.a)?.state, reports.get(candidate.b)?.state];
+        const state: OverlayLink["state"] = states.every((value) => value === "direct") ? "direct" : states.includes("closed") ? "closed" : states.includes("degraded") ? "degraded" : "connecting";
+        const measured = [...reports.values()].flatMap((report) => report.rttMs === undefined ? [] : [report.rttMs]);
         const link: OverlayLink = {
           a: candidate.a < candidate.b ? candidate.a : candidate.b,
           b: candidate.a < candidate.b ? candidate.b : candidate.a,
-          state: parsed.data.state,
+          state,
           reportedByPeerId: session.peer.id,
-          rttMs: parsed.data.rttMs,
+          rttMs: measured.length ? measured.reduce((sum, value) => sum + value, 0) / measured.length : undefined,
           updatedAt: Date.now(),
         };
         room.links.set(key, link);

@@ -21,6 +21,7 @@ type ManagedPeer = {
   state: LinkState;
   pendingPings: Map<string, number>;
   lastByteUpdate?: number;
+  pingTimer?: ReturnType<typeof setInterval>;
 };
 
 export class PeerManager {
@@ -101,6 +102,7 @@ export class PeerManager {
   ping(remotePeerId: string): string {
     const messageId = createUuid();
     const managed = this.requireOpen(remotePeerId);
+    for (const [id, at] of managed.pendingPings) if (performance.now() - at > 30_000) managed.pendingPings.delete(id);
     managed.pendingPings.set(messageId, performance.now());
     this.send(remotePeerId, { protocolVersion: PROTOCOL_VERSION, kind: "ping", messageId, sentAt: performance.timeOrigin + performance.now() });
     return messageId;
@@ -122,8 +124,10 @@ export class PeerManager {
 
   close(remotePeerId: string): void {
     const managed = this.peers.get(remotePeerId);
+    clearInterval(managed?.pingTimer);
     managed?.channel?.close();
     managed?.pc.close();
+    if (managed) this.emit(managed, { state: "closed", channelState: "closed" });
     this.peers.delete(remotePeerId);
   }
 
@@ -148,8 +152,12 @@ export class PeerManager {
     managed.channel = channel;
     channel.binaryType = "arraybuffer";
     channel.bufferedAmountLowThreshold = 64 * 1024;
-    channel.onopen = () => { this.emit(managed, { state: "direct", channelState: channel.readyState }); void this.inspectCandidate(managed); };
-    channel.onclose = () => this.emit(managed, { state: "closed", channelState: channel.readyState });
+    channel.onopen = () => {
+      this.emit(managed, { state: "direct", channelState: channel.readyState }); void this.inspectCandidate(managed);
+      const measure = () => { if (channel.readyState === "open") this.ping(remotePeerId); };
+      measure(); managed.pingTimer = setInterval(measure, 10_000);
+    };
+    channel.onclose = () => { clearInterval(managed.pingTimer); this.emit(managed, { state: "closed", channelState: channel.readyState }); };
     channel.onerror = () => this.emit(managed, { state: "degraded", channelState: channel.readyState, error: "DataChannel error" });
     channel.onmessage = ({ data }) => {
       if (typeof data !== "string") return;
@@ -208,6 +216,7 @@ export class PeerManager {
   }
 
   private emit(managed: ManagedPeer, patch: Partial<LinkState>): void {
+    if (this.peers.get(managed.state.peerId) !== managed) return;
     managed.state = { ...managed.state, ...patch, channelState: managed.channel?.readyState ?? managed.state.channelState };
     if (Object.keys(patch).every((key) => key === "bytesSent" || key === "bytesReceived")) {
       if (performance.now() - (managed.lastByteUpdate ?? 0) < 200) return;
@@ -217,6 +226,7 @@ export class PeerManager {
   }
 
   private async inspectCandidate(managed: ManagedPeer): Promise<void> {
+    if (managed.pc.connectionState === "closed") return;
     const stats = await managed.pc.getStats();
     let pair: RTCStats | undefined;
     stats.forEach((report) => { if (report.type === "candidate-pair" && report.state === "succeeded" && (report.nominated || !pair)) pair = report; });
