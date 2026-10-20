@@ -1,8 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import WebSocket from "ws";
-import { buildApp } from "../src/app.ts";
+import { buildApp, requestLogFields } from "../src/app.ts";
 import { normalizeLanInterfaces } from "../src/network.ts";
+
+test("request logs exclude invitation and bearer-token query strings", () => {
+  const fields = requestLogFields({ method: "GET", url: "/signal?token=private-session&invite=private-invitation", ip: "127.0.0.1" });
+  assert.deepEqual(fields, { method: "GET", url: "/signal", remoteAddress: "127.0.0.1" });
+  assert.doesNotMatch(JSON.stringify(fields), /private-session|private-invitation/);
+});
 
 test("network discovery and QR invitations use an allow-listed LAN origin", async (t) => {
   process.env.NODE_ENV = "test";

@@ -85,6 +85,10 @@ function bearer(value: string | string[] | undefined): string | undefined {
 
 export type BuildOptions = { serveWeb?: boolean; port?: number; networkInterfaces?: LanInterface[] };
 
+export function requestLogFields(request: { method?: string; url?: string; ip?: string }) {
+  return { method: request.method, url: request.url?.split("?")[0], remoteAddress: request.ip };
+}
+
 export async function buildApp(options: BuildOptions = {}): Promise<FastifyInstance> {
   const certPath = process.env.HOPNET_TLS_CERT;
   const keyPath = process.env.HOPNET_TLS_KEY;
@@ -94,7 +98,7 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
   const network = createNetworkConfig(protocol, configuredPort, options.networkInterfaces ?? discoverLanInterfaces(protocol, configuredPort));
   // Fastify's overloads cannot express a server that is selected between HTTP and
   // HTTPS at runtime. The returned API remains the common FastifyInstance surface.
-  const app = Fastify({ logger: process.env.NODE_ENV !== "test", bodyLimit: 96 * 1024, ...(https ? { https } : {}) } as never) as unknown as FastifyInstance;
+  const app = Fastify({ logger: process.env.NODE_ENV === "test" ? false : { serializers: { req: requestLogFields } }, bodyLimit: 96 * 1024, ...(https ? { https } : {}) } as never) as unknown as FastifyInstance;
 
   app.get("/api/health", async () => ({ status: "ok", service: "hopnet-coordinator", rooms: rooms.size }));
   app.get("/api/network", async (_request, reply) => reply.header("cache-control", "no-store").send({
