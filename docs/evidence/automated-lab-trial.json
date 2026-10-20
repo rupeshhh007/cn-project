@@ -1,0 +1,177 @@
+{
+  "exportedAt": "2026-10-20T07:38:23.050Z",
+  "results": [
+    {
+      "schemaVersion": 1,
+      "provenance": "LOCAL BROWSER OBSERVATIONS",
+      "experiment": {
+        "preset": "direct-overlay",
+        "mode": "direct",
+        "strategy": "minimum-hops",
+        "peerId": "peer_mOvsY2B4Le-b",
+        "id": "2a60df50-0113-4f0d-91c3-814d602f1549",
+        "createdAt": 11504.300000190735,
+        "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+        "result": {
+          "id": "a71e2249-edce-437d-a649-bad9002af38e",
+          "direction": "send",
+          "peerId": "peer_mOvsY2B4Le-b",
+          "fileName": "lab-proof.bin",
+          "mime": "application/octet-stream",
+          "size": 22,
+          "status": "verified",
+          "acknowledgedChunks": 1,
+          "totalChunks": 1,
+          "acknowledgedBytes": 22,
+          "paths": [
+            [
+              "peer_w-lXoqOLp9Q7",
+              "peer_mOvsY2B4Le-b"
+            ]
+          ],
+          "recoveryCount": 0,
+          "pathStats": [
+            {
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "attemptedChunks": 1,
+              "acknowledgedChunks": 1,
+              "deliveredBytes": 22,
+              "retries": 0,
+              "failures": 0,
+              "rttMs": 13.900000095367432
+            }
+          ],
+          "history": [
+            {
+              "type": "offer",
+              "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+              "at": 11513.599999904633,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_mOvsY2B4Le-b"
+              ]
+            },
+            {
+              "type": "accepted",
+              "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+              "at": 12676.700000286102
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+              "at": 12677,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 0
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+              "at": 12690.900000095367,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_mOvsY2B4Le-b"
+              ],
+              "chunkIndex": 0
+            },
+            {
+              "type": "verified",
+              "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+              "at": 12692.5,
+              "path": [
+                "peer_w-lXoqOLp9Q7",
+                "peer_mOvsY2B4Le-b"
+              ]
+            }
+          ],
+          "startedAt": 12676.599999904633,
+          "verifiedHash": "bfdc6133033b107ec4b790cc70084cf9006d1c069edaeccffc278994d88fbac2",
+          "completedAt": 12692.5
+        }
+      },
+      "status": "verified",
+      "payloadBytes": 22,
+      "chunkCount": 1,
+      "receiverAcknowledgedBytes": 22,
+      "receiverAcknowledgedChunks": 1,
+      "individuallyObservedChunkAcks": 1,
+      "attempts": 1,
+      "retries": 0,
+      "elapsedMs": 15.900000095367432,
+      "payloadBytesPerSecond": 1383.6477904430858,
+      "failureDetectionMs": null,
+      "recoveryMs": null,
+      "observedAckGapMs": null,
+      "offeredAtMs": 11513.599999904633,
+      "acceptedAtMs": 12676.700000286102,
+      "completedAtMs": 12692.5,
+      "verifiedHash": "bfdc6133033b107ec4b790cc70084cf9006d1c069edaeccffc278994d88fbac2",
+      "pathStats": [
+        {
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "attemptedChunks": 1,
+          "acknowledgedChunks": 1,
+          "deliveredBytes": 22,
+          "retries": 0,
+          "failures": 0,
+          "rttMs": 13.900000095367432
+        }
+      ],
+      "pathHistory": [
+        {
+          "type": "offer",
+          "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+          "at": 11513.599999904633,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_mOvsY2B4Le-b"
+          ]
+        },
+        {
+          "type": "accepted",
+          "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+          "at": 12676.700000286102
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+          "at": 12677,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 0
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+          "at": 12690.900000095367,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_mOvsY2B4Le-b"
+          ],
+          "chunkIndex": 0
+        },
+        {
+          "type": "verified",
+          "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+          "at": 12692.5,
+          "path": [
+            "peer_w-lXoqOLp9Q7",
+            "peer_mOvsY2B4Le-b"
+          ]
+        }
+      ],
+      "error": null,
+      "limitations": "Sender-local monotonic time. ACK latency includes forwarding, hashing and browser scheduling. Fault timing is an application-level command, not physical Wi-Fi failure. Receiver byte evidence is reported by its authenticated overlay receipt; remote wall clocks are not subtracted."
+    }
+  ]
+}

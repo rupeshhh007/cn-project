@@ -21,6 +21,7 @@ HTTP is sufficient for basic room and DataChannel diagnosis, but the verified-tr
 ```bash
 brew install mkcert
 mkcert -install
+mkdir -p .certs
 mkcert -cert-file .certs/hopnet.pem -key-file .certs/hopnet-key.pem localhost 127.0.0.1 YOUR_LAN_IP
 HOPNET_TLS_CERT="$PWD/.certs/hopnet.pem" HOPNET_TLS_KEY="$PWD/.certs/hopnet-key.pem" npm run doctor
 HOPNET_TLS_CERT="$PWD/.certs/hopnet.pem" HOPNET_TLS_KEY="$PWD/.certs/hopnet-key.pem" npm start
@@ -62,6 +63,22 @@ Repeat admission for Mac B and the remaining phones. Verify every displayed devi
 5. Record file size, acknowledged bytes/chunks, start/end time, and any retry or route-change event. Do not infer throughput from animation time.
 
 The browser E2E suite verifies these flows with isolated Chrome contexts. Physical transfer, secure-certificate trust on the phones, and relay-failure recovery remain separate manual gates.
+
+## 6. Resilience Studio and five-device live demo
+
+Use Mac A as host/sender, Phone A and Phone B as relays, Mac B as receiver, and Phone C as an additional participant. Keep all browsers foregrounded on trusted HTTPS. Record the browser/OS versions and Wi-Fi/hotspot type.
+
+1. Show the five actual admitted peers in Space. Send a unique message from Mac A to Mac B and show its visible Send conversation and delivery receipt.
+2. In Lab, select Mac B as receiver and configure the four diamond links in `RESILIENCE_STUDIO.md`. Disable the direct Mac A ↔ Mac B link. Wait for all four links to say established and both route names to appear.
+3. Select preset C, two overlay routes and the repeatable payload (or a larger file up to 32 MiB if a phone completes too quickly for the demonstration). Start. On Mac B, open Send and accept the file.
+4. Wait for receiver-confirmed progress on both paths. Close Phone A's HOPNET tab, or explicitly label the host's **Disconnect relay links** action as logical fault injection. Record which action occurred and when.
+5. Show the continuing receiver byte count, surviving path, retries, final verified result and downloadable file. If no alternate path remains, demonstrate the honest failure instead.
+6. Download the file at Mac B and independently compare `shasum -a 256` with the sender's original. For the default generated file, compare against the manifest's exported digest and retain the downloaded file.
+7. Export Lab JSON and CSV. Open Replay, select the path-failure/retry and verification events, scrub backward, step forward and show the recorded topology. Explain that playback sends no packets.
+
+Return: redacted screenshots from all five devices; the sender's experiment JSON/CSV and journal JSON; independent file hashes; a short screen recording covering the failure through completion; browser errors, if any; and browser/OS/network details. Never include invitations, session tokens, CA private keys or file contents containing private data. Physical acceptance is pending until this evidence is reviewed.
+
+For the viva: signaling establishes channels; channels carry payloads; overlay hops are browser forwarding, not IP routing; final-receiver ACKs differ from relay sends; hash equality proves reconstruction; signatures bind receipts to the receiving session; logical-link injection is not a Wi-Fi fault; local monotonic durations do not require clock synchronization; and a successful trial does not establish statistical superiority.
 
 ## Failure isolation
 

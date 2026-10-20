@@ -32,6 +32,14 @@ The sender hashes the complete file and each 32 KiB chunk before offering a boun
 
 Room state is intentionally ephemeral in Phase 0. Private payloads are not stored or silently uploaded. The coordinator binds to the LAN only when the operator starts it.
 
+## Resilience Studio extension
+
+`apps/web/src/lib/transfer-manager.ts` owns consent, bounded scheduling, endpoint verification, ACK tracking, recovery and cancellation. `receipt-identity.ts` signs and verifies immutable transfer envelopes using coordinator-bound public keys. `experiment-paths.ts` keeps direct and single-route baselines distinct from pair optimization. `evidence.ts` defines local journal snapshots, trial records, metric derivation and exports. `components/Studio.tsx` implements dedicated Send, Lab and historical Replay workspaces while retaining the original Space assets and room art direction.
+
+The coordinator aggregates both endpoint reports before treating a permitted link as established. Removing an edge invalidates its observations. Browsers discard removed links and close their channels; a restored permission must negotiate again. State callbacks from replaced peer connections cannot overwrite a newer connection.
+
+See `RESILIENCE_STUDIO.md` for protocol limits and metric definitions, and `RESEARCH_DRAFT.md` for the experimental methodology and limitations.
+
 ## Phase 0 failure boundaries
 
 - Invalid or expired invitation: join is rejected without revealing room state.

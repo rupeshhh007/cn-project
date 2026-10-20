@@ -30,6 +30,14 @@ The protocol caps file size at 32 MiB, chunk payloads at 32 KiB before encoding,
 
 ## Security properties
 
+### Resilience Studio extension
+
+Secure sessions publish an ephemeral ECDSA P-256 verification key through authenticated signaling (`publish-receipt-key`, `peer-key-updated`). The coordinator binds the key to that session only and rejects replacement. Every transfer envelope includes an endpoint signature; canonical signing excludes only `signature`, `nextHop`, `hopIndex`, and `ttl`. A relay may advance those hop-local fields, but cannot alter endpoints, full path, transfer/attempt identity, consent, bytes, digest or completion result. Endpoint verification precedes application processing.
+
+`transfer-chunk-ack` echoes the exact chunk attempt's route ID and reverses its path. Unique matching final-receiver ACKs update accounting once. `transfer-cancel` terminates an active endpoint transfer. Verified receivers respond idempotently to a repeated final chunk, allowing recovery of a lost completion receipt. Failed/cancelled transfers ignore later completion. Receivers stop inactive transfers after their no-progress deadline; a failed reverse-channel send does not invalidate a correctly stored or verified file.
+
+This extension requires matching current HOPNET clients. It is not compatible with unsigned file-transfer clients from the earlier checkpoint; they must reload. Chat packet semantics are unchanged.
+
 - Invitations contain a random room secret.
 - Joining creates only a pending request.
 - Only the host bearer token can admit a request.
