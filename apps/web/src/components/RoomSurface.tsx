@@ -8,6 +8,7 @@ import type { NetworkInfo } from "../App.tsx";
 import type { ConversationMessage } from "../App.tsx";
 import type { Experiment, ExperimentConfig, NetworkEvent } from "../lib/evidence.ts";
 import { Conversation, LabWorkspace, ReplayWorkspace, SendWorkspace } from "./Studio.tsx";
+import { deviceAsset } from "../lib/device-assets.ts";
 
 export type Props = {
   self: Peer;
@@ -52,11 +53,11 @@ type View = "space" | "send" | "lab" | "replay";
 type Point = { x: number; y: number };
 
 const positions: Point[] = [
-  { x: 33, y: 54 },
-  { x: 61, y: 25 },
-  { x: 77, y: 52 },
-  { x: 57, y: 79 },
-  { x: 23, y: 77 },
+  { x: 16, y: 48 },
+  { x: 59, y: 23 },
+  { x: 81, y: 56 },
+  { x: 68, y: 80 },
+  { x: 31, y: 80 },
   { x: 17, y: 31 },
 ];
 
@@ -143,7 +144,7 @@ function DesktopRoom(props: Props) {
         <button className="soft-button" onClick={() => { void navigator.clipboard?.writeText(props.inviteUrl).then(() => { setInviteCopied(true); setCopyError(""); window.setTimeout(() => setInviteCopied(false), 1600); }).catch(() => setCopyError("Clipboard unavailable. Use trusted HTTPS or scan the room QR.")); if (!navigator.clipboard) setCopyError("Clipboard requires trusted HTTPS. Scan the room QR instead."); }}>{inviteCopied ? "Invitation copied" : "Copy invitation"}</button>
         {copyError && <p className="session-note" role="alert">{copyError}</p>}
         <NetworkDoctor {...props} />
-        <TransferShelf transfers={props.transfers} peers={props.peers} self={props.self} onResponse={props.onTransferResponse} />
+        <TransferShelf compact transfers={props.transfers} peers={props.peers} self={props.self} onResponse={props.onTransferResponse} />
         {props.joinRequests.map((request) => <div className="admission" key={request.requestId}><span>{request.displayName}<small>{request.deviceCategory} requests entry</small></span><button onClick={() => props.onApprove(request.requestId)}>Admit</button></div>)}
         {orderedPeers.length > 1 && <Topology peers={orderedPeers} edges={props.topologyEdges} onToggle={props.onToggleEdge} />}
       </motion.aside> : props.selectedPeer ? <motion.aside key={props.selectedPeer.id} className="peer-inspector" initial={{ opacity: 0, x: 28, scale: .96 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 28 }} transition={{ type: "spring", stiffness: 340, damping: 30 }}>
@@ -155,7 +156,7 @@ function DesktopRoom(props: Props) {
         </div>
         <label className="policy-control">Path strategy<select value={props.routeStrategy} onChange={(event) => props.onRouteStrategy(event.target.value as RouteStrategy)}><option value="minimum-hops">Minimum hops</option><option value="lowest-latency">Lowest observed RTT</option><option value="adaptive">Adaptive resilience</option></select></label>
         {props.selectedRoute && <div className="route-chip">{props.selectedRoute.map((id) => orderedPeers.find((peer) => peer.id === id)?.displayName ?? "peer").join(" → ")}</div>}
-        <TransferShelf transfers={props.transfers} peers={props.peers} self={props.self} onResponse={props.onTransferResponse} />
+        <TransferShelf compact transfers={props.transfers} peers={props.peers} self={props.self} onResponse={props.onTransferResponse} />
         <button className="inspector-action" onClick={props.onPing} disabled={props.selectedLink?.state !== "direct"}><Icon name="pulse"/>Ping over WebRTC</button>
         <Composer className="desktop-composer" message={props.message} onMessage={props.onMessage} onSend={props.onSend} disabled={!props.selectedRoute} onFile={props.onFile} fileDisabled={!props.selectedRoute || !window.isSecureContext || !crypto.subtle} />
         <FilePicker disabled={!props.selectedRoute || !window.isSecureContext || !crypto.subtle} onFile={props.onFile} />
@@ -242,7 +243,7 @@ function MobileRoom(props: Props) {
 function Atmosphere() { return <div className="atmosphere" aria-hidden="true"><i className="blob blob-a"/><i className="blob blob-b"/><i className="blob blob-c"/><i className="grain"/></div>; }
 
 function Navigation({ active, onSelect }: { active: View; onSelect: (view: View) => void }) {
-  return <nav className="primary-nav">{(["space", "send", "lab", "replay"] as View[]).map((item) => <button key={item} aria-label={`Open ${item} view`} className={active === item ? "active" : ""} onClick={() => onSelect(item)}><Icon name={item}/><span>{item[0].toUpperCase() + item.slice(1)}</span></button>)}</nav>;
+  return <nav className="primary-nav" aria-label="Workspace navigation">{(["space", "send", "lab", "replay"] as View[]).map((item) => <button key={item} aria-label={`Open ${item} view`} aria-current={active === item ? "page" : undefined} className={active === item ? "active" : ""} onClick={() => onSelect(item)}>{active === item && <motion.span className="nav-selection" layoutId="workspace-selection" transition={{ type: "spring", stiffness: 390, damping: 34 }} />}<Icon name={item}/><span>{item[0].toUpperCase() + item.slice(1)}</span></button>)}</nav>;
 }
 
 function SpatialDevice({ peer, point, state, selected, self, onClick }: { peer: Peer; point: Point; state: LinkState["state"] | "overlay"; selected: boolean; self: boolean; onClick: () => void }) {
@@ -254,8 +255,8 @@ function SpatialDevice({ peer, point, state, selected, self, onClick }: { peer: 
 }
 
 function DeviceAsset({ category }: { category: DeviceCategory }) {
-  const source = category === "laptop" ? "laptop" : category === "phone" ? "phone" : category === "tablet" ? "tablet" : "node";
-  return <img className={`device-asset ${source}`} src={`/assets/devices/${source}.webp`} alt="" decoding="async"/>;
+  const asset = deviceAsset(category);
+  return <img className={`device-asset ${asset.className}`} src={asset.source} alt="" decoding="async"/>;
 }
 
 function InfoRow({ icon, label, value }: { icon: string; label: string; value: string }) { return <div className="info-row"><Icon name={icon}/><div><strong>{label}</strong><span>{value}</span></div></div>; }
@@ -272,8 +273,9 @@ function FilePicker({ disabled, onFile }: { disabled: boolean; onFile: (file: Fi
   return <label className={`file-picker ${disabled ? "disabled" : ""}`}><Icon name="attach"/><span>Choose file to send</span><input aria-label="Choose file to send" type="file" disabled={disabled} onChange={(event) => { const file = event.target.files?.[0]; if (file) void onFile(file); event.target.value = ""; }}/></label>;
 }
 
-export function TransferShelf({ transfers, peers, self, onResponse, onCancel }: { transfers: TransferView[]; peers: Peer[]; self: Peer; onResponse: (transferId: string, accepted: boolean) => Promise<void>; onCancel?: (id: string) => Promise<void> }) {
-  const visible = transfers.slice(0, 12);
+export function TransferShelf({ transfers, peers, self, onResponse, onCancel, compact = false }: { transfers: TransferView[]; peers: Peer[]; self: Peer; onResponse: (transferId: string, accepted: boolean) => Promise<void>; onCancel?: (id: string) => Promise<void>; compact?: boolean }) {
+  const active = transfers.filter((transfer) => !["verified", "failed", "declined", "cancelled"].includes(transfer.status));
+  const visible = compact ? active.length ? active : transfers.slice(0, 1) : transfers.slice(0, 12);
   if (!visible.length) return null;
   return <section className="transfer-shelf" aria-label="File transfers">{visible.map((transfer) => {
     const peer = peers.find((item) => item.id === transfer.peerId)?.displayName ?? "peer";
@@ -281,7 +283,7 @@ export function TransferShelf({ transfers, peers, self, onResponse, onCancel }: 
     const path = transfer.paths[0]?.map((id) => id === self.id ? "This device" : peers.find((item) => item.id === id)?.displayName ?? "peer").join(" → ");
     return <motion.article key={transfer.id} data-testid={`transfer-${transfer.direction}`} data-status={transfer.status} initial={{ opacity: 0, y: 18, scale: .98 }} animate={{ opacity: 1, y: 0, scale: 1 }}>
       <div className="transfer-file-icon"><Icon name="file"/></div>
-      <div className="transfer-copy"><small>{transfer.direction === "receive" ? `FROM ${peer}` : `TO ${peer}`}</small><strong>{transfer.fileName}</strong><span>{formatBytes(transfer.size)} · {transfer.paths.length > 1 ? `${transfer.paths.length} disjoint paths` : path ?? "finding route"}</span></div>
+      <div className="transfer-copy"><small>{transfer.direction === "receive" ? `FROM ${peer}` : `TO ${peer}`}</small><strong>{transfer.fileName}</strong><span>{formatBytes(transfer.size)} · {transfer.paths.length > 1 ? `${transfer.paths.length} routes observed` : path ?? "finding route"}</span></div>
       {transfer.status === "awaiting-acceptance" ? <div className="transfer-consent"><button onClick={() => void onResponse(transfer.id, true)} aria-label={`Accept ${transfer.fileName}`}>Accept</button><button onClick={() => void onResponse(transfer.id, false)} aria-label={`Decline ${transfer.fileName}`}>Decline</button></div> : <div className="transfer-progress"><div><i style={{ width: `${percentage}%` }}/></div><span>{transfer.status === "verified" ? "SHA-256 verified" : ["failed", "declined", "cancelled"].includes(transfer.status) ? transfer.error ?? transfer.status : transfer.status === "offered" ? "Waiting for receiver consent" : transfer.status === "verifying" ? "Verifying whole file…" : `${percentage}% receiver acknowledged`}</span>{transfer.downloadUrl && <a href={transfer.downloadUrl} download={transfer.fileName}>Save file</a>}</div>}
       {onCancel && !["verified", "failed", "declined", "cancelled"].includes(transfer.status) && <button className="cancel-transfer" onClick={() => void onCancel(transfer.id)}>Cancel transfer</button>}
       <details className="transfer-evidence"><summary>Receiver evidence · {transfer.acknowledgedChunks}/{transfer.totalChunks} chunks</summary><pre data-testid="transfer-evidence">{JSON.stringify({ ...transfer, downloadUrl: undefined, history: transfer.history?.filter((event) => !["chunk-scheduled", "receiver-ack", "chunk-received"].includes(event.type)) }, null, 2)}</pre></details>
@@ -329,12 +331,12 @@ function Icon({ name }: { name: string }) {
 }
 
 function curve(a: Point, b: Point, size: { width: number; height: number }) {
-  const scale = window.innerWidth <= 1000 ? .8 : 1;
-  const ax = a.x * size.width / 100, ay = a.y * size.height / 100 + 35 * scale;
-  const bx = b.x * size.width / 100, by = b.y * size.height / 100 + 35 * scale;
+  const scale = window.innerWidth <= 1000 ? .75 : 1;
+  const ax = a.x * size.width / 100, ay = a.y * size.height / 100 + 41 * scale;
+  const bx = b.x * size.width / 100, by = b.y * size.height / 100 + 41 * scale;
   const distance = Math.max(1, Math.hypot(bx - ax, by - ay));
   // Terminate on the illuminated plinth perimeter, not the device's screen.
-  const ox = (bx - ax) / distance * 54 * scale, oy = (by - ay) / distance * 15 * scale;
+  const ox = (bx - ax) / distance * 70 * scale, oy = (by - ay) / distance * 17 * scale;
   const x1 = ax + ox, y1 = ay + oy, x2 = bx - ox, y2 = by - oy;
   const dx = x2 - x1, dy = y2 - y1, length = Math.max(1, Math.hypot(dx, dy));
   const offset = Math.min(64, length * .11);

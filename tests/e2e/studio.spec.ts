@@ -4,7 +4,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 test.use({ trace: "off" });
 const screenshots = path.resolve("docs/screenshots/studio");
-const sizes = [[1920, 1080], [1440, 900], [1280, 720], [768, 1024], [430, 932], [390, 844]];
+const sizes = [[1920, 1080], [1586, 992], [1440, 900], [1280, 720], [768, 1024], [430, 932], [390, 844]];
 
 async function layout(page: Page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
@@ -25,10 +25,38 @@ async function layout(page: Page) {
   }));
   if (obstructions.length) await page.screenshot({ path: `/tmp/hopnet-obstruction-${page.viewportSize()?.width}.png`, animations: "disabled" });
   expect(obstructions).toEqual([]);
+  expect(await page.locator(".device-render img").evaluateAll((images) => images.every((image) => {
+    const frame = image.parentElement!.getBoundingClientRect(), bounds = image.getBoundingClientRect();
+    return bounds.width <= frame.width + 1 && bounds.height <= frame.height + 1;
+  }))).toBe(true);
+  // Live endpoints must terminate on a plinth, including after responsive resize.
+  await expect.poll(() => page.locator(".network-lines path").evaluateAll((paths) => {
+    const pads = [...document.querySelectorAll(".plinth")].map((pad) => pad.getBoundingClientRect());
+    return paths.every((node) => {
+      const path = node as SVGPathElement;
+      return [0, path.getTotalLength()].every((length) => {
+        const point = path.getPointAtLength(length).matrixTransform(path.getScreenCTM()!);
+        return pads.some((pad) => point.x >= pad.left - 3 && point.x <= pad.right + 3 && point.y >= pad.top - 3 && point.y <= pad.bottom + 3);
+      });
+    });
+  })).toBe(true);
+  // Recorded percent positions and SVG endpoints must share the same coordinate
+  // space, rather than letterboxing a square viewBox in a rectangular panel.
+  expect(await page.locator(".historical-network line").evaluateAll((lines) => {
+    const peers = [...document.querySelectorAll(".historical-peer")].map((peer) => peer.getBoundingClientRect());
+    return lines.every((node) => {
+      const line = node as SVGLineElement;
+      return [[line.x1.baseVal.value, line.y1.baseVal.value], [line.x2.baseVal.value, line.y2.baseVal.value]].every(([x, y]) => {
+        const point = new DOMPoint(x, y).matrixTransform(line.getScreenCTM()!);
+        return peers.some((peer) => Math.abs(point.x - (peer.left + peer.width / 2)) < 2 && Math.abs(point.y - (peer.top + peer.height / 2)) < 2);
+      });
+    });
+  })).toBe(true);
 }
 
-test("SEND conversations, Lab evidence exports, Replay controls and six responsive viewports", async ({ browser }) => {
-  // Five real browser peers, two accepted trials and six viewport walkthroughs.
+test("SEND conversations, Lab evidence exports, Replay controls and responsive viewports", async ({ browser }) => {
+  // Five real browser peers, two accepted trials, six acceptance sizes and the
+  // generated concept's native dimensions for direct visual comparison.
   test.setTimeout(120_000);
   await mkdir(screenshots, { recursive: true });
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, acceptDownloads: true, reducedMotion: "reduce" });
@@ -38,6 +66,11 @@ test("SEND conversations, Lab evidence exports, Replay controls and six responsi
   try {
     await host.goto("/");
     await expect(host).toHaveTitle(/HOPNET/);
+    // Typography is self-hosted: the presentation must not rely on a font CDN.
+    expect(await host.evaluate(async () => {
+      const loaded = await document.fonts.load('400 16px "Instrument Sans"');
+      return loaded.length > 0 && getComputedStyle(document.documentElement).fontFamily.startsWith('"Instrument Sans"');
+    })).toBe(true);
     await host.screenshot({ path: path.join(screenshots, "entry.png") });
     await host.getByLabel("Device name").fill("Studio Mac");
     await host.getByRole("button", { name: "Create private room" }).click();
@@ -64,6 +97,7 @@ test("SEND conversations, Lab evidence exports, Replay controls and six responsi
     }
     await host.getByRole("button", { name: /^Studio Phone,/ }).click();
     await expect(host.locator(".spatial-device")).toHaveCount(5);
+    expect(await host.locator(".spatial-device img").evaluateAll((images) => images.every((image) => (image as HTMLImageElement).complete && (image as HTMLImageElement).naturalWidth > 0))).toBe(true);
     await expect(host.locator(".peer-inspector")).toHaveCSS("opacity", "1");
     await host.screenshot({ path: path.join(screenshots, "five-browser-peers.png"), animations: "disabled" });
     await host.getByRole("button", { name: "Open send view" }).click();
@@ -78,7 +112,8 @@ test("SEND conversations, Lab evidence exports, Replay controls and six responsi
     await host.getByLabel("Experiment test file").setInputFiles({ name: "lab-proof.bin", mimeType: "application/octet-stream", buffer: Buffer.from("real lab data over RTC") });
     await host.getByRole("button", { name: "Start experiment", exact: true }).click();
     await expect(peer.getByRole("button", { name: "Accept lab-proof.bin" })).toBeVisible();
-    await peer.screenshot({ path: path.join(screenshots, "incoming-offer.png") });
+    await expect(peer.getByTestId("transfer-receive")).toHaveCSS("opacity", "1");
+    await peer.screenshot({ path: path.join(screenshots, "incoming-offer.png"), animations: "disabled" });
     await peer.getByRole("button", { name: "Accept lab-proof.bin" }).click();
     await expect(host.getByTestId("transfer-send")).toHaveAttribute("data-status", "verified");
     await expect(host.getByLabel("Experiment results").getByText("verified", { exact: true })).toBeVisible();
@@ -133,14 +168,14 @@ test("SEND conversations, Lab evidence exports, Replay controls and six responsi
         await host.getByRole("button", { name: "Messages", exact: true }).click();
         await expect(host.getByLabel("Conversation history").getByText("A visible conversation, confirmed by the receiver.")).toBeVisible();
         await layout(host);
-        await host.screenshot({ path: path.join(screenshots, `messages-${width}x${height}.png`) });
+        await host.screenshot({ path: path.join(screenshots, `messages-${width}x${height}.png`), animations: "disabled" });
         await host.getByRole("button", { name: "Activity", exact: true }).click();
       } else {
         await host.getByRole("button", { name: "Open space view" }).click();
         await expect(host.getByRole("button", { name: "Open space view" })).toHaveClass(/active/);
         await expect(host.locator(".peer-inspector")).toHaveCSS("opacity", "1");
         await layout(host);
-        await host.screenshot({ path: path.join(screenshots, `space-${width}x${height}.png`) });
+        await host.screenshot({ path: path.join(screenshots, `space-${width}x${height}.png`), animations: "disabled" });
         await host.getByRole("button", { name: "Open replay view" }).click();
       }
       await expect(host.getByRole("heading", { name: "Every hop has a story." })).toBeVisible();
@@ -151,9 +186,13 @@ test("SEND conversations, Lab evidence exports, Replay controls and six responsi
       // Playback may finish a short journal immediately, so both terminal and paused states are valid.
       const pause = host.getByRole("button", { name: "Pause replay", exact: true });
       if (await pause.isVisible()) await pause.click();
+      const verification = host.locator(".replay-event-list button").filter({ has: host.getByText("verified", { exact: true }) }).last();
+      const verificationIndex = await verification.evaluate((button) => [...button.parentElement!.children].indexOf(button));
+      await host.getByLabel("Replay timeline").fill(String(verificationIndex));
       await expect(host.getByLabel("Selected protocol event")).toBeVisible();
+      await expect(host.getByLabel("Selected protocol event").getByRole("heading", { name: "verified", exact: true })).toBeVisible();
       await layout(host);
-      await host.screenshot({ path: path.join(screenshots, `replay-${width}x${height}.png`) });
+      await host.screenshot({ path: path.join(screenshots, `replay-${width}x${height}.png`), animations: "disabled" });
     }
     expect(errors).toEqual([]);
   } finally { await context.close(); }

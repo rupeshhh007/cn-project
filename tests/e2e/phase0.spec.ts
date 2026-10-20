@@ -1,6 +1,10 @@
 import path from "node:path";
 import { expect, test } from "@playwright/test";
 
+// Continuous trace screencasting materially stalls UI actions on this host.
+// Keep assertions and explicit screenshots, as in the bulk-transfer gates.
+test.use({ trace: "off" });
+
 const screenshotPath = (name: string) => path.resolve("docs/screenshots", name);
 
 test("host admits a participant and exchanges data over WebRTC", async ({ browser }) => {
@@ -10,7 +14,7 @@ test("host admits a participant and exchanges data over WebRTC", async ({ browse
   await host.getByLabel("Device name").fill("Host Mac");
   await host.getByRole("button", { name: "Create private room" }).click();
   await expect(host.getByText("Your room is ready.")).toBeVisible();
-  await host.screenshot({ path: screenshotPath("hopnet-phase0-entry-desktop.png"), mask: [host.getByRole("img", { name: "QR code to join this HOPNET room" })] });
+  await host.screenshot({ path: screenshotPath("hopnet-phase0-entry-desktop.png"), animations: "disabled", mask: [host.getByRole("img", { name: "QR code to join this HOPNET room" })] });
 
   const qrSource = await host.getByRole("img", { name: "QR code to join this HOPNET room" }).getAttribute("src");
   expect(qrSource).toBeTruthy();
@@ -36,13 +40,13 @@ test("host admits a participant and exchanges data over WebRTC", async ({ browse
   await expect(participant.getByText("Direct WebRTC", { exact: true }).first()).toBeVisible({ timeout: 15_000 });
   await participant.getByRole("button", { name: "Ping over WebRTC" }).click();
   await expect(participant.getByText(/ms$/)).toBeVisible();
-  await participant.screenshot({ path: screenshotPath("hopnet-phase0-mobile-participant.png") });
+  await participant.screenshot({ path: screenshotPath("hopnet-phase0-mobile-participant.png"), animations: "disabled" });
   await participant.getByPlaceholder("Message this peer…").fill("hello over the real data channel");
   await participant.getByRole("button", { name: "Send", exact: true }).click();
   await expect(host.getByText("hello over the real data channel")).toBeAttached();
   await participant.getByRole("button", { name: "Activity", exact: true }).click();
   await expect(participant.getByText("Message acknowledged")).toBeAttached();
-  await host.screenshot({ path: screenshotPath("hopnet-phase0-live-desktop.png") });
+  await host.screenshot({ path: screenshotPath("hopnet-phase0-live-desktop.png"), animations: "disabled" });
 
   await participantContext.close();
   await hostContext.close();
@@ -87,17 +91,21 @@ test("routes a message through a real intermediate browser without an endpoint c
 
   await expect(phoneB.getByText("Routed message delivered")).toBeAttached({ timeout: 10_000 });
   await expect(phoneB.getByText(/forward this through the relay/)).toBeAttached();
+  // The live ribbon intentionally shows only three recent events; periodic
+  // measurements may replace it. Assert forwarding against the durable journal.
+  await host.getByRole("button", { name: "Open replay view" }).click();
   await expect(host.getByText("Payload forwarded").first()).toBeAttached();
   await expect(phoneA.getByText("Route receipt returned")).toBeAttached();
   await phoneA.getByLabel("Choose file to send").setInputFiles({ name: "relay-proof.bin", mimeType: "application/octet-stream", buffer: Buffer.from("verified through the intermediate browser") });
   await expect(phoneB.getByRole("button", { name: "Accept relay-proof.bin" })).toBeVisible();
   await phoneB.getByRole("button", { name: "Accept relay-proof.bin" }).click();
   await expect(phoneA.getByText("File integrity verified")).toBeAttached({ timeout: 15_000 });
-  await expect(host.getByText("Transfer packet forwarded").first()).toBeAttached();
   await expect(phoneB.getByText("SHA-256 verified")).toBeVisible();
+  await host.getByRole("button", { name: "Load latest journal", exact: true }).click();
+  await expect(host.getByText("Transfer packet forwarded").first()).toBeAttached();
   await expect(phoneA.getByText("SHA-256 verified")).toBeVisible();
   await phoneA.evaluate(() => window.scrollTo(0, 0));
-  await phoneA.screenshot({ path: screenshotPath("hopnet-phase2-multihop-proof.png") });
+  await phoneA.screenshot({ path: screenshotPath("hopnet-phase2-multihop-proof.png"), animations: "disabled" });
 
   await context.close();
 });

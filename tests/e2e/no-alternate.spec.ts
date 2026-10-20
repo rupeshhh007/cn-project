@@ -4,8 +4,9 @@ import { expect, test } from "@playwright/test";
 test.use({ trace: "off" });
 
 test("loss of the only relay ends with an honest bounded failure and actionable UI", async ({ browser }) => {
-  // This deliberately exercises the production 60-second no-progress deadline.
-  test.setTimeout(90_000);
+  // Keep the production failure assertion at 65 seconds below. The overall
+  // harness additionally needs room creation, RTC admission, capture and cleanup.
+  test.setTimeout(120_000);
   const contexts = await Promise.all([0, 1, 2].map(() => browser.newContext({ viewport: { width: 1440, height: 900 } })));
   try {
     const [sender, relay, receiver] = await Promise.all(contexts.map((context) => context.newPage()));
@@ -30,10 +31,15 @@ test("loss of the only relay ends with an honest bounded failure and actionable 
     await receiver.getByRole("button", { name: "Accept unavailable.bin" }).click();
     await expect.poll(async () => JSON.parse(await sender.getByTestId("transfer-evidence").textContent() ?? "{}").acknowledgedChunks).toBeGreaterThan(0);
     await contexts[1]!.close();
-    await expect(sender.getByTestId("transfer-send")).toHaveAttribute("data-status", "failed", { timeout: 65_000 });
+    await test.step("production no-progress deadline remains bounded", async () => {
+      await expect(sender.getByTestId("transfer-send")).toHaveAttribute("data-status", "failed", { timeout: 65_000 });
+    });
     await expect(sender.getByText(/No receiver progress for 60 seconds/).first()).toBeAttached();
     await sender.getByRole("button", { name: "Open send view" }).click();
     await expect(sender.getByTestId("transfer-send")).toBeVisible();
-    await sender.screenshot({ path: path.resolve("docs/screenshots/hopnet-no-alternate-failure.png") });
-  } finally { await Promise.all(contexts.map((context) => context.close())); }
+    await expect(sender.getByTestId("transfer-send")).toHaveCSS("opacity", "1");
+    await test.step("capture actionable failure", async () => {
+      await sender.screenshot({ path: path.resolve("docs/screenshots/hopnet-no-alternate-failure.png"), animations: "disabled" });
+    });
+  } finally { await test.step("close test browser contexts", () => Promise.all(contexts.map((context) => context.close()))); }
 });
