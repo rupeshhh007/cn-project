@@ -55,6 +55,12 @@ const MAX_ATTEMPTS = 8;
 const MAX_IN_FLIGHT_CHUNKS = 8;
 const TRANSFER_TIMEOUT_MS = 90_000;
 
+function canVerifyWithWebCrypto(): boolean {
+  return (typeof window === "undefined" || window.isSecureContext) && typeof crypto !== "undefined" && Boolean(crypto.subtle);
+}
+
+const SECURE_FILE_ERROR = "Verified file transfers require trusted HTTPS on both devices. Open the HOPNET LAN HTTPS URL and trust its local CA certificate first.";
+
 export class TransferManager {
   private readonly outbound = new Map<string, Outbound>();
   private readonly inbound = new Map<string, Inbound>();
@@ -62,6 +68,7 @@ export class TransferManager {
   constructor(private readonly dependencies: Dependencies) {}
 
   async offer(file: File, destinationPeerId: string): Promise<string> {
+    if (!canVerifyWithWebCrypto()) throw new Error(SECURE_FILE_ERROR);
     const transferId = createUuid();
     const view: TransferView = {
       id: transferId,
@@ -111,6 +118,7 @@ export class TransferManager {
   }
 
   async respond(transferId: string, accepted: boolean): Promise<void> {
+    if (accepted && !canVerifyWithWebCrypto()) throw new Error(SECURE_FILE_ERROR);
     const transfer = this.inbound.get(transferId);
     if (!transfer || transfer.view.status !== "awaiting-acceptance") throw new Error("This transfer offer is no longer pending.");
     transfer.accepted = accepted;
@@ -153,6 +161,26 @@ export class TransferManager {
 
   private receiveOffer(packet: Extract<TransferDataPacket, { kind: "transfer-offer" }>): void {
     if (this.inbound.has(packet.transferId)) return;
+    if (!canVerifyWithWebCrypto()) {
+      this.dependencies.onEvent("File offer rejected", SECURE_FILE_ERROR);
+      const reverse = [...packet.path].reverse();
+      void this.sendAlong(reverse, {
+        protocolVersion: PROTOCOL_VERSION,
+        kind: "transfer-response",
+        transferId: packet.transferId,
+        sourcePeerId: this.dependencies.selfPeerId,
+        destinationPeerId: packet.sourcePeerId,
+        routeId: createUuid(),
+        nextHop: reverse[1]!,
+        path: reverse,
+        hopIndex: 1,
+        ttl: reverse.length + 2,
+        createdAt: Date.now(),
+        accepted: false,
+        reason: SECURE_FILE_ERROR,
+      }).catch((error: unknown) => this.dependencies.onEvent("File offer rejection failed", error instanceof Error ? error.message : "Peer unreachable"));
+      return;
+    }
     try {
       const assembler = new TransferAssembler(packet.manifest);
       const view: TransferView = {
