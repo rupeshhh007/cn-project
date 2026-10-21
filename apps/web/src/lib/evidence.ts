@@ -1,11 +1,13 @@
 import type { OverlayLink, Peer, TopologyEdge } from "@hopnet/protocol";
 import type { TransferView } from "./transfer-manager.ts";
+import type { RouterSnapshot } from "./distributed-router.ts";
 
 export type NetworkEvent = {
   id: string; at: Date; monotonicMs: number; type: string; title: string; detail: string;
   provenance: "REAL" | "EMULATED" | "INFERRED";
   transferId?: string; experimentId?: string; path?: string[]; chunkIndex?: number;
-  snapshot: { peers: Pick<Peer, "id" | "displayName" | "deviceCategory" | "coordinatorConnected">[]; edges: TopologyEdge[]; links: OverlayLink[] };
+  routerId?: string; controlOrigin?: string; plane?: "control" | "data";
+  snapshot: { peers: Pick<Peer, "id" | "displayName" | "deviceCategory" | "coordinatorConnected">[]; edges: TopologyEdge[]; links: OverlayLink[]; router?: RouterSnapshot };
 };
 
 export type ExperimentConfig = { preset: "direct-overlay" | "single-multipath" | "relay-recovery"; mode: "direct" | "single-overlay" | "multipath"; strategy: string; peerId: string };

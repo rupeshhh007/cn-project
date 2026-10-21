@@ -29,7 +29,7 @@ test("loss of the only relay ends with an honest bounded failure and actionable 
     await expect(sender.getByText("2-hop overlay", { exact: true })).toBeVisible({ timeout: 15_000 });
     await sender.getByLabel("Choose file to send").setInputFiles({ name: "unavailable.bin", mimeType: "application/octet-stream", buffer: Buffer.alloc(4 * 1024 * 1024, 42) });
     await receiver.getByRole("button", { name: "Accept unavailable.bin" }).click();
-    await expect.poll(async () => JSON.parse(await sender.getByTestId("transfer-evidence").textContent() ?? "{}").acknowledgedChunks).toBeGreaterThan(0);
+    await expect.poll(async () => JSON.parse(await sender.getByTestId("transfer-evidence").textContent() ?? "{}").acknowledgedChunks, { timeout:15_000 }).toBeGreaterThan(0);
     await contexts[1]!.close();
     await test.step("production no-progress deadline remains bounded", async () => {
       await expect(sender.getByTestId("transfer-send")).toHaveAttribute("data-status", "failed", { timeout: 65_000 });

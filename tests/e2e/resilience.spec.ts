@@ -8,7 +8,9 @@ test.use({ trace: "off" });
 const evidence = async (page: Page) => JSON.parse(await page.getByTestId("transfer-send").getByTestId("transfer-evidence").textContent() ?? "{}");
 
 test("two real relay routes survive a mid-transfer browser failure with receiver SHA-256", async ({ browser }, testInfo) => {
-  test.setTimeout(90_000);
+  // Setup includes distributed topology learning; the verified-recovery
+  // assertion below remains independently bounded at 60 seconds.
+  test.setTimeout(120_000);
   const contexts = await Promise.all([0, 1, 2, 3].map(() => browser.newContext({ viewport: { width: 1440, height: 900 }, acceptDownloads: true })));
   try {
     const [host, relay1, relay2, receiver] = await Promise.all(contexts.map((context) => context.newPage()));
@@ -25,10 +27,12 @@ test("two real relay routes survive a mid-transfer browser failure with receiver
       await expect(page.getByText("Direct WebRTC", { exact: true }).first()).toBeVisible({ timeout: 15_000 });
     }
     await host.getByRole("button", { name: "Open lab view" }).click();
+    await host.getByLabel("Experiment receiver").selectOption({ label:"Receiver" });
     const edge = (a: string, b: string) => host.getByRole("button", { name: new RegExp(`^(${a} ↔ ${b}|${b} ↔ ${a})`) });
     await edge("Sender", "Receiver").click();
     await edge("Relay One", "Receiver").click();
     await edge("Relay Two", "Receiver").click();
+    await expect(host.getByLabel("Available experiment routes").getByText("2 established routes", { exact:true })).toBeVisible({ timeout:15_000 });
     await host.getByRole("button", { name: "Open space view" }).click();
     await host.getByRole("button", { name: /^Receiver,/ }).click();
     await expect(host.getByText("2-hop overlay", { exact: true })).toBeVisible({ timeout: 15_000 });
@@ -37,14 +41,20 @@ test("two real relay routes survive a mid-transfer browser failure with receiver
     const expectedHash = createHash("sha256").update(payload).digest("hex");
     await host.getByLabel("Choose file to send").setInputFiles({ name: "resilience-proof.bin", mimeType: "application/octet-stream", buffer: payload });
     await receiver.getByRole("button", { name: "Accept resilience-proof.bin" }).click();
-    await expect.poll(async () => (await evidence(host)).pathStats?.filter((item: { acknowledgedChunks: number }) => item.acknowledgedChunks > 0).length).toBe(2);
+    await expect.poll(async () => (await evidence(host)).pathStats?.filter((item: { acknowledgedChunks: number }) => item.acknowledgedChunks > 0).length, { timeout:15_000 }).toBe(2);
     const before = await evidence(host);
+    await testInfo.attach("before-relay-close.json", { body:JSON.stringify(before,null,2),contentType:"application/json" });
     expect(before.acknowledgedChunks).toBeLessThan(before.totalChunks);
     // Close an actual browser participating in the data plane. No coordinator
     // fallback, fake RTC implementation, or synthesized completion is involved.
     await contexts[1]!.close();
     await host.screenshot({ path: path.resolve("docs/screenshots/hopnet-resilience-active.png") });
-    await expect(host.getByTestId("transfer-send")).toHaveAttribute("data-status", "verified", { timeout: 60_000 });
+    try {
+      await expect(host.getByTestId("transfer-send")).toHaveAttribute("data-status", "verified", { timeout: 60_000 });
+    } catch (cause) {
+      await testInfo.attach("unverified-recovery-state.json", { body:JSON.stringify(await evidence(host),null,2),contentType:"application/json" });
+      throw cause;
+    }
     const after = await evidence(host);
     expect(after.verifiedHash).toBe(expectedHash);
     expect(after.acknowledgedBytes).toBe(payload.length);

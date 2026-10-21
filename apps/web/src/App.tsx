@@ -8,6 +8,7 @@ import { RoomSurface } from "./components/RoomSurface.tsx";
 import type { Experiment, ExperimentConfig, NetworkEvent } from "./lib/evidence.ts";
 import { createReceiptIdentity, verifyTransferPacket } from "./lib/receipt-identity.ts";
 import { transferPaths } from "./lib/experiment-paths.ts";
+import { DistributedRouter, type RouterSnapshot } from "./lib/distributed-router.ts";
 
 export type ConversationMessage = { id: string; peerId: string; direction: "incoming" | "outgoing"; body: string; at: number; status: "sent" | "delivered" | "failed" };
 
@@ -33,8 +34,14 @@ function App() {
   const [peers, setPeers] = useState<Peer[]>([]);
   const [links, setLinks] = useState<Record<string, LinkState>>({});
   const [topologyEdges, setTopologyEdges] = useState<TopologyEdge[]>([]);
+  const [faultedEdges, setFaultedEdges] = useState<Record<string, TopologyEdge[]>>({});
   const [observedLinks, setObservedLinks] = useState<OverlayLink[]>([]);
   const [routeStrategy, setRouteStrategy] = useState<RouteStrategy>("minimum-hops");
+  const [routerState, setRouterState] = useState<RouterSnapshot>();
+  const [routerReports, setRouterReports] = useState<RouterSnapshot[]>([]);
+  const [routingGraph, setRoutingGraph] = useState<GraphEdge[]>([]);
+  const routerRef = useRef<DistributedRouter | undefined>(undefined);
+  const routerObservationRef = useRef<RouterSnapshot | undefined>(undefined);
   const [joinRequests, setJoinRequests] = useState<JoinRequest[]>([]);
   const [events, setEvents] = useState<EventItem[]>([]);
   const [conversations, setConversations] = useState<ConversationMessage[]>([]);
@@ -61,12 +68,7 @@ function App() {
 
   useEffect(() => { peersRef.current = peers; }, [peers]);
   useEffect(() => { topologyRef.current = topologyEdges; }, [topologyEdges]);
-  useEffect(() => {
-    graphRef.current = observedLinks
-      .filter((link) => link.state === "direct" && topologyEdges.some((edge) => canonicalEdge(edge.a, edge.b) === canonicalEdge(link.a, link.b)))
-      .map((link) => ({ a: link.a, b: link.b, metrics: { rttMs: link.rttMs, measuredAt: link.updatedAt } }));
-  }, [observedLinks, topologyEdges]);
-  useEffect(() => { routeStrategyRef.current = routeStrategy; }, [routeStrategy]);
+  useEffect(() => { routeStrategyRef.current = routeStrategy; routerRef.current?.setStrategy(routeStrategy); }, [routeStrategy]);
   useEffect(() => {
     const pending = conversations.filter((item) => item.direction === "outgoing" && item.status === "sent");
     if (!pending.length) return;
@@ -90,7 +92,11 @@ function App() {
   }, []);
 
   const addEvent = (title: string, detail: string, provenance: EventItem["provenance"] = "REAL", metadata: Partial<EventItem> = {}) => {
-    const event: EventItem = { id: createUuid(), at: new Date(), monotonicMs: performance.now(), type: title.toLowerCase().replaceAll(" ", "-"), title, detail, provenance, snapshot: { peers: peersRef.current.map(({ id, displayName, deviceCategory, coordinatorConnected }) => ({ id, displayName, deviceCategory, coordinatorConnected })), edges: topologyRef.current.map((edge) => ({ ...edge })), links: observedRef.current.map((link) => ({ ...link })) }, ...metadata };
+    // File events share the latest immutable routing observation instead of
+    // cloning the complete LSDB for every chunk. Its observedAt remains explicit.
+    // Router-generated events capture their exact current control-plane state.
+    const observation = metadata.routerId ? routerRef.current?.snapshot() : routerObservationRef.current;
+    const event: EventItem = { id: createUuid(), at: new Date(), monotonicMs: performance.now(), type: title.toLowerCase().replaceAll(" ", "-"), title, detail, provenance, snapshot: { peers: peersRef.current.map(({ id, displayName, deviceCategory, coordinatorConnected }) => ({ id, displayName, deviceCategory, coordinatorConnected })), edges: topologyRef.current.map((edge) => ({ ...edge })), links: observedRef.current.map((link) => ({ ...link })), router: observation }, ...metadata };
     setEvents((current) => [event, ...current].slice(0, 2048));
   };
 
@@ -114,11 +120,13 @@ function App() {
       }
     };
     let transferManager: TransferManager;
+    let router: DistributedRouter | undefined;
     const reportedStates = new Map<string, string>();
     const manager = new PeerManager(
       credentials.peer.id,
       (targetPeerId, signal) => socket.send(JSON.stringify({ type: "signal", targetPeerId, signal })),
       (state) => {
+        router?.setLink(state.peerId, state.state === "direct");
         setLinks((current) => ({ ...current, [state.peerId]: state }));
         const signature = `${state.state}:${state.rttMs}`;
         if (socket.readyState === WebSocket.OPEN && state.state !== "new" && reportedStates.get(state.peerId) !== signature && topologyRef.current.some((edge) => canonicalEdge(edge.a, edge.b) === canonicalEdge(credentials.peer.id, state.peerId))) {
@@ -129,6 +137,33 @@ function App() {
       (peerId, packet) => onDataPacket(peerId, packet),
     );
     managerRef.current = manager;
+    router = new DistributedRouter({
+      self: credentials.peer.id,
+      peers: () => peersRef.current.map((peer) => peer.id),
+      send: (id, packet) => manager.sendPacket(id, packet),
+      update: (state, reports) => {
+        routerObservationRef.current = state;
+        setRouterState(state); setRouterReports(reports);
+        graphRef.current = router?.graph() ?? [];
+        setRoutingGraph(graphRef.current);
+      },
+      event: (event) => {
+        addEvent(event.type.replaceAll("-", " "), event.detail, "REAL", { type: event.type, path: event.path, routerId: credentials.peer.id, controlOrigin: event.origin, plane: event.type.startsWith("packet") || event.type === "delivery-ack" ? "data" : "control" });
+        if (event.type === "packet-forward" && event.path && event.path.length > 2) addEvent("Payload forwarded", "Distributed local forwarding-table decision", "REAL", { path: event.path });
+      },
+      deliver: (packet) => {
+        const source = peersRef.current.find((peer) => peer.id === packet.source)?.displayName ?? "peer";
+        if (packet.purpose === "message") {
+          addEvent(packet.trace.length > 2 ? "Routed message delivered" : `Message from ${source}`, packet.body, "REAL", { path: packet.trace, plane: "data" });
+          setConversations((current) => current.some((item) => item.id === packet.messageId) ? current : [...current, { id: packet.messageId, peerId: packet.source, direction: "incoming", body: packet.body, at: Date.now(), status: "delivered" }].slice(-300) as ConversationMessage[]);
+        } else {
+          addEvent("Message acknowledged", `${source} confirmed application receipt`, "REAL", { path: packet.trace, plane: "data" });
+          if (packet.trace.length > 2) addEvent("Route receipt returned", "Receiver acknowledgement returned using local forwarding tables", "REAL", { path: packet.trace });
+          setConversations((current) => current.map((item) => item.id === packet.messageId && item.peerId === packet.source && item.direction === "outgoing" ? { ...item, status: "delivered" } : item));
+        }
+      },
+    });
+    routerRef.current = router; router.start();
     transferManager = new TransferManager({
       selfPeerId: credentials.peer.id,
       canOfferTo: (peerId) => Boolean(peersRef.current.find((peer) => peer.id === peerId)?.receiptPublicKey),
@@ -153,10 +188,11 @@ function App() {
         }
       },
       onEvent: (title, detail) => addEvent(title, detail),
-      onProtocolEvent: (event) => addEvent(event.type.replaceAll("-", " "), event.detail ?? "Observed by this browser", "REAL", { type: event.type, transferId: event.transferId, path: event.path, chunkIndex: event.chunkIndex, experimentId: experimentRef.current?.id }),
+      onProtocolEvent: (event) => addEvent(event.type.replaceAll("-", " "), event.detail ?? "Observed by this browser", "REAL", { type: event.type, plane: "data", transferId: event.transferId, path: event.path, chunkIndex: event.chunkIndex, experimentId: experimentRef.current?.id }),
     });
     transferManagerRef.current = transferManager;
     const onDataPacket = (peerId: string, packet: DataPacket) => {
+      if (router?.handle(peerId, packet)) return;
       const source = peersRef.current.find((peer) => peer.id === peerId)?.displayName ?? `peer …${peerId.slice(-5)}`;
       if (isTransferPacket(packet)) {
         void transferManager.handle(peerId, packet).catch((cause) => addEvent("Transfer forwarding failed", cause instanceof Error ? cause.message : "Unknown transfer error", "INFERRED"));
@@ -262,15 +298,13 @@ function App() {
         setError(item.message);
       }
     };
-    return () => { socket.close(); manager.closeAll(); transferManager.dispose(); transferManagerRef.current = undefined; };
+    return () => { router?.dispose(); routerRef.current = undefined; socket.close(); manager.closeAll(); transferManager.dispose(); transferManagerRef.current = undefined; };
   }, [credentials]);
 
   const remotePeers = peers.filter((peer) => peer.id !== credentials?.peer.id);
   const selectedPeer = selectedPeerId === "" ? undefined : remotePeers.find((peer) => peer.id === selectedPeerId) ?? remotePeers[0];
   const selectedLink = selectedPeer ? links[selectedPeer.id] : undefined;
-  const activeGraphEdges: GraphEdge[] = observedLinks
-    .filter((link) => link.state === "direct" && topologyEdges.some((edge) => canonicalEdge(edge.a, edge.b) === canonicalEdge(link.a, link.b)))
-    .map((link) => ({ a: link.a, b: link.b, metrics: { rttMs: link.rttMs, measuredAt: link.updatedAt } }));
+  const activeGraphEdges: GraphEdge[] = routingGraph;
   let selectedRoute: string[] | undefined;
   if (credentials && selectedPeer) {
     try { selectedRoute = selectPath(peers.map((peer) => peer.id), activeGraphEdges, credentials.peer.id, selectedPeer.id, routeStrategy); } catch { selectedRoute = undefined; }
@@ -304,7 +338,10 @@ function App() {
   const approve = async (requestId: string) => {
     if (!credentials?.hostToken) return;
     const response = await fetch(`/api/rooms/${credentials.roomId}/approve`, { method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${credentials.hostToken}` }, body: JSON.stringify({ requestId }) });
-    if (!response.ok) return setError("Admission approval failed.");
+    if (!response.ok) {
+      const failure = await response.json().catch(() => ({})) as { message?: string };
+      return setError(failure.message ?? "Admission approval failed.");
+    }
     setJoinRequests((current) => current.filter((request) => request.requestId !== requestId));
     addEvent("Peer admitted", "Host approval created a short-lived authenticated peer session");
   };
@@ -319,28 +356,9 @@ function App() {
     try {
       if (!selectedRoute) throw new Error("No established overlay route is available.");
       const messageId = createUuid();
-      if (selectedRoute.length === 2) {
-        managerRef.current?.sendPacket(selectedPeer.id, { protocolVersion: PROTOCOL_VERSION, kind: "message", messageId, sentAt: Date.now(), body: message.trim() });
-        addEvent("Message sent on direct channel", `${selectedPeer.displayName}: ${message.trim()}`);
-      } else {
-        const routeId = createUuid();
-        managerRef.current?.sendPacket(selectedRoute[1], {
-          protocolVersion: PROTOCOL_VERSION,
-          kind: "routed-message",
-          messageId,
-          sourcePeerId: credentials.peer.id,
-          destinationPeerId: selectedPeer.id,
-          routeId,
-          nextHop: selectedRoute[1],
-          path: selectedRoute,
-          hopIndex: 1,
-          ttl: selectedRoute.length + 2,
-          createdAt: Date.now(),
-          payloadType: "text",
-          body: message.trim(),
-        });
-        addEvent("Routed message sent", selectedRoute.map((peerId) => peers.find((peer) => peer.id === peerId)?.displayName ?? peerId).join(" → "));
-      }
+      if (!routerRef.current) throw new Error("Distributed router is not initialized.");
+      routerRef.current.sendMessage(selectedPeer.id, message.trim(), messageId);
+      addEvent(selectedRoute.length === 2 ? "Message sent on direct channel" : "Routed message sent", "Each hop selects its own next hop from its local LSDB; packet-forward events record actual traversal.", "REAL", { plane: "data" });
       setConversations((current) => [...current, { id: messageId, peerId: selectedPeer.id, direction: "outgoing", body: message.trim(), at: Date.now(), status: "sent" }].slice(-300) as ConversationMessage[]);
       setMessage("");
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Message failed"); }
@@ -397,6 +415,8 @@ function App() {
 
   const faultRelay = (peerId: string) => {
     if (credentials?.peer.role !== "host" || peerId === credentials.peer.id || socketRef.current?.readyState !== WebSocket.OPEN) return;
+    const removed = topologyEdges.filter((edge) => edge.a === peerId || edge.b === peerId);
+    if (removed.length) setFaultedEdges((current) => ({ ...current, [peerId]: removed }));
     const experiment = experimentRef.current;
     if (experiment) {
       experiment.faultAt = performance.now(); experiment.failedPeerId = peerId;
@@ -404,6 +424,18 @@ function App() {
     }
     addEvent("Controlled relay failure requested", "Host removed the relay's permitted links; physical Wi-Fi is unchanged.", "EMULATED", { experimentId: experiment?.id });
     socketRef.current.send(JSON.stringify({ type: "set-topology", edges: topologyEdges.filter((edge) => edge.a !== peerId && edge.b !== peerId) }));
+  };
+
+  const restoreRelay = (peerId: string) => {
+    if (credentials?.peer.role !== "host" || socketRef.current?.readyState !== WebSocket.OPEN) return;
+    const online = new Set(peers.filter((peer) => peer.coordinatorConnected).map((peer) => peer.id));
+    if (!online.has(peerId)) { setError("Rejoin the relay browser before restoring its links."); return; }
+    const restored = new Map(topologyEdges.map((edge) => [canonicalEdge(edge.a, edge.b), edge]));
+    for (const edge of faultedEdges[peerId] ?? []) if (online.has(edge.a) && online.has(edge.b)) restored.set(canonicalEdge(edge.a, edge.b), edge);
+    if (restored.size > 20) { setError("Restoring these links would exceed the 20-link classroom limit. Remove another permitted link first."); return; }
+    socketRef.current.send(JSON.stringify({ type: "set-topology", edges: [...restored.values()] }));
+    setFaultedEdges((current) => { const next = { ...current }; delete next[peerId]; return next; });
+    addEvent("Controlled relay restoration requested", "Saved permitted links restored; channels must renegotiate and exchange hellos before becoming routes.", "EMULATED");
   };
 
   const cancelTransfer = async (id: string) => {
@@ -414,7 +446,7 @@ function App() {
 
   const inviteUrl = `${invitationOrigin}/?room=${encodeURIComponent(credentials.roomId)}&invite=${encodeURIComponent(credentials.inviteSecret)}`;
   const inviteQrUrl = `/api/rooms/${credentials.roomId}/qr?invite=${encodeURIComponent(credentials.inviteSecret)}&origin=${encodeURIComponent(invitationOrigin)}`;
-  return <RoomSurface self={credentials.peer} peers={peers} links={links} observedLinks={observedLinks} topologyEdges={topologyEdges} selectedPeer={selectedPeer} selectedLink={selectedLink} selectedRoute={selectedRoute} routeStrategy={routeStrategy} events={events} transfers={transfers} coordinatorState={coordinatorState} networkInfo={networkInfo} invitationOrigin={invitationOrigin} inviteUrl={inviteUrl} inviteQrUrl={inviteQrUrl} joinRequests={joinRequests} message={message} error={error} onInvitationOrigin={setInvitationOrigin} onSelectPeer={(id) => setSelectedPeerId(id)} onApprove={(id) => void approve(id)} onToggleEdge={toggleTopologyEdge} onRouteStrategy={setRouteStrategy} onMessage={setMessage} onSend={sendMessage} onFile={offerFile} onTransferResponse={respondToTransfer} onPing={ping} onFallback={relayFallback} onClearError={() => setError("")} conversations={conversations} experiments={experiments} onExperiment={startExperiment} onFault={faultRelay} onCancelTransfer={cancelTransfer} />;
+  return <RoomSurface routingGraph={routingGraph} routerState={routerState} routerReports={routerReports} self={credentials.peer} peers={peers} links={links} observedLinks={observedLinks} topologyEdges={topologyEdges} selectedPeer={selectedPeer} selectedLink={selectedLink} selectedRoute={selectedRoute} routeStrategy={routeStrategy} events={events} transfers={transfers} coordinatorState={coordinatorState} networkInfo={networkInfo} invitationOrigin={invitationOrigin} inviteUrl={inviteUrl} inviteQrUrl={inviteQrUrl} joinRequests={joinRequests} message={message} error={error} onInvitationOrigin={setInvitationOrigin} onSelectPeer={(id) => setSelectedPeerId(id)} onApprove={(id) => void approve(id)} onToggleEdge={toggleTopologyEdge} onRouteStrategy={setRouteStrategy} onMessage={setMessage} onSend={sendMessage} onFile={offerFile} onTransferResponse={respondToTransfer} onPing={ping} onFallback={relayFallback} onClearError={() => setError("")} conversations={conversations} experiments={experiments} onExperiment={startExperiment} onFault={faultRelay} onRestore={restoreRelay} restorablePeers={Object.keys(faultedEdges)} onCancelTransfer={cancelTransfer} />;
 }
 
 function isTransferPacket(packet: DataPacket): packet is TransferDataPacket {

@@ -161,6 +161,9 @@ test("SEND conversations, Lab evidence exports, Replay controls and responsive v
     expect(recoveryResult.recoveryMs).not.toBeNull();
     await expect(host.locator(".error-toast")).toHaveCount(0);
     await writeFile(path.resolve("docs/evidence/automated-lab-logical-recovery.json"), recoveryRaw);
+    await host.getByRole("button", { name:"Restore relay links",exact:true }).click();
+    await expect(edge("Studio Mac", "Studio Mac B")).toHaveAttribute("aria-pressed","true");
+    await expect(edge("Studio Mac B", "Studio Phone")).toHaveAttribute("aria-description","established", { timeout:15_000 });
     for (const [width, height] of sizes) {
       await host.setViewportSize({ width: width!, height: height! });
       const mobile = width! <= 680;

@@ -95,7 +95,9 @@ test("routes a message through a real intermediate browser without an endpoint c
   // measurements may replace it. Assert forwarding against the durable journal.
   await host.getByRole("button", { name: "Open replay view" }).click();
   await expect(host.getByText("Payload forwarded").first()).toBeAttached();
-  await expect(phoneA.getByText("Route receipt returned")).toBeAttached();
+  await phoneA.getByRole("button", { name:"Open replay view" }).click();
+  await expect(phoneA.getByText("Route receipt returned").first()).toBeAttached();
+  await phoneA.getByRole("button", { name:"Open space view" }).click();
   await phoneA.getByLabel("Choose file to send").setInputFiles({ name: "relay-proof.bin", mimeType: "application/octet-stream", buffer: Buffer.from("verified through the intermediate browser") });
   await expect(phoneB.getByRole("button", { name: "Accept relay-proof.bin" })).toBeVisible();
   await phoneB.getByRole("button", { name: "Accept relay-proof.bin" }).click();

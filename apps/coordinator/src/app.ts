@@ -8,6 +8,7 @@ import QRCode from "qrcode";
 import { WebSocket, WebSocketServer } from "ws";
 import { z } from "zod";
 import {
+  MAX_ROOM_PEERS,
   clientSocketMessageSchema,
   deviceCategorySchema,
   safeDisplayName,
@@ -183,6 +184,7 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
     if (!parsed.success) return reply.code(400).send({ error: "INVALID_REQUEST" });
     const join = room.joins.get(parsed.data.requestId);
     if (!join || join.status !== "pending") return reply.code(404).send({ error: "JOIN_NOT_FOUND" });
+    if (room.sessions.size >= MAX_ROOM_PEERS) return reply.code(409).send({ error: "ROOM_CAPACITY", message: `This classroom room supports up to ${MAX_ROOM_PEERS} admitted peers, including the host. Create another room for a new session.` });
     const peerId = id("peer");
     const session: Session = {
       token: secret(),

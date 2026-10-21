@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { DeviceCategory, OverlayLink, Peer, TopologyEdge } from "@hopnet/protocol";
-import { canonicalEdge, type RouteStrategy } from "@hopnet/routing";
+import { canonicalEdge, type GraphEdge, type RouteStrategy } from "@hopnet/routing";
 import type { LinkState } from "../lib/peer-manager.ts";
 import type { TransferView } from "../lib/transfer-manager.ts";
 import type { NetworkInfo } from "../App.tsx";
@@ -9,8 +9,13 @@ import type { ConversationMessage } from "../App.tsx";
 import type { Experiment, ExperimentConfig, NetworkEvent } from "../lib/evidence.ts";
 import { Conversation, LabWorkspace, ReplayWorkspace, SendWorkspace } from "./Studio.tsx";
 import { deviceAsset } from "../lib/device-assets.ts";
+import { RoutingWorkspace } from "./RoutingWorkspace.tsx";
+import type { RouterSnapshot } from "../lib/distributed-router.ts";
 
 export type Props = {
+  routerState?: RouterSnapshot;
+  routerReports: RouterSnapshot[];
+  routingGraph: GraphEdge[];
   self: Peer;
   peers: Peer[];
   links: Record<string, LinkState>;
@@ -46,10 +51,12 @@ export type Props = {
   experiments: Experiment[];
   onExperiment: (config: ExperimentConfig, file: File) => Promise<void>;
   onFault: (peerId: string) => void;
+  onRestore: (peerId: string) => void;
+  restorablePeers: string[];
   onCancelTransfer: (id: string) => Promise<void>;
 };
 
-type View = "space" | "send" | "lab" | "replay";
+type View = "space" | "routing" | "send" | "lab" | "replay";
 type Point = { x: number; y: number };
 
 const positions: Point[] = [
@@ -122,9 +129,10 @@ function DesktopRoom(props: Props) {
           if (!a || !b) return null;
           const key = canonicalEdge(edge.a, edge.b);
           const route = routeEdges.has(key); const live = liveEdges.has(key);
+          const pulse = props.events.find((event) => ["lsa-received", "packet-forward"].includes(event.type) && performance.now() - event.monotonicMs < 1000 && (event.path?.length ?? 0) >= 2 && canonicalEdge(event.path!.at(-2)!, event.path!.at(-1)!) === key);
           return <g key={key} className={route ? "route-line" : live ? "live-line" : "planned-line"}>
             <path d={curve(a, b, boardSize)} />
-            
+            {pulse && <circle key={pulse.id} r="4" className={pulse.plane === "control" ? "control-pulse" : "data-pulse"} fill={pulse.plane === "control" ? "#9c8fff" : "#b9ffff"}><animateMotion dur=".7s" repeatCount="1" path={pulse.path?.at(-2) === edge.a ? curve(a, b, boardSize) : curve(b, a, boardSize)}/></circle>}
           </g>;
         })}
       </svg>
@@ -149,6 +157,7 @@ function DesktopRoom(props: Props) {
         {orderedPeers.length > 1 && <Topology peers={orderedPeers} edges={props.topologyEdges} onToggle={props.onToggleEdge} />}
       </motion.aside> : props.selectedPeer ? <motion.aside key={props.selectedPeer.id} className="peer-inspector" initial={{ opacity: 0, x: 28, scale: .96 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 28 }} transition={{ type: "spring", stiffness: 340, damping: 30 }}>
         <div className="inspector-top"><DeviceAsset category={props.selectedPeer.deviceCategory} /><div><h2>{props.selectedPeer.displayName}</h2><p><i />{props.selectedPeer.coordinatorConnected ? "Online" : "Offline"}</p></div><button aria-label="Close peer inspector" onClick={() => props.onSelectPeer("")}>×</button></div>
+        <button className="inspector-action" onClick={() => chooseView("routing")}>Inspect distributed routing tables</button>
         <div className="inspector-section">
           <InfoRow icon="swap" label={props.selectedLink?.state === "direct" ? "Direct WebRTC" : props.selectedRoute ? `${props.selectedRoute.length - 1}-hop overlay` : "Route unavailable"} value={props.selectedLink?.state === "direct" ? props.selectedLink.candidateType ?? "Candidate selected" : props.selectedRoute ? "Established overlay links" : "No usable path"} />
           <InfoRow icon="clock" label="Measured RTT" value={props.selectedLink?.state === "direct" && props.selectedLink.rttMs !== undefined ? `${props.selectedLink.rttMs} ms` : props.selectedRoute?.length === 2 ? "Run a ping" : "Not measured end-to-end"} />
@@ -164,7 +173,7 @@ function DesktopRoom(props: Props) {
         <button className="fallback-action" onClick={props.onFallback} disabled={!props.message.trim()}>Use explicit coordinator fallback</button>
         {props.selectedLink?.error && <p className="inline-error">{props.selectedLink.error}</p>}
       </motion.aside> : null}
-    </AnimatePresence></> : <section className="studio-workspace" aria-label={`${view} workspace`}>{view === "send" ? <SendWorkspace {...props}/> : view === "lab" ? <LabWorkspace {...props}/> : <ReplayWorkspace events={props.events}/>}</section>}
+    </AnimatePresence></> : <section className="studio-workspace" aria-label={`${view} workspace`}>{view === "routing" ? <RoutingWorkspace {...props}/> : view === "send" ? <SendWorkspace {...props}/> : view === "lab" ? <LabWorkspace {...props}/> : <ReplayWorkspace events={props.events}/>}</section>}
 
     {view === "space" && <EventRibbon events={props.events} expanded={false} />}
     {props.error && <button className="error-toast" onClick={props.onClearError}>{props.error}</button>}
@@ -172,7 +181,7 @@ function DesktopRoom(props: Props) {
 }
 
 function MobileRoom(props: Props) {
-  const [tab, setTab] = useState<"room" | "messages" | "activity" | "lab">("messages");
+  const [tab, setTab] = useState<"room" | "routing" | "messages" | "activity" | "lab">("messages");
   const [keyboardInset, setKeyboardInset] = useState(0);
   useEffect(() => {
     const viewport = window.visualViewport;
@@ -227,10 +236,12 @@ function MobileRoom(props: Props) {
 
     {tab === "activity" && <ReplayWorkspace events={props.events}/>}
     {tab === "lab" && <LabWorkspace {...props}/>}
+    {tab === "routing" && <RoutingWorkspace {...props}/>}
 
     <div className="mobile-controls" style={{ bottom: `${Math.max(12, keyboardInset)}px` }}>
       {tab === "messages" && <Composer message={props.message} onMessage={props.onMessage} onSend={props.onSend} disabled={!props.selectedRoute} onFile={props.onFile} fileDisabled={!props.selectedRoute || !secureFiles}/>}
       <nav aria-label="Mobile navigation">
+        <button aria-current={tab === "routing" ? "page" : undefined} className={tab === "routing" ? "active" : ""} onClick={() => setTab("routing")}><Icon name="route"/><span>Routing</span></button>
         <button aria-current={tab === "room" ? "page" : undefined} className={tab === "room" ? "active" : ""} onClick={() => setTab("room")}><Icon name="space"/><span>Room</span></button>
         <button aria-current={tab === "messages" ? "page" : undefined} className={tab === "messages" ? "active" : ""} onClick={() => setTab("messages")}><Icon name="send"/><span>Messages</span></button>
         <button aria-current={tab === "activity" ? "page" : undefined} className={tab === "activity" ? "active" : ""} onClick={() => setTab("activity")}><Icon name="replay"/><span>Activity</span></button>
@@ -243,7 +254,7 @@ function MobileRoom(props: Props) {
 function Atmosphere() { return <div className="atmosphere" aria-hidden="true"><i className="blob blob-a"/><i className="blob blob-b"/><i className="blob blob-c"/><i className="grain"/></div>; }
 
 function Navigation({ active, onSelect }: { active: View; onSelect: (view: View) => void }) {
-  return <nav className="primary-nav" aria-label="Workspace navigation">{(["space", "send", "lab", "replay"] as View[]).map((item) => <button key={item} aria-label={`Open ${item} view`} aria-current={active === item ? "page" : undefined} className={active === item ? "active" : ""} onClick={() => onSelect(item)}>{active === item && <motion.span className="nav-selection" layoutId="workspace-selection" transition={{ type: "spring", stiffness: 390, damping: 34 }} />}<Icon name={item}/><span>{item[0].toUpperCase() + item.slice(1)}</span></button>)}</nav>;
+  return <nav className="primary-nav" aria-label="Workspace navigation">{(["space", "routing", "send", "lab", "replay"] as View[]).map((item) => <button key={item} aria-label={`Open ${item} view`} aria-current={active === item ? "page" : undefined} className={active === item ? "active" : ""} onClick={() => onSelect(item)}>{active === item && <motion.span className="nav-selection" layoutId="workspace-selection" transition={{ type: "spring", stiffness: 390, damping: 34 }} />}<Icon name={item}/><span>{item[0].toUpperCase() + item.slice(1)}</span></button>)}</nav>;
 }
 
 function SpatialDevice({ peer, point, state, selected, self, onClick }: { peer: Peer; point: Point; state: LinkState["state"] | "overlay"; selected: boolean; self: boolean; onClick: () => void }) {
@@ -327,7 +338,7 @@ function Icon({ name }: { name: string }) {
     check: <path d="M5 12l4 4L19 6"/>,
     file: <><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></>,
   };
-  return <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{paths[name] ?? paths.space}</svg>;
+  return <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{paths[name === "routing" ? "route" : name] ?? paths.space}</svg>;
 }
 
 function curve(a: Point, b: Point, size: { width: number; height: number }) {
