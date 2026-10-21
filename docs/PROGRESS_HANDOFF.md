@@ -1,3 +1,15 @@
+# HOPNET CN Studio checkpoint — 2026-10-21
+
+Current branch: `codex/hopnet-cn-studio`, extending preserved Resilience Studio commit `1c6c99d`. New work includes RTC hello/LSA flooding, independent LSDB/SPF/forwarding, locally routed messages and ACKs, per-router Routing inspectors/exports, observer-local convergence episodes, saved-link restoration, and control/data Replay filtering with historical router snapshots. File selection uses the local LSA graph; signed file forwarding remains source-routed. See `CN_STUDIO.md` for the exact gate status, protocol/trust definitions, demonstration and pending work; `CN_RESEARCH_DRAFT.md` is the implementation-backed paper extension.
+
+New automated evidence is `evidence/distributed-routing.json`: four real Chrome contexts, all-router LSDB/table exports, actual chosen-relay browser closure, alternate next-hop selection and acknowledged message delivery. Six requested responsive Routing viewports are captured in `screenshots/hopnet-routing-WIDTHxHEIGHT.png`. These are one-host automated experiments, not physical LAN acceptance. The existing file-recovery and no-alternate flows remain present. Admission is explicitly bounded to eight total admitted sessions per room to match protocol reports; create a fresh room after exhausting sessions during repeated rejoining.
+
+Source checkpoint `1c43a2c` is pushed. Final verification: 46 unit/integration tests plus TypeScript/build pass; final sequential seven-flow Chrome suite passed in 4.7 minutes; npm high-severity audit reports zero findings. Prior loaded failures and harness corrections are documented rather than counted as successes. Production no-progress and recovery-assertion deadlines are unchanged.
+
+Remaining: dynamic local-next-hop file envelopes without breaking signed receipts, application delay controls, automatic routing-specific A–F trial orchestration/message-stream metrics, full graphical shortest-path tree/convergence timeline, physical five-device validation and comparative trials. Do not represent those as complete. Keep the feature review unmerged into main. Prior checkpoint history follows unchanged.
+
+---
+
 # HOPNET Resilience Studio checkpoint — 2026-10-20
 
 ## Current branch and preservation

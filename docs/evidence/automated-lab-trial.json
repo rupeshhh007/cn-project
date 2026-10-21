@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-10-20T07:38:23.050Z",
+  "exportedAt": "2026-10-21T14:47:28.626Z",
   "results": [
     {
       "schemaVersion": 1,
@@ -8,14 +8,14 @@
         "preset": "direct-overlay",
         "mode": "direct",
         "strategy": "minimum-hops",
-        "peerId": "peer_mOvsY2B4Le-b",
-        "id": "2a60df50-0113-4f0d-91c3-814d602f1549",
-        "createdAt": 11504.300000190735,
-        "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
+        "peerId": "peer_Umt3tJc9Q32W",
+        "id": "8aee4bfd-3c18-4078-b176-4e2ec826b3d5",
+        "createdAt": 11194.400000095367,
+        "transferId": "dce9db92-cc81-4201-bc0e-b288879bf372",
         "result": {
-          "id": "a71e2249-edce-437d-a649-bad9002af38e",
+          "id": "dce9db92-cc81-4201-bc0e-b288879bf372",
           "direction": "send",
-          "peerId": "peer_mOvsY2B4Le-b",
+          "peerId": "peer_Umt3tJc9Q32W",
           "fileName": "lab-proof.bin",
           "mime": "application/octet-stream",
           "size": 22,
@@ -25,73 +25,73 @@
           "acknowledgedBytes": 22,
           "paths": [
             [
-              "peer_w-lXoqOLp9Q7",
-              "peer_mOvsY2B4Le-b"
+              "peer_gi0_rtPRgyv5",
+              "peer_Umt3tJc9Q32W"
             ]
           ],
           "recoveryCount": 0,
           "pathStats": [
             {
               "path": [
-                "peer_w-lXoqOLp9Q7",
-                "peer_mOvsY2B4Le-b"
+                "peer_gi0_rtPRgyv5",
+                "peer_Umt3tJc9Q32W"
               ],
               "attemptedChunks": 1,
               "acknowledgedChunks": 1,
               "deliveredBytes": 22,
               "retries": 0,
               "failures": 0,
-              "rttMs": 13.900000095367432
+              "rttMs": 13.400000095367432
             }
           ],
           "history": [
             {
               "type": "offer",
-              "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
-              "at": 11513.599999904633,
+              "transferId": "dce9db92-cc81-4201-bc0e-b288879bf372",
+              "at": 11205,
               "path": [
-                "peer_w-lXoqOLp9Q7",
-                "peer_mOvsY2B4Le-b"
+                "peer_gi0_rtPRgyv5",
+                "peer_Umt3tJc9Q32W"
               ]
             },
             {
               "type": "accepted",
-              "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
-              "at": 12676.700000286102
+              "transferId": "dce9db92-cc81-4201-bc0e-b288879bf372",
+              "at": 12360.799999713898
             },
             {
               "type": "chunk-scheduled",
-              "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
-              "at": 12677,
+              "transferId": "dce9db92-cc81-4201-bc0e-b288879bf372",
+              "at": 12361.199999809265,
               "path": [
-                "peer_w-lXoqOLp9Q7",
-                "peer_mOvsY2B4Le-b"
+                "peer_gi0_rtPRgyv5",
+                "peer_Umt3tJc9Q32W"
               ],
               "chunkIndex": 0
             },
             {
               "type": "receiver-ack",
-              "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
-              "at": 12690.900000095367,
+              "transferId": "dce9db92-cc81-4201-bc0e-b288879bf372",
+              "at": 12374.599999904633,
               "path": [
-                "peer_w-lXoqOLp9Q7",
-                "peer_mOvsY2B4Le-b"
+                "peer_gi0_rtPRgyv5",
+                "peer_Umt3tJc9Q32W"
               ],
               "chunkIndex": 0
             },
             {
               "type": "verified",
-              "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
-              "at": 12692.5,
+              "transferId": "dce9db92-cc81-4201-bc0e-b288879bf372",
+              "at": 12376.099999904633,
               "path": [
-                "peer_w-lXoqOLp9Q7",
-                "peer_mOvsY2B4Le-b"
+                "peer_gi0_rtPRgyv5",
+                "peer_Umt3tJc9Q32W"
               ]
             }
           ],
-          "startedAt": 12676.599999904633,
+          "startedAt": 12360.799999713898,
           "verifiedHash": "bfdc6133033b107ec4b790cc70084cf9006d1c069edaeccffc278994d88fbac2",
-          "completedAt": 12692.5
+          "completedAt": 12376.099999904633
         }
       },
       "status": "verified",
@@ -102,71 +102,71 @@
       "individuallyObservedChunkAcks": 1,
       "attempts": 1,
       "retries": 0,
-      "elapsedMs": 15.900000095367432,
-      "payloadBytesPerSecond": 1383.6477904430858,
+      "elapsedMs": 15.300000190734863,
+      "payloadBytesPerSecond": 1437.9084788065832,
       "failureDetectionMs": null,
       "recoveryMs": null,
       "observedAckGapMs": null,
-      "offeredAtMs": 11513.599999904633,
-      "acceptedAtMs": 12676.700000286102,
-      "completedAtMs": 12692.5,
+      "offeredAtMs": 11205,
+      "acceptedAtMs": 12360.799999713898,
+      "completedAtMs": 12376.099999904633,
       "verifiedHash": "bfdc6133033b107ec4b790cc70084cf9006d1c069edaeccffc278994d88fbac2",
       "pathStats": [
         {
           "path": [
-            "peer_w-lXoqOLp9Q7",
-            "peer_mOvsY2B4Le-b"
+            "peer_gi0_rtPRgyv5",
+            "peer_Umt3tJc9Q32W"
           ],
           "attemptedChunks": 1,
           "acknowledgedChunks": 1,
           "deliveredBytes": 22,
           "retries": 0,
           "failures": 0,
-          "rttMs": 13.900000095367432
+          "rttMs": 13.400000095367432
         }
       ],
       "pathHistory": [
         {
           "type": "offer",
-          "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
-          "at": 11513.599999904633,
+          "transferId": "dce9db92-cc81-4201-bc0e-b288879bf372",
+          "at": 11205,
           "path": [
-            "peer_w-lXoqOLp9Q7",
-            "peer_mOvsY2B4Le-b"
+            "peer_gi0_rtPRgyv5",
+            "peer_Umt3tJc9Q32W"
           ]
         },
         {
           "type": "accepted",
-          "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
-          "at": 12676.700000286102
+          "transferId": "dce9db92-cc81-4201-bc0e-b288879bf372",
+          "at": 12360.799999713898
         },
         {
           "type": "chunk-scheduled",
-          "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
-          "at": 12677,
+          "transferId": "dce9db92-cc81-4201-bc0e-b288879bf372",
+          "at": 12361.199999809265,
           "path": [
-            "peer_w-lXoqOLp9Q7",
-            "peer_mOvsY2B4Le-b"
+            "peer_gi0_rtPRgyv5",
+            "peer_Umt3tJc9Q32W"
           ],
           "chunkIndex": 0
         },
         {
           "type": "receiver-ack",
-          "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
-          "at": 12690.900000095367,
+          "transferId": "dce9db92-cc81-4201-bc0e-b288879bf372",
+          "at": 12374.599999904633,
           "path": [
-            "peer_w-lXoqOLp9Q7",
-            "peer_mOvsY2B4Le-b"
+            "peer_gi0_rtPRgyv5",
+            "peer_Umt3tJc9Q32W"
           ],
           "chunkIndex": 0
         },
         {
           "type": "verified",
-          "transferId": "a71e2249-edce-437d-a649-bad9002af38e",
-          "at": 12692.5,
+          "transferId": "dce9db92-cc81-4201-bc0e-b288879bf372",
+          "at": 12376.099999904633,
           "path": [
-            "peer_w-lXoqOLp9Q7",
-            "peer_mOvsY2B4Le-b"
+            "peer_gi0_rtPRgyv5",
+            "peer_Umt3tJc9Q32W"
           ]
         }
       ],
