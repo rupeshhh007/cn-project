@@ -49,6 +49,7 @@ export async function createManifest(name: string, mime: string, bytes: Uint8Arr
 export class TransferAssembler {
   private readonly chunks = new Map<number, Uint8Array>();
   private receivedBytes = 0;
+  private discarded = false;
 
   constructor(readonly manifest: TransferManifest) {
     if (manifest.size < 1 || manifest.size > MAX_FILE_BYTES) throw new Error("Manifest file size is outside the accepted limit.");
@@ -61,14 +62,17 @@ export class TransferAssembler {
   get receivedCount(): number { return this.chunks.size; }
   get bytesReceived(): number { return this.receivedBytes; }
   get complete(): boolean { return this.chunks.size === this.manifest.chunkCount; }
+  discard(): void { this.discarded = true; this.chunks.clear(); this.receivedBytes = 0; }
 
   async add(index: number, bytes: Uint8Array, declaredHash: string): Promise<"stored" | "duplicate"> {
+    if (this.discarded) throw new Error("Transfer assembly was discarded.");
     if (!Number.isInteger(index) || index < 0 || index >= this.manifest.chunkCount) throw new Error("Chunk index is outside the manifest.");
     if (bytes.byteLength > this.manifest.chunkSize) throw new Error("Chunk exceeds the manifest chunk size.");
     const expectedLength = index === this.manifest.chunkCount - 1 ? this.manifest.size - this.manifest.chunkSize * index : this.manifest.chunkSize;
     if (bytes.byteLength !== expectedLength) throw new Error("Chunk length does not match the manifest.");
     const expectedHash = this.manifest.chunkHashes[index];
     if (!expectedHash || declaredHash !== expectedHash || await sha256(bytes) !== expectedHash) throw new Error("Chunk integrity verification failed.");
+    if (this.discarded) throw new Error("Transfer assembly was discarded.");
     if (this.chunks.has(index)) return "duplicate";
     this.chunks.set(index, new Uint8Array(bytes));
     this.receivedBytes += bytes.byteLength;

@@ -1,8 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import WebSocket from "ws";
-import { buildApp } from "../src/app.ts";
+import { buildApp, requestLogFields } from "../src/app.ts";
 import { normalizeLanInterfaces } from "../src/network.ts";
+
+test("request logs exclude invitation and bearer-token query strings", () => {
+  const fields = requestLogFields({ method: "GET", url: "/signal?token=private-session&invite=private-invitation", ip: "127.0.0.1" });
+  assert.deepEqual(fields, { method: "GET", url: "/signal", remoteAddress: "127.0.0.1" });
+  assert.doesNotMatch(JSON.stringify(fields), /private-session|private-invitation/);
+});
 
 test("network discovery and QR invitations use an allow-listed LAN origin", async (t) => {
   process.env.NODE_ENV = "test";
@@ -93,4 +99,21 @@ test("participant sessions cannot author the overlay topology", async (t) => {
   const closed = new Promise<void>((resolve) => socket.once("close", () => resolve()));
   socket.close();
   await closed;
+});
+
+test("admission cannot exceed the bounded distributed-router room capacity", async (t) => {
+  const app = await buildApp({ serveWeb:false });
+  t.after(() => app.close());
+  const room = (await app.inject({ method:"POST",url:"/api/rooms",payload:{ displayName:"Capacity host",deviceCategory:"laptop" } })).json();
+  for (let index = 1; index <= 8; index++) {
+    const join = (await app.inject({ method:"POST",url:`/api/rooms/${room.roomId}/join`,payload:{ displayName:`Peer ${index}`,deviceCategory:"phone",inviteSecret:room.inviteSecret } })).json();
+    const approval = await app.inject({ method:"POST",url:`/api/rooms/${room.roomId}/approve`,headers:{ authorization:`Bearer ${room.hostToken}` },payload:{ requestId:join.requestId } });
+    assert.equal(approval.statusCode,index < 8 ? 200 : 409);
+    if (index === 8) {
+      assert.equal(approval.json().error,"ROOM_CAPACITY");
+      assert.match(approval.json().message,/8 admitted peers/);
+      const claim = await app.inject({ method:"GET",url:`/api/rooms/${room.roomId}/join/${join.requestId}`,headers:{ "x-hopnet-claim":join.claimToken } });
+      assert.equal(claim.json().status,"pending");
+    }
+  }
 });

@@ -6,6 +6,7 @@ export type LinkState = {
   state: "new" | "connecting" | "direct" | "degraded" | "closed";
   channelState: RTCDataChannelState | "none";
   rttMs?: number;
+  measuredAt?: number;
   candidateType?: string;
   bytesSent: number;
   bytesReceived: number;
@@ -13,6 +14,7 @@ export type LinkState = {
 };
 
 type ManagedPeer = {
+  createdAt: number;
   pc: RTCPeerConnection;
   channel?: RTCDataChannel;
   makingOffer: boolean;
@@ -20,6 +22,8 @@ type ManagedPeer = {
   polite: boolean;
   state: LinkState;
   pendingPings: Map<string, number>;
+  lastByteUpdate?: number;
+  pingTimer?: ReturnType<typeof setInterval>;
 };
 
 export class PeerManager {
@@ -33,10 +37,15 @@ export class PeerManager {
   ) {}
 
   ensure(remotePeerId: string): void {
-    if (remotePeerId === this.selfPeerId || this.peers.has(remotePeerId)) return;
+    if (remotePeerId === this.selfPeerId) return;
+    const existing=this.peers.get(remotePeerId);
+    const negotiationExpired=existing && existing.channel?.readyState!=="open" && performance.now()-existing.createdAt>15_000;
+    if(existing && !negotiationExpired && existing.pc.connectionState!=="failed" && existing.pc.connectionState!=="closed" && existing.channel?.readyState!=="closed") return;
+    if(existing) this.close(remotePeerId);
     const pc = new RTCPeerConnection({ iceServers: [] });
     const state: LinkState = { peerId: remotePeerId, state: "new", channelState: "none", bytesSent: 0, bytesReceived: 0 };
     const managed: ManagedPeer = {
+      createdAt: performance.now(),
       pc,
       makingOffer: false,
       ignoreOffer: false,
@@ -48,22 +57,23 @@ export class PeerManager {
     this.emit(managed, { state: "connecting" });
 
     pc.onicecandidate = ({ candidate }) => {
-      if (!candidate) return;
+      if (!candidate || this.peers.get(remotePeerId)!==managed) return;
       const json = candidate.toJSON();
       if (!json.candidate) return;
       this.signal(remotePeerId, { candidate: { ...json, candidate: json.candidate } });
     };
     pc.onconnectionstatechange = () => {
-      const next = pc.connectionState === "connected" ? "direct" : pc.connectionState === "failed" || pc.connectionState === "disconnected" ? "degraded" : pc.connectionState === "closed" ? "closed" : "connecting";
+      const next = pc.connectionState === "connected" && managed.channel?.readyState === "open" ? "direct" : pc.connectionState === "failed" || pc.connectionState === "disconnected" ? "degraded" : pc.connectionState === "closed" ? "closed" : "connecting";
       this.emit(managed, { state: next, error: pc.connectionState === "failed" ? "ICE connection failed" : undefined });
       if (next === "direct") void this.inspectCandidate(managed);
     };
     pc.ondatachannel = ({ channel }) => this.bindChannel(remotePeerId, managed, channel);
     pc.onnegotiationneeded = async () => {
+      if(this.peers.get(remotePeerId)!==managed) return;
       try {
         managed.makingOffer = true;
         await pc.setLocalDescription();
-        if (pc.localDescription) this.signal(remotePeerId, { description: { type: pc.localDescription.type, sdp: pc.localDescription.sdp } });
+        if (this.peers.get(remotePeerId)===managed && pc.localDescription) this.signal(remotePeerId, { description: { type: pc.localDescription.type, sdp: pc.localDescription.sdp } });
       } catch (error) {
         this.emit(managed, { state: "degraded", error: error instanceof Error ? error.message : "Negotiation failed" });
       } finally {
@@ -87,7 +97,7 @@ export class PeerManager {
         await pc.setRemoteDescription(description);
         if (description.type === "offer") {
           await pc.setLocalDescription();
-          if (pc.localDescription) this.signal(remotePeerId, { description: { type: pc.localDescription.type, sdp: pc.localDescription.sdp } });
+          if (this.peers.get(remotePeerId)===managed && pc.localDescription) this.signal(remotePeerId, { description: { type: pc.localDescription.type, sdp: pc.localDescription.sdp } });
         }
       } else if (signal.candidate && !managed.ignoreOffer) {
         await pc.addIceCandidate(signal.candidate as RTCIceCandidateInit);
@@ -100,6 +110,7 @@ export class PeerManager {
   ping(remotePeerId: string): string {
     const messageId = createUuid();
     const managed = this.requireOpen(remotePeerId);
+    for (const [id, at] of managed.pendingPings) if (performance.now() - at > 30_000) managed.pendingPings.delete(id);
     managed.pendingPings.set(messageId, performance.now());
     this.send(remotePeerId, { protocolVersion: PROTOCOL_VERSION, kind: "ping", messageId, sentAt: performance.timeOrigin + performance.now() });
     return messageId;
@@ -121,8 +132,10 @@ export class PeerManager {
 
   close(remotePeerId: string): void {
     const managed = this.peers.get(remotePeerId);
+    clearInterval(managed?.pingTimer);
     managed?.channel?.close();
     managed?.pc.close();
+    if (managed) this.emit(managed, { state: "closed", channelState: "closed" });
     this.peers.delete(remotePeerId);
   }
 
@@ -147,11 +160,18 @@ export class PeerManager {
     managed.channel = channel;
     channel.binaryType = "arraybuffer";
     channel.bufferedAmountLowThreshold = 64 * 1024;
-    channel.onopen = () => { this.emit(managed, { state: "direct", channelState: channel.readyState }); void this.inspectCandidate(managed); };
-    channel.onclose = () => this.emit(managed, { state: "closed", channelState: channel.readyState });
+    channel.onopen = () => {
+      if(this.peers.get(remotePeerId)!==managed) return;
+      this.emit(managed, { state: "direct", channelState: channel.readyState }); void this.inspectCandidate(managed);
+      const measure = () => { if (channel.readyState === "open") this.ping(remotePeerId); };
+      measure(); managed.pingTimer = setInterval(measure, 10_000);
+    };
+    channel.onclose = () => { clearInterval(managed.pingTimer); this.emit(managed, { state: "closed", channelState: channel.readyState }); };
     channel.onerror = () => this.emit(managed, { state: "degraded", channelState: channel.readyState, error: "DataChannel error" });
     channel.onmessage = ({ data }) => {
+      if(this.peers.get(remotePeerId)!==managed) return;
       if (typeof data !== "string") return;
+      if (data.length > 96 * 1024) return;
       this.emit(managed, { bytesReceived: managed.state.bytesReceived + new TextEncoder().encode(data).byteLength });
       let value: unknown;
       try { value = JSON.parse(data); } catch { return; }
@@ -166,7 +186,7 @@ export class PeerManager {
         const started = managed.pendingPings.get(packet.messageId);
         if (started !== undefined) {
           managed.pendingPings.delete(packet.messageId);
-          this.emit(managed, { rttMs: Math.round((performance.now() - started) * 10) / 10 });
+          this.emit(managed, { rttMs: Math.round((performance.now() - started) * 10) / 10,measuredAt:performance.now() });
         }
       }
       this.onMessage(remotePeerId, packet);
@@ -179,15 +199,21 @@ export class PeerManager {
     if (channel.bufferedAmount < 256 * 1024) return;
     await new Promise<void>((resolve, reject) => {
       const timeout = window.setTimeout(() => {
-        channel.removeEventListener("bufferedamountlow", ready);
+        cleanup();
         reject(new Error("WebRTC send queue remained congested."));
       }, 5_000);
-      const ready = () => {
+      const cleanup = () => {
         window.clearTimeout(timeout);
         channel.removeEventListener("bufferedamountlow", ready);
+        channel.removeEventListener("close", closed);
+      };
+      const closed = () => { cleanup(); reject(new Error("Direct WebRTC channel closed while waiting for backpressure.")); };
+      const ready = () => {
+        cleanup();
         resolve();
       };
       channel.addEventListener("bufferedamountlow", ready, { once: true });
+      channel.addEventListener("close", closed, { once: true });
       // The queue may drain between the initial check and listener registration.
       if (channel.readyState !== "open") {
         window.clearTimeout(timeout);
@@ -200,11 +226,17 @@ export class PeerManager {
   }
 
   private emit(managed: ManagedPeer, patch: Partial<LinkState>): void {
+    if (this.peers.get(managed.state.peerId) !== managed) return;
     managed.state = { ...managed.state, ...patch, channelState: managed.channel?.readyState ?? managed.state.channelState };
+    if (Object.keys(patch).every((key) => key === "bytesSent" || key === "bytesReceived")) {
+      if (performance.now() - (managed.lastByteUpdate ?? 0) < 200) return;
+      managed.lastByteUpdate = performance.now();
+    }
     this.onState({ ...managed.state });
   }
 
   private async inspectCandidate(managed: ManagedPeer): Promise<void> {
+    if (managed.pc.connectionState === "closed") return;
     const stats = await managed.pc.getStats();
     let pair: RTCStats | undefined;
     stats.forEach((report) => { if (report.type === "candidate-pair" && report.state === "succeeded" && (report.nominated || !pair)) pair = report; });

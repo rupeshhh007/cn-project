@@ -1,0 +1,2265 @@
+{
+  "provenance": "AUTOMATED CHROME WEBRTC — NOT PHYSICAL DEVICES",
+  "before": {
+    "provenance": "RTC-FLOODED ROUTER OBSERVATIONS",
+    "observer": "peer_z4lzowFANJyK",
+    "snapshots": [
+      {
+        "id": "peer_z4lzowFANJyK",
+        "observedAt": 13933.5,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_az-JXBWh_g57\",\"peer_z4lzowFANJyK\",1],[\"peer_DLybXSupnH0p\",\"peer_az-JXBWh_g57\",1],[\"peer_DLybXSupnH0p\",\"peer_zWhEE4YJInv9\",1],[\"peer_z4lzowFANJyK\",\"peer_zWhEE4YJInv9\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_zWhEE4YJInv9",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 13760,
+            "rttMs": 27.699999809265137
+          },
+          {
+            "id": "peer_az-JXBWh_g57",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 13915.700000286102,
+            "rttMs": 31.09999990463257
+          },
+          {
+            "id": "peer_DLybXSupnH0p",
+            "channelOpen": false,
+            "active": false,
+            "lastHello": 9310.10000038147,
+            "rttMs": 103.19999980926514
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_z4lzowFANJyK",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 9482.800000190735,
+            "expiresAt": 27482.800000190735,
+            "neighbors": [
+              {
+                "id": "peer_az-JXBWh_g57",
+                "rttMs": 31
+              },
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 32
+              }
+            ]
+          },
+          {
+            "origin": "peer_zWhEE4YJInv9",
+            "generation": 0,
+            "sequence": 4,
+            "receivedAt": 10011.300000190735,
+            "expiresAt": 28011,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 33
+              }
+            ]
+          },
+          {
+            "origin": "peer_az-JXBWh_g57",
+            "generation": 0,
+            "sequence": 3,
+            "receivedAt": 10383.300000190735,
+            "expiresAt": 28382.400000095367,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 3
+              }
+            ]
+          },
+          {
+            "origin": "peer_DLybXSupnH0p",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 10384.5,
+            "expiresAt": 28383.599999904633,
+            "neighbors": [
+              {
+                "id": "peer_az-JXBWh_g57",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 84
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_zWhEE4YJInv9",
+            "nextHop": "peer_zWhEE4YJInv9",
+            "path": [
+              "peer_z4lzowFANJyK",
+              "peer_zWhEE4YJInv9"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_az-JXBWh_g57",
+            "nextHop": "peer_az-JXBWh_g57",
+            "path": [
+              "peer_z4lzowFANJyK",
+              "peer_az-JXBWh_g57"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_DLybXSupnH0p",
+            "nextHop": "peer_az-JXBWh_g57",
+            "path": [
+              "peer_z4lzowFANJyK",
+              "peer_az-JXBWh_g57",
+              "peer_DLybXSupnH0p"
+            ],
+            "cost": 2
+          }
+        ],
+        "counters": {
+          "helloSent": 21,
+          "helloReceived": 22,
+          "lsaSent": 5,
+          "lsaReceived": 8,
+          "duplicates": 5,
+          "recomputations": 7,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 85954
+        },
+        "convergence": {
+          "startedAt": 8626.400000095367,
+          "lastChangeAt": 10384.700000286102,
+          "before": [
+            {
+              "destination": "peer_zWhEE4YJInv9",
+              "nextHop": "peer_zWhEE4YJInv9",
+              "path": [
+                "peer_z4lzowFANJyK",
+                "peer_zWhEE4YJInv9"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_az-JXBWh_g57",
+              "nextHop": "peer_az-JXBWh_g57",
+              "path": [
+                "peer_z4lzowFANJyK",
+                "peer_az-JXBWh_g57"
+              ],
+              "cost": 1
+            }
+          ],
+          "after": [
+            {
+              "destination": "peer_zWhEE4YJInv9",
+              "nextHop": "peer_zWhEE4YJInv9",
+              "path": [
+                "peer_z4lzowFANJyK",
+                "peer_zWhEE4YJInv9"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_az-JXBWh_g57",
+              "nextHop": "peer_az-JXBWh_g57",
+              "path": [
+                "peer_z4lzowFANJyK",
+                "peer_az-JXBWh_g57"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_DLybXSupnH0p",
+              "nextHop": "peer_az-JXBWh_g57",
+              "path": [
+                "peer_z4lzowFANJyK",
+                "peer_az-JXBWh_g57",
+                "peer_DLybXSupnH0p"
+              ],
+              "cost": 2
+            }
+          ],
+          "settledAt": 11433.400000095367,
+          "agreementAt": 13434.900000095367
+        }
+      },
+      {
+        "id": "peer_zWhEE4YJInv9",
+        "observedAt": 12254.60000038147,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_az-JXBWh_g57\",\"peer_z4lzowFANJyK\",1],[\"peer_DLybXSupnH0p\",\"peer_az-JXBWh_g57\",1],[\"peer_DLybXSupnH0p\",\"peer_zWhEE4YJInv9\",1],[\"peer_z4lzowFANJyK\",\"peer_zWhEE4YJInv9\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_z4lzowFANJyK",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 12044.900000095367,
+            "rttMs": 41.90000009536743
+          },
+          {
+            "id": "peer_DLybXSupnH0p",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 12050.700000286102,
+            "rttMs": 47.59999990463257
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_zWhEE4YJInv9",
+            "generation": 0,
+            "sequence": 4,
+            "receivedAt": 9213.800000190735,
+            "expiresAt": 27213.800000190735,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 33
+              }
+            ]
+          },
+          {
+            "origin": "peer_z4lzowFANJyK",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 8732.400000095367,
+            "expiresAt": 26730.5,
+            "neighbors": [
+              {
+                "id": "peer_az-JXBWh_g57",
+                "rttMs": 31
+              },
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 32
+              }
+            ]
+          },
+          {
+            "origin": "peer_az-JXBWh_g57",
+            "generation": 0,
+            "sequence": 3,
+            "receivedAt": 9659.10000038147,
+            "expiresAt": 27658.200000286102,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 3
+              }
+            ]
+          },
+          {
+            "origin": "peer_DLybXSupnH0p",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 9657,
+            "expiresAt": 27656.099999904633,
+            "neighbors": [
+              {
+                "id": "peer_az-JXBWh_g57",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 84
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_z4lzowFANJyK",
+            "nextHop": "peer_z4lzowFANJyK",
+            "path": [
+              "peer_zWhEE4YJInv9",
+              "peer_z4lzowFANJyK"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_az-JXBWh_g57",
+            "nextHop": "peer_DLybXSupnH0p",
+            "path": [
+              "peer_zWhEE4YJInv9",
+              "peer_DLybXSupnH0p",
+              "peer_az-JXBWh_g57"
+            ],
+            "cost": 2
+          },
+          {
+            "destination": "peer_DLybXSupnH0p",
+            "nextHop": "peer_DLybXSupnH0p",
+            "path": [
+              "peer_zWhEE4YJInv9",
+              "peer_DLybXSupnH0p"
+            ],
+            "cost": 1
+          }
+        ],
+        "counters": {
+          "helloSent": 14,
+          "helloReceived": 14,
+          "lsaSent": 4,
+          "lsaReceived": 9,
+          "duplicates": 6,
+          "recomputations": 7,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 34238
+        },
+        "convergence": {
+          "startedAt": 7905.10000038147,
+          "lastChangeAt": 9659.5,
+          "settledAt": 10755.300000190735,
+          "before": [
+            {
+              "destination": "peer_z4lzowFANJyK",
+              "nextHop": "peer_z4lzowFANJyK",
+              "path": [
+                "peer_zWhEE4YJInv9",
+                "peer_z4lzowFANJyK"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_az-JXBWh_g57",
+              "nextHop": "peer_z4lzowFANJyK",
+              "path": [
+                "peer_zWhEE4YJInv9",
+                "peer_z4lzowFANJyK",
+                "peer_az-JXBWh_g57"
+              ],
+              "cost": 2
+            }
+          ],
+          "after": [
+            {
+              "destination": "peer_z4lzowFANJyK",
+              "nextHop": "peer_z4lzowFANJyK",
+              "path": [
+                "peer_zWhEE4YJInv9",
+                "peer_z4lzowFANJyK"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_az-JXBWh_g57",
+              "nextHop": "peer_DLybXSupnH0p",
+              "path": [
+                "peer_zWhEE4YJInv9",
+                "peer_DLybXSupnH0p",
+                "peer_az-JXBWh_g57"
+              ],
+              "cost": 2
+            },
+            {
+              "destination": "peer_DLybXSupnH0p",
+              "nextHop": "peer_DLybXSupnH0p",
+              "path": [
+                "peer_zWhEE4YJInv9",
+                "peer_DLybXSupnH0p"
+              ],
+              "cost": 1
+            }
+          ]
+        },
+        "receivedLocallyAt": 13011.900000095367
+      },
+      {
+        "id": "peer_az-JXBWh_g57",
+        "observedAt": 10094.200000286102,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_az-JXBWh_g57\",\"peer_z4lzowFANJyK\",1],[\"peer_DLybXSupnH0p\",\"peer_az-JXBWh_g57\",1],[\"peer_DLybXSupnH0p\",\"peer_zWhEE4YJInv9\",1],[\"peer_z4lzowFANJyK\",\"peer_zWhEE4YJInv9\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_z4lzowFANJyK",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 9394.700000286102,
+            "rttMs": 7.5
+          },
+          {
+            "id": "peer_DLybXSupnH0p",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 9353.200000286102,
+            "rttMs": 7.599999904632568
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_az-JXBWh_g57",
+            "generation": 0,
+            "sequence": 3,
+            "receivedAt": 6953.5,
+            "expiresAt": 24953.5,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 3
+              }
+            ]
+          },
+          {
+            "origin": "peer_z4lzowFANJyK",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 6167.700000286102,
+            "expiresAt": 24165.800000190735,
+            "neighbors": [
+              {
+                "id": "peer_az-JXBWh_g57",
+                "rttMs": 31
+              },
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 32
+              }
+            ]
+          },
+          {
+            "origin": "peer_zWhEE4YJInv9",
+            "generation": 0,
+            "sequence": 4,
+            "receivedAt": 6761,
+            "expiresAt": 24760.699999809265,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 33
+              }
+            ]
+          },
+          {
+            "origin": "peer_DLybXSupnH0p",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 7048.400000095367,
+            "expiresAt": 25047.5,
+            "neighbors": [
+              {
+                "id": "peer_az-JXBWh_g57",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 84
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_z4lzowFANJyK",
+            "nextHop": "peer_z4lzowFANJyK",
+            "path": [
+              "peer_az-JXBWh_g57",
+              "peer_z4lzowFANJyK"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_zWhEE4YJInv9",
+            "nextHop": "peer_DLybXSupnH0p",
+            "path": [
+              "peer_az-JXBWh_g57",
+              "peer_DLybXSupnH0p",
+              "peer_zWhEE4YJInv9"
+            ],
+            "cost": 2
+          },
+          {
+            "destination": "peer_DLybXSupnH0p",
+            "nextHop": "peer_DLybXSupnH0p",
+            "path": [
+              "peer_az-JXBWh_g57",
+              "peer_DLybXSupnH0p"
+            ],
+            "cost": 1
+          }
+        ],
+        "counters": {
+          "helloSent": 11,
+          "helloReceived": 11,
+          "lsaSent": 3,
+          "lsaReceived": 9,
+          "duplicates": 7,
+          "recomputations": 7,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 30488
+        },
+        "convergence": {
+          "startedAt": 5344.700000286102,
+          "lastChangeAt": 7048.60000038147,
+          "settledAt": 8101.200000286102,
+          "agreementAt": 10093.800000190735,
+          "before": [
+            {
+              "destination": "peer_z4lzowFANJyK",
+              "nextHop": "peer_z4lzowFANJyK",
+              "path": [
+                "peer_az-JXBWh_g57",
+                "peer_z4lzowFANJyK"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_zWhEE4YJInv9",
+              "nextHop": "peer_z4lzowFANJyK",
+              "path": [
+                "peer_az-JXBWh_g57",
+                "peer_z4lzowFANJyK",
+                "peer_zWhEE4YJInv9"
+              ],
+              "cost": 2
+            }
+          ],
+          "after": [
+            {
+              "destination": "peer_z4lzowFANJyK",
+              "nextHop": "peer_z4lzowFANJyK",
+              "path": [
+                "peer_az-JXBWh_g57",
+                "peer_z4lzowFANJyK"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_zWhEE4YJInv9",
+              "nextHop": "peer_DLybXSupnH0p",
+              "path": [
+                "peer_az-JXBWh_g57",
+                "peer_DLybXSupnH0p",
+                "peer_zWhEE4YJInv9"
+              ],
+              "cost": 2
+            },
+            {
+              "destination": "peer_DLybXSupnH0p",
+              "nextHop": "peer_DLybXSupnH0p",
+              "path": [
+                "peer_az-JXBWh_g57",
+                "peer_DLybXSupnH0p"
+              ],
+              "cost": 1
+            }
+          ]
+        },
+        "receivedLocallyAt": 13416.200000286102
+      },
+      {
+        "id": "peer_DLybXSupnH0p",
+        "observedAt": 7457.400000095367,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_az-JXBWh_g57\",\"peer_z4lzowFANJyK\",1],[\"peer_DLybXSupnH0p\",\"peer_az-JXBWh_g57\",1],[\"peer_DLybXSupnH0p\",\"peer_zWhEE4YJInv9\",1],[\"peer_z4lzowFANJyK\",\"peer_zWhEE4YJInv9\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_z4lzowFANJyK",
+            "channelOpen": false,
+            "active": false,
+            "lastHello": 3524.5999999046326,
+            "rttMs": 65
+          },
+          {
+            "id": "peer_zWhEE4YJInv9",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 6965.800000190735,
+            "rttMs": 5.5
+          },
+          {
+            "id": "peer_az-JXBWh_g57",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 6848.800000190735,
+            "rttMs": 5.699999809265137
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_DLybXSupnH0p",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 4452.099999904633,
+            "expiresAt": 22452.099999904633,
+            "neighbors": [
+              {
+                "id": "peer_az-JXBWh_g57",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 84
+              }
+            ]
+          },
+          {
+            "origin": "peer_z4lzowFANJyK",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 4195.800000190735,
+            "expiresAt": 21712.199999809265,
+            "neighbors": [
+              {
+                "id": "peer_az-JXBWh_g57",
+                "rttMs": 31
+              },
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 32
+              }
+            ]
+          },
+          {
+            "origin": "peer_zWhEE4YJInv9",
+            "generation": 0,
+            "sequence": 4,
+            "receivedAt": 4195.300000190735,
+            "expiresAt": 22195,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 33
+              }
+            ]
+          },
+          {
+            "origin": "peer_az-JXBWh_g57",
+            "generation": 0,
+            "sequence": 3,
+            "receivedAt": 4481.599999904633,
+            "expiresAt": 22480.699999809265,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 3
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_z4lzowFANJyK",
+            "nextHop": "peer_az-JXBWh_g57",
+            "path": [
+              "peer_DLybXSupnH0p",
+              "peer_az-JXBWh_g57",
+              "peer_z4lzowFANJyK"
+            ],
+            "cost": 2
+          },
+          {
+            "destination": "peer_zWhEE4YJInv9",
+            "nextHop": "peer_zWhEE4YJInv9",
+            "path": [
+              "peer_DLybXSupnH0p",
+              "peer_zWhEE4YJInv9"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_az-JXBWh_g57",
+            "nextHop": "peer_az-JXBWh_g57",
+            "path": [
+              "peer_DLybXSupnH0p",
+              "peer_az-JXBWh_g57"
+            ],
+            "cost": 1
+          }
+        ],
+        "counters": {
+          "helloSent": 10,
+          "helloReceived": 9,
+          "lsaSent": 5,
+          "lsaReceived": 7,
+          "duplicates": 5,
+          "recomputations": 7,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 26338
+        },
+        "convergence": {
+          "startedAt": 1955.0999999046326,
+          "lastChangeAt": 4482.300000190735,
+          "settledAt": 5707.800000190735,
+          "before": [],
+          "after": [
+            {
+              "destination": "peer_z4lzowFANJyK",
+              "nextHop": "peer_az-JXBWh_g57",
+              "path": [
+                "peer_DLybXSupnH0p",
+                "peer_az-JXBWh_g57",
+                "peer_z4lzowFANJyK"
+              ],
+              "cost": 2
+            },
+            {
+              "destination": "peer_zWhEE4YJInv9",
+              "nextHop": "peer_zWhEE4YJInv9",
+              "path": [
+                "peer_DLybXSupnH0p",
+                "peer_zWhEE4YJInv9"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_az-JXBWh_g57",
+              "nextHop": "peer_az-JXBWh_g57",
+              "path": [
+                "peer_DLybXSupnH0p",
+                "peer_az-JXBWh_g57"
+              ],
+              "cost": 1
+            }
+          ]
+        },
+        "receivedLocallyAt": 13299.900000095367
+      }
+    ]
+  },
+  "after": {
+    "provenance": "RTC-FLOODED ROUTER OBSERVATIONS",
+    "observer": "peer_z4lzowFANJyK",
+    "snapshots": [
+      {
+        "id": "peer_z4lzowFANJyK",
+        "observedAt": 19785.60000038147,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_DLybXSupnH0p\",\"peer_zWhEE4YJInv9\",1],[\"peer_z4lzowFANJyK\",\"peer_zWhEE4YJInv9\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_zWhEE4YJInv9",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 19762.700000286102,
+            "rttMs": 10
+          },
+          {
+            "id": "peer_az-JXBWh_g57",
+            "channelOpen": true,
+            "active": false,
+            "lastHello": 14976.700000286102,
+            "rttMs": 40.59999990463257
+          },
+          {
+            "id": "peer_DLybXSupnH0p",
+            "channelOpen": false,
+            "active": false,
+            "lastHello": 9310.10000038147,
+            "rttMs": 103.19999980926514
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_z4lzowFANJyK",
+            "generation": 0,
+            "sequence": 7,
+            "receivedAt": 19684.5,
+            "expiresAt": 37684.5,
+            "neighbors": [
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 10
+              }
+            ]
+          },
+          {
+            "origin": "peer_zWhEE4YJInv9",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 16042.800000190735,
+            "expiresAt": 34042.5,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 24
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 24
+              }
+            ]
+          },
+          {
+            "origin": "peer_az-JXBWh_g57",
+            "generation": 0,
+            "sequence": 3,
+            "receivedAt": 10383.300000190735,
+            "expiresAt": 28382.400000095367,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 3
+              }
+            ]
+          },
+          {
+            "origin": "peer_DLybXSupnH0p",
+            "generation": 0,
+            "sequence": 7,
+            "receivedAt": 19784.300000190735,
+            "expiresAt": 37782.7000002861,
+            "neighbors": [
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 3
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_zWhEE4YJInv9",
+            "nextHop": "peer_zWhEE4YJInv9",
+            "path": [
+              "peer_z4lzowFANJyK",
+              "peer_zWhEE4YJInv9"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_DLybXSupnH0p",
+            "nextHop": "peer_zWhEE4YJInv9",
+            "path": [
+              "peer_z4lzowFANJyK",
+              "peer_zWhEE4YJInv9",
+              "peer_DLybXSupnH0p"
+            ],
+            "cost": 2
+          }
+        ],
+        "counters": {
+          "helloSent": 31,
+          "helloReceived": 28,
+          "lsaSent": 7,
+          "lsaReceived": 11,
+          "duplicates": 5,
+          "recomputations": 9,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 115412
+        },
+        "convergence": {
+          "startedAt": 19684.700000286102,
+          "lastChangeAt": 19785.400000095367,
+          "before": [
+            {
+              "destination": "peer_zWhEE4YJInv9",
+              "nextHop": "peer_zWhEE4YJInv9",
+              "path": [
+                "peer_z4lzowFANJyK",
+                "peer_zWhEE4YJInv9"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_az-JXBWh_g57",
+              "nextHop": "peer_az-JXBWh_g57",
+              "path": [
+                "peer_z4lzowFANJyK",
+                "peer_az-JXBWh_g57"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_DLybXSupnH0p",
+              "nextHop": "peer_az-JXBWh_g57",
+              "path": [
+                "peer_z4lzowFANJyK",
+                "peer_az-JXBWh_g57",
+                "peer_DLybXSupnH0p"
+              ],
+              "cost": 2
+            }
+          ],
+          "after": [
+            {
+              "destination": "peer_zWhEE4YJInv9",
+              "nextHop": "peer_zWhEE4YJInv9",
+              "path": [
+                "peer_z4lzowFANJyK",
+                "peer_zWhEE4YJInv9"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_DLybXSupnH0p",
+              "nextHop": "peer_zWhEE4YJInv9",
+              "path": [
+                "peer_z4lzowFANJyK",
+                "peer_zWhEE4YJInv9",
+                "peer_DLybXSupnH0p"
+              ],
+              "cost": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "peer_zWhEE4YJInv9",
+        "observedAt": 18504.10000038147,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_az-JXBWh_g57\",\"peer_z4lzowFANJyK\",1],[\"peer_DLybXSupnH0p\",\"peer_az-JXBWh_g57\",1],[\"peer_DLybXSupnH0p\",\"peer_zWhEE4YJInv9\",1],[\"peer_z4lzowFANJyK\",\"peer_zWhEE4YJInv9\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_z4lzowFANJyK",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 18431.800000190735,
+            "rttMs": 6.599999904632568
+          },
+          {
+            "id": "peer_DLybXSupnH0p",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 18007.10000038147,
+            "rttMs": 3.5
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_zWhEE4YJInv9",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 15257.300000190735,
+            "expiresAt": 33257.300000190735,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 24
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 24
+              }
+            ]
+          },
+          {
+            "origin": "peer_z4lzowFANJyK",
+            "generation": 0,
+            "sequence": 6,
+            "receivedAt": 14930.800000190735,
+            "expiresAt": 32930.00000047684,
+            "neighbors": [
+              {
+                "id": "peer_az-JXBWh_g57",
+                "rttMs": 41
+              },
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 41
+              }
+            ]
+          },
+          {
+            "origin": "peer_az-JXBWh_g57",
+            "generation": 0,
+            "sequence": 3,
+            "receivedAt": 9659.10000038147,
+            "expiresAt": 27658.200000286102,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 3
+              }
+            ]
+          },
+          {
+            "origin": "peer_DLybXSupnH0p",
+            "generation": 0,
+            "sequence": 6,
+            "receivedAt": 15556.700000286102,
+            "expiresAt": 33556.2000002861,
+            "neighbors": [
+              {
+                "id": "peer_az-JXBWh_g57",
+                "rttMs": 16
+              },
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 51
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_z4lzowFANJyK",
+            "nextHop": "peer_z4lzowFANJyK",
+            "path": [
+              "peer_zWhEE4YJInv9",
+              "peer_z4lzowFANJyK"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_az-JXBWh_g57",
+            "nextHop": "peer_DLybXSupnH0p",
+            "path": [
+              "peer_zWhEE4YJInv9",
+              "peer_DLybXSupnH0p",
+              "peer_az-JXBWh_g57"
+            ],
+            "cost": 2
+          },
+          {
+            "destination": "peer_DLybXSupnH0p",
+            "nextHop": "peer_DLybXSupnH0p",
+            "path": [
+              "peer_zWhEE4YJInv9",
+              "peer_DLybXSupnH0p"
+            ],
+            "cost": 1
+          }
+        ],
+        "counters": {
+          "helloSent": 24,
+          "helloReceived": 25,
+          "lsaSent": 5,
+          "lsaReceived": 11,
+          "duplicates": 7,
+          "recomputations": 7,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 67073
+        },
+        "convergence": {
+          "startedAt": 7905.10000038147,
+          "lastChangeAt": 9659.5,
+          "settledAt": 10755.300000190735,
+          "agreementAt": 12757.900000095367,
+          "before": [
+            {
+              "destination": "peer_z4lzowFANJyK",
+              "nextHop": "peer_z4lzowFANJyK",
+              "path": [
+                "peer_zWhEE4YJInv9",
+                "peer_z4lzowFANJyK"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_az-JXBWh_g57",
+              "nextHop": "peer_z4lzowFANJyK",
+              "path": [
+                "peer_zWhEE4YJInv9",
+                "peer_z4lzowFANJyK",
+                "peer_az-JXBWh_g57"
+              ],
+              "cost": 2
+            }
+          ],
+          "after": [
+            {
+              "destination": "peer_z4lzowFANJyK",
+              "nextHop": "peer_z4lzowFANJyK",
+              "path": [
+                "peer_zWhEE4YJInv9",
+                "peer_z4lzowFANJyK"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_az-JXBWh_g57",
+              "nextHop": "peer_DLybXSupnH0p",
+              "path": [
+                "peer_zWhEE4YJInv9",
+                "peer_DLybXSupnH0p",
+                "peer_az-JXBWh_g57"
+              ],
+              "cost": 2
+            },
+            {
+              "destination": "peer_DLybXSupnH0p",
+              "nextHop": "peer_DLybXSupnH0p",
+              "path": [
+                "peer_zWhEE4YJInv9",
+                "peer_DLybXSupnH0p"
+              ],
+              "cost": 1
+            }
+          ]
+        },
+        "receivedLocallyAt": 19260
+      },
+      {
+        "id": "peer_az-JXBWh_g57",
+        "observedAt": 10094.200000286102,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_az-JXBWh_g57\",\"peer_z4lzowFANJyK\",1],[\"peer_DLybXSupnH0p\",\"peer_az-JXBWh_g57\",1],[\"peer_DLybXSupnH0p\",\"peer_zWhEE4YJInv9\",1],[\"peer_z4lzowFANJyK\",\"peer_zWhEE4YJInv9\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_z4lzowFANJyK",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 9394.700000286102,
+            "rttMs": 7.5
+          },
+          {
+            "id": "peer_DLybXSupnH0p",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 9353.200000286102,
+            "rttMs": 7.599999904632568
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_az-JXBWh_g57",
+            "generation": 0,
+            "sequence": 3,
+            "receivedAt": 6953.5,
+            "expiresAt": 24953.5,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 3
+              }
+            ]
+          },
+          {
+            "origin": "peer_z4lzowFANJyK",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 6167.700000286102,
+            "expiresAt": 24165.800000190735,
+            "neighbors": [
+              {
+                "id": "peer_az-JXBWh_g57",
+                "rttMs": 31
+              },
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 32
+              }
+            ]
+          },
+          {
+            "origin": "peer_zWhEE4YJInv9",
+            "generation": 0,
+            "sequence": 4,
+            "receivedAt": 6761,
+            "expiresAt": 24760.699999809265,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 33
+              }
+            ]
+          },
+          {
+            "origin": "peer_DLybXSupnH0p",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 7048.400000095367,
+            "expiresAt": 25047.5,
+            "neighbors": [
+              {
+                "id": "peer_az-JXBWh_g57",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 84
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_z4lzowFANJyK",
+            "nextHop": "peer_z4lzowFANJyK",
+            "path": [
+              "peer_az-JXBWh_g57",
+              "peer_z4lzowFANJyK"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_zWhEE4YJInv9",
+            "nextHop": "peer_DLybXSupnH0p",
+            "path": [
+              "peer_az-JXBWh_g57",
+              "peer_DLybXSupnH0p",
+              "peer_zWhEE4YJInv9"
+            ],
+            "cost": 2
+          },
+          {
+            "destination": "peer_DLybXSupnH0p",
+            "nextHop": "peer_DLybXSupnH0p",
+            "path": [
+              "peer_az-JXBWh_g57",
+              "peer_DLybXSupnH0p"
+            ],
+            "cost": 1
+          }
+        ],
+        "counters": {
+          "helloSent": 11,
+          "helloReceived": 11,
+          "lsaSent": 3,
+          "lsaReceived": 9,
+          "duplicates": 7,
+          "recomputations": 7,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 30488
+        },
+        "convergence": {
+          "startedAt": 5344.700000286102,
+          "lastChangeAt": 7048.60000038147,
+          "settledAt": 8101.200000286102,
+          "agreementAt": 10093.800000190735,
+          "before": [
+            {
+              "destination": "peer_z4lzowFANJyK",
+              "nextHop": "peer_z4lzowFANJyK",
+              "path": [
+                "peer_az-JXBWh_g57",
+                "peer_z4lzowFANJyK"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_zWhEE4YJInv9",
+              "nextHop": "peer_z4lzowFANJyK",
+              "path": [
+                "peer_az-JXBWh_g57",
+                "peer_z4lzowFANJyK",
+                "peer_zWhEE4YJInv9"
+              ],
+              "cost": 2
+            }
+          ],
+          "after": [
+            {
+              "destination": "peer_z4lzowFANJyK",
+              "nextHop": "peer_z4lzowFANJyK",
+              "path": [
+                "peer_az-JXBWh_g57",
+                "peer_z4lzowFANJyK"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_zWhEE4YJInv9",
+              "nextHop": "peer_DLybXSupnH0p",
+              "path": [
+                "peer_az-JXBWh_g57",
+                "peer_DLybXSupnH0p",
+                "peer_zWhEE4YJInv9"
+              ],
+              "cost": 2
+            },
+            {
+              "destination": "peer_DLybXSupnH0p",
+              "nextHop": "peer_DLybXSupnH0p",
+              "path": [
+                "peer_az-JXBWh_g57",
+                "peer_DLybXSupnH0p"
+              ],
+              "cost": 1
+            }
+          ]
+        },
+        "receivedLocallyAt": 13416.200000286102
+      },
+      {
+        "id": "peer_DLybXSupnH0p",
+        "observedAt": 13708.5,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_az-JXBWh_g57\",\"peer_z4lzowFANJyK\",1],[\"peer_DLybXSupnH0p\",\"peer_az-JXBWh_g57\",1],[\"peer_DLybXSupnH0p\",\"peer_zWhEE4YJInv9\",1],[\"peer_z4lzowFANJyK\",\"peer_zWhEE4YJInv9\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_z4lzowFANJyK",
+            "channelOpen": false,
+            "active": false,
+            "lastHello": 3524.5999999046326,
+            "rttMs": 65
+          },
+          {
+            "id": "peer_zWhEE4YJInv9",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 12938.700000286102,
+            "rttMs": 3.4000000953674316
+          },
+          {
+            "id": "peer_az-JXBWh_g57",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 9222,
+            "rttMs": 15.699999809265137
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_DLybXSupnH0p",
+            "generation": 0,
+            "sequence": 6,
+            "receivedAt": 10478.800000190735,
+            "expiresAt": 28478.800000190735,
+            "neighbors": [
+              {
+                "id": "peer_az-JXBWh_g57",
+                "rttMs": 16
+              },
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 51
+              }
+            ]
+          },
+          {
+            "origin": "peer_z4lzowFANJyK",
+            "generation": 0,
+            "sequence": 6,
+            "receivedAt": 9873.200000286102,
+            "expiresAt": 27872.400000572205,
+            "neighbors": [
+              {
+                "id": "peer_az-JXBWh_g57",
+                "rttMs": 41
+              },
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 41
+              }
+            ]
+          },
+          {
+            "origin": "peer_zWhEE4YJInv9",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 10222.700000286102,
+            "expiresAt": 28222.400000095367,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 24
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 24
+              }
+            ]
+          },
+          {
+            "origin": "peer_az-JXBWh_g57",
+            "generation": 0,
+            "sequence": 3,
+            "receivedAt": 4481.599999904633,
+            "expiresAt": 22480.699999809265,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 3
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_z4lzowFANJyK",
+            "nextHop": "peer_az-JXBWh_g57",
+            "path": [
+              "peer_DLybXSupnH0p",
+              "peer_az-JXBWh_g57",
+              "peer_z4lzowFANJyK"
+            ],
+            "cost": 2
+          },
+          {
+            "destination": "peer_zWhEE4YJInv9",
+            "nextHop": "peer_zWhEE4YJInv9",
+            "path": [
+              "peer_DLybXSupnH0p",
+              "peer_zWhEE4YJInv9"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_az-JXBWh_g57",
+            "nextHop": "peer_az-JXBWh_g57",
+            "path": [
+              "peer_DLybXSupnH0p",
+              "peer_az-JXBWh_g57"
+            ],
+            "cost": 1
+          }
+        ],
+        "counters": {
+          "helloSent": 20,
+          "helloReceived": 16,
+          "lsaSent": 6,
+          "lsaReceived": 9,
+          "duplicates": 7,
+          "recomputations": 7,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 58289
+        },
+        "convergence": {
+          "startedAt": 1955.0999999046326,
+          "lastChangeAt": 4482.300000190735,
+          "settledAt": 5707.800000190735,
+          "agreementAt": 7707.400000095367,
+          "before": [],
+          "after": [
+            {
+              "destination": "peer_z4lzowFANJyK",
+              "nextHop": "peer_az-JXBWh_g57",
+              "path": [
+                "peer_DLybXSupnH0p",
+                "peer_az-JXBWh_g57",
+                "peer_z4lzowFANJyK"
+              ],
+              "cost": 2
+            },
+            {
+              "destination": "peer_zWhEE4YJInv9",
+              "nextHop": "peer_zWhEE4YJInv9",
+              "path": [
+                "peer_DLybXSupnH0p",
+                "peer_zWhEE4YJInv9"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_az-JXBWh_g57",
+              "nextHop": "peer_az-JXBWh_g57",
+              "path": [
+                "peer_DLybXSupnH0p",
+                "peer_az-JXBWh_g57"
+              ],
+              "cost": 1
+            }
+          ]
+        },
+        "receivedLocallyAt": 19536.200000286102
+      }
+    ]
+  },
+  "afterDelivery": {
+    "provenance": "RTC-FLOODED ROUTER OBSERVATIONS",
+    "observer": "peer_z4lzowFANJyK",
+    "snapshots": [
+      {
+        "id": "peer_z4lzowFANJyK",
+        "observedAt": 21027.400000095367,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_DLybXSupnH0p\",\"peer_zWhEE4YJInv9\",1],[\"peer_z4lzowFANJyK\",\"peer_zWhEE4YJInv9\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_zWhEE4YJInv9",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 20762.900000095367,
+            "rttMs": 9.599999904632568
+          },
+          {
+            "id": "peer_az-JXBWh_g57",
+            "channelOpen": false,
+            "active": false,
+            "lastHello": 14976.700000286102,
+            "rttMs": 40.59999990463257
+          },
+          {
+            "id": "peer_DLybXSupnH0p",
+            "channelOpen": false,
+            "active": false,
+            "lastHello": 9310.10000038147,
+            "rttMs": 103.19999980926514
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_z4lzowFANJyK",
+            "generation": 0,
+            "sequence": 8,
+            "receivedAt": 20875.10000038147,
+            "expiresAt": 38875.10000038147,
+            "neighbors": [
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 10
+              }
+            ]
+          },
+          {
+            "origin": "peer_zWhEE4YJInv9",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 16042.800000190735,
+            "expiresAt": 34042.5,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 24
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 24
+              }
+            ]
+          },
+          {
+            "origin": "peer_az-JXBWh_g57",
+            "generation": 0,
+            "sequence": 3,
+            "receivedAt": 10383.300000190735,
+            "expiresAt": 28382.400000095367,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 3
+              }
+            ]
+          },
+          {
+            "origin": "peer_DLybXSupnH0p",
+            "generation": 0,
+            "sequence": 7,
+            "receivedAt": 19784.300000190735,
+            "expiresAt": 37782.7000002861,
+            "neighbors": [
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 3
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_zWhEE4YJInv9",
+            "nextHop": "peer_zWhEE4YJInv9",
+            "path": [
+              "peer_z4lzowFANJyK",
+              "peer_zWhEE4YJInv9"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_DLybXSupnH0p",
+            "nextHop": "peer_zWhEE4YJInv9",
+            "path": [
+              "peer_z4lzowFANJyK",
+              "peer_zWhEE4YJInv9",
+              "peer_DLybXSupnH0p"
+            ],
+            "cost": 2
+          }
+        ],
+        "counters": {
+          "helloSent": 33,
+          "helloReceived": 29,
+          "lsaSent": 8,
+          "lsaReceived": 11,
+          "duplicates": 5,
+          "recomputations": 9,
+          "forwarded": 0,
+          "received": 1,
+          "dropped": 0,
+          "controlBytes": 119025
+        },
+        "convergence": {
+          "startedAt": 19684.700000286102,
+          "lastChangeAt": 19785.400000095367,
+          "before": [
+            {
+              "destination": "peer_zWhEE4YJInv9",
+              "nextHop": "peer_zWhEE4YJInv9",
+              "path": [
+                "peer_z4lzowFANJyK",
+                "peer_zWhEE4YJInv9"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_az-JXBWh_g57",
+              "nextHop": "peer_az-JXBWh_g57",
+              "path": [
+                "peer_z4lzowFANJyK",
+                "peer_az-JXBWh_g57"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_DLybXSupnH0p",
+              "nextHop": "peer_az-JXBWh_g57",
+              "path": [
+                "peer_z4lzowFANJyK",
+                "peer_az-JXBWh_g57",
+                "peer_DLybXSupnH0p"
+              ],
+              "cost": 2
+            }
+          ],
+          "after": [
+            {
+              "destination": "peer_zWhEE4YJInv9",
+              "nextHop": "peer_zWhEE4YJInv9",
+              "path": [
+                "peer_z4lzowFANJyK",
+                "peer_zWhEE4YJInv9"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_DLybXSupnH0p",
+              "nextHop": "peer_zWhEE4YJInv9",
+              "path": [
+                "peer_z4lzowFANJyK",
+                "peer_zWhEE4YJInv9",
+                "peer_DLybXSupnH0p"
+              ],
+              "cost": 2
+            }
+          ],
+          "settledAt": 20950.800000190735
+        }
+      },
+      {
+        "id": "peer_zWhEE4YJInv9",
+        "observedAt": 18504.10000038147,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_az-JXBWh_g57\",\"peer_z4lzowFANJyK\",1],[\"peer_DLybXSupnH0p\",\"peer_az-JXBWh_g57\",1],[\"peer_DLybXSupnH0p\",\"peer_zWhEE4YJInv9\",1],[\"peer_z4lzowFANJyK\",\"peer_zWhEE4YJInv9\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_z4lzowFANJyK",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 18431.800000190735,
+            "rttMs": 6.599999904632568
+          },
+          {
+            "id": "peer_DLybXSupnH0p",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 18007.10000038147,
+            "rttMs": 3.5
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_zWhEE4YJInv9",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 15257.300000190735,
+            "expiresAt": 33257.300000190735,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 24
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 24
+              }
+            ]
+          },
+          {
+            "origin": "peer_z4lzowFANJyK",
+            "generation": 0,
+            "sequence": 6,
+            "receivedAt": 14930.800000190735,
+            "expiresAt": 32930.00000047684,
+            "neighbors": [
+              {
+                "id": "peer_az-JXBWh_g57",
+                "rttMs": 41
+              },
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 41
+              }
+            ]
+          },
+          {
+            "origin": "peer_az-JXBWh_g57",
+            "generation": 0,
+            "sequence": 3,
+            "receivedAt": 9659.10000038147,
+            "expiresAt": 27658.200000286102,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 3
+              }
+            ]
+          },
+          {
+            "origin": "peer_DLybXSupnH0p",
+            "generation": 0,
+            "sequence": 6,
+            "receivedAt": 15556.700000286102,
+            "expiresAt": 33556.2000002861,
+            "neighbors": [
+              {
+                "id": "peer_az-JXBWh_g57",
+                "rttMs": 16
+              },
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 51
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_z4lzowFANJyK",
+            "nextHop": "peer_z4lzowFANJyK",
+            "path": [
+              "peer_zWhEE4YJInv9",
+              "peer_z4lzowFANJyK"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_az-JXBWh_g57",
+            "nextHop": "peer_DLybXSupnH0p",
+            "path": [
+              "peer_zWhEE4YJInv9",
+              "peer_DLybXSupnH0p",
+              "peer_az-JXBWh_g57"
+            ],
+            "cost": 2
+          },
+          {
+            "destination": "peer_DLybXSupnH0p",
+            "nextHop": "peer_DLybXSupnH0p",
+            "path": [
+              "peer_zWhEE4YJInv9",
+              "peer_DLybXSupnH0p"
+            ],
+            "cost": 1
+          }
+        ],
+        "counters": {
+          "helloSent": 24,
+          "helloReceived": 25,
+          "lsaSent": 5,
+          "lsaReceived": 11,
+          "duplicates": 7,
+          "recomputations": 7,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 67073
+        },
+        "convergence": {
+          "startedAt": 7905.10000038147,
+          "lastChangeAt": 9659.5,
+          "settledAt": 10755.300000190735,
+          "agreementAt": 12757.900000095367,
+          "before": [
+            {
+              "destination": "peer_z4lzowFANJyK",
+              "nextHop": "peer_z4lzowFANJyK",
+              "path": [
+                "peer_zWhEE4YJInv9",
+                "peer_z4lzowFANJyK"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_az-JXBWh_g57",
+              "nextHop": "peer_z4lzowFANJyK",
+              "path": [
+                "peer_zWhEE4YJInv9",
+                "peer_z4lzowFANJyK",
+                "peer_az-JXBWh_g57"
+              ],
+              "cost": 2
+            }
+          ],
+          "after": [
+            {
+              "destination": "peer_z4lzowFANJyK",
+              "nextHop": "peer_z4lzowFANJyK",
+              "path": [
+                "peer_zWhEE4YJInv9",
+                "peer_z4lzowFANJyK"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_az-JXBWh_g57",
+              "nextHop": "peer_DLybXSupnH0p",
+              "path": [
+                "peer_zWhEE4YJInv9",
+                "peer_DLybXSupnH0p",
+                "peer_az-JXBWh_g57"
+              ],
+              "cost": 2
+            },
+            {
+              "destination": "peer_DLybXSupnH0p",
+              "nextHop": "peer_DLybXSupnH0p",
+              "path": [
+                "peer_zWhEE4YJInv9",
+                "peer_DLybXSupnH0p"
+              ],
+              "cost": 1
+            }
+          ]
+        },
+        "receivedLocallyAt": 19260
+      },
+      {
+        "id": "peer_az-JXBWh_g57",
+        "observedAt": 10094.200000286102,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_az-JXBWh_g57\",\"peer_z4lzowFANJyK\",1],[\"peer_DLybXSupnH0p\",\"peer_az-JXBWh_g57\",1],[\"peer_DLybXSupnH0p\",\"peer_zWhEE4YJInv9\",1],[\"peer_z4lzowFANJyK\",\"peer_zWhEE4YJInv9\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_z4lzowFANJyK",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 9394.700000286102,
+            "rttMs": 7.5
+          },
+          {
+            "id": "peer_DLybXSupnH0p",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 9353.200000286102,
+            "rttMs": 7.599999904632568
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_az-JXBWh_g57",
+            "generation": 0,
+            "sequence": 3,
+            "receivedAt": 6953.5,
+            "expiresAt": 24953.5,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 3
+              }
+            ]
+          },
+          {
+            "origin": "peer_z4lzowFANJyK",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 6167.700000286102,
+            "expiresAt": 24165.800000190735,
+            "neighbors": [
+              {
+                "id": "peer_az-JXBWh_g57",
+                "rttMs": 31
+              },
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 32
+              }
+            ]
+          },
+          {
+            "origin": "peer_zWhEE4YJInv9",
+            "generation": 0,
+            "sequence": 4,
+            "receivedAt": 6761,
+            "expiresAt": 24760.699999809265,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 33
+              }
+            ]
+          },
+          {
+            "origin": "peer_DLybXSupnH0p",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 7048.400000095367,
+            "expiresAt": 25047.5,
+            "neighbors": [
+              {
+                "id": "peer_az-JXBWh_g57",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 84
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_z4lzowFANJyK",
+            "nextHop": "peer_z4lzowFANJyK",
+            "path": [
+              "peer_az-JXBWh_g57",
+              "peer_z4lzowFANJyK"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_zWhEE4YJInv9",
+            "nextHop": "peer_DLybXSupnH0p",
+            "path": [
+              "peer_az-JXBWh_g57",
+              "peer_DLybXSupnH0p",
+              "peer_zWhEE4YJInv9"
+            ],
+            "cost": 2
+          },
+          {
+            "destination": "peer_DLybXSupnH0p",
+            "nextHop": "peer_DLybXSupnH0p",
+            "path": [
+              "peer_az-JXBWh_g57",
+              "peer_DLybXSupnH0p"
+            ],
+            "cost": 1
+          }
+        ],
+        "counters": {
+          "helloSent": 11,
+          "helloReceived": 11,
+          "lsaSent": 3,
+          "lsaReceived": 9,
+          "duplicates": 7,
+          "recomputations": 7,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 30488
+        },
+        "convergence": {
+          "startedAt": 5344.700000286102,
+          "lastChangeAt": 7048.60000038147,
+          "settledAt": 8101.200000286102,
+          "agreementAt": 10093.800000190735,
+          "before": [
+            {
+              "destination": "peer_z4lzowFANJyK",
+              "nextHop": "peer_z4lzowFANJyK",
+              "path": [
+                "peer_az-JXBWh_g57",
+                "peer_z4lzowFANJyK"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_zWhEE4YJInv9",
+              "nextHop": "peer_z4lzowFANJyK",
+              "path": [
+                "peer_az-JXBWh_g57",
+                "peer_z4lzowFANJyK",
+                "peer_zWhEE4YJInv9"
+              ],
+              "cost": 2
+            }
+          ],
+          "after": [
+            {
+              "destination": "peer_z4lzowFANJyK",
+              "nextHop": "peer_z4lzowFANJyK",
+              "path": [
+                "peer_az-JXBWh_g57",
+                "peer_z4lzowFANJyK"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_zWhEE4YJInv9",
+              "nextHop": "peer_DLybXSupnH0p",
+              "path": [
+                "peer_az-JXBWh_g57",
+                "peer_DLybXSupnH0p",
+                "peer_zWhEE4YJInv9"
+              ],
+              "cost": 2
+            },
+            {
+              "destination": "peer_DLybXSupnH0p",
+              "nextHop": "peer_DLybXSupnH0p",
+              "path": [
+                "peer_az-JXBWh_g57",
+                "peer_DLybXSupnH0p"
+              ],
+              "cost": 1
+            }
+          ]
+        },
+        "receivedLocallyAt": 13416.200000286102
+      },
+      {
+        "id": "peer_DLybXSupnH0p",
+        "observedAt": 13708.5,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_az-JXBWh_g57\",\"peer_z4lzowFANJyK\",1],[\"peer_DLybXSupnH0p\",\"peer_az-JXBWh_g57\",1],[\"peer_DLybXSupnH0p\",\"peer_zWhEE4YJInv9\",1],[\"peer_z4lzowFANJyK\",\"peer_zWhEE4YJInv9\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_z4lzowFANJyK",
+            "channelOpen": false,
+            "active": false,
+            "lastHello": 3524.5999999046326,
+            "rttMs": 65
+          },
+          {
+            "id": "peer_zWhEE4YJInv9",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 12938.700000286102,
+            "rttMs": 3.4000000953674316
+          },
+          {
+            "id": "peer_az-JXBWh_g57",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 9222,
+            "rttMs": 15.699999809265137
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_DLybXSupnH0p",
+            "generation": 0,
+            "sequence": 6,
+            "receivedAt": 10478.800000190735,
+            "expiresAt": 28478.800000190735,
+            "neighbors": [
+              {
+                "id": "peer_az-JXBWh_g57",
+                "rttMs": 16
+              },
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 51
+              }
+            ]
+          },
+          {
+            "origin": "peer_z4lzowFANJyK",
+            "generation": 0,
+            "sequence": 6,
+            "receivedAt": 9873.200000286102,
+            "expiresAt": 27872.400000572205,
+            "neighbors": [
+              {
+                "id": "peer_az-JXBWh_g57",
+                "rttMs": 41
+              },
+              {
+                "id": "peer_zWhEE4YJInv9",
+                "rttMs": 41
+              }
+            ]
+          },
+          {
+            "origin": "peer_zWhEE4YJInv9",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 10222.700000286102,
+            "expiresAt": 28222.400000095367,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 24
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 24
+              }
+            ]
+          },
+          {
+            "origin": "peer_az-JXBWh_g57",
+            "generation": 0,
+            "sequence": 3,
+            "receivedAt": 4481.599999904633,
+            "expiresAt": 22480.699999809265,
+            "neighbors": [
+              {
+                "id": "peer_DLybXSupnH0p",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_z4lzowFANJyK",
+                "rttMs": 3
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_z4lzowFANJyK",
+            "nextHop": "peer_az-JXBWh_g57",
+            "path": [
+              "peer_DLybXSupnH0p",
+              "peer_az-JXBWh_g57",
+              "peer_z4lzowFANJyK"
+            ],
+            "cost": 2
+          },
+          {
+            "destination": "peer_zWhEE4YJInv9",
+            "nextHop": "peer_zWhEE4YJInv9",
+            "path": [
+              "peer_DLybXSupnH0p",
+              "peer_zWhEE4YJInv9"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_az-JXBWh_g57",
+            "nextHop": "peer_az-JXBWh_g57",
+            "path": [
+              "peer_DLybXSupnH0p",
+              "peer_az-JXBWh_g57"
+            ],
+            "cost": 1
+          }
+        ],
+        "counters": {
+          "helloSent": 20,
+          "helloReceived": 16,
+          "lsaSent": 6,
+          "lsaReceived": 9,
+          "duplicates": 7,
+          "recomputations": 7,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 58289
+        },
+        "convergence": {
+          "startedAt": 1955.0999999046326,
+          "lastChangeAt": 4482.300000190735,
+          "settledAt": 5707.800000190735,
+          "agreementAt": 7707.400000095367,
+          "before": [],
+          "after": [
+            {
+              "destination": "peer_z4lzowFANJyK",
+              "nextHop": "peer_az-JXBWh_g57",
+              "path": [
+                "peer_DLybXSupnH0p",
+                "peer_az-JXBWh_g57",
+                "peer_z4lzowFANJyK"
+              ],
+              "cost": 2
+            },
+            {
+              "destination": "peer_zWhEE4YJInv9",
+              "nextHop": "peer_zWhEE4YJInv9",
+              "path": [
+                "peer_DLybXSupnH0p",
+                "peer_zWhEE4YJInv9"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_az-JXBWh_g57",
+              "nextHop": "peer_az-JXBWh_g57",
+              "path": [
+                "peer_DLybXSupnH0p",
+                "peer_az-JXBWh_g57"
+              ],
+              "cost": 1
+            }
+          ]
+        },
+        "receivedLocallyAt": 19536.200000286102
+      }
+    ]
+  },
+  "runtimeErrors": []
+}

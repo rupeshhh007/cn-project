@@ -1,0 +1,177 @@
+{
+  "exportedAt": "2026-10-22T03:21:43.938Z",
+  "results": [
+    {
+      "schemaVersion": 1,
+      "provenance": "LOCAL BROWSER OBSERVATIONS",
+      "experiment": {
+        "preset": "direct-overlay",
+        "mode": "direct",
+        "strategy": "minimum-hops",
+        "peerId": "peer_o_yWc404Jqx5",
+        "id": "d1dbee36-066a-4aa3-ab0d-902ba9d642a2",
+        "createdAt": 12148.900000095367,
+        "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
+        "result": {
+          "id": "20ef427d-fdf2-4d31-878c-d515158e43c9",
+          "direction": "send",
+          "peerId": "peer_o_yWc404Jqx5",
+          "fileName": "lab-proof.bin",
+          "mime": "application/octet-stream",
+          "size": 22,
+          "status": "verified",
+          "acknowledgedChunks": 1,
+          "totalChunks": 1,
+          "acknowledgedBytes": 22,
+          "paths": [
+            [
+              "peer_XKU9yAnqJlqR",
+              "peer_o_yWc404Jqx5"
+            ]
+          ],
+          "recoveryCount": 0,
+          "pathStats": [
+            {
+              "path": [
+                "peer_XKU9yAnqJlqR",
+                "peer_o_yWc404Jqx5"
+              ],
+              "attemptedChunks": 1,
+              "acknowledgedChunks": 1,
+              "deliveredBytes": 22,
+              "retries": 0,
+              "failures": 0,
+              "rttMs": 10.700000286102295
+            }
+          ],
+          "history": [
+            {
+              "type": "offer",
+              "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
+              "at": 12184.200000286102,
+              "path": [
+                "peer_XKU9yAnqJlqR",
+                "peer_o_yWc404Jqx5"
+              ]
+            },
+            {
+              "type": "accepted",
+              "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
+              "at": 13026.800000190735
+            },
+            {
+              "type": "chunk-scheduled",
+              "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
+              "at": 13027.599999904633,
+              "path": [
+                "peer_XKU9yAnqJlqR",
+                "peer_o_yWc404Jqx5"
+              ],
+              "chunkIndex": 0
+            },
+            {
+              "type": "receiver-ack",
+              "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
+              "at": 13038.5,
+              "path": [
+                "peer_XKU9yAnqJlqR",
+                "peer_o_yWc404Jqx5"
+              ],
+              "chunkIndex": 0
+            },
+            {
+              "type": "verified",
+              "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
+              "at": 13041.300000190735,
+              "path": [
+                "peer_XKU9yAnqJlqR",
+                "peer_o_yWc404Jqx5"
+              ]
+            }
+          ],
+          "startedAt": 13026.800000190735,
+          "verifiedHash": "bfdc6133033b107ec4b790cc70084cf9006d1c069edaeccffc278994d88fbac2",
+          "completedAt": 13041.300000190735
+        }
+      },
+      "status": "verified",
+      "payloadBytes": 22,
+      "chunkCount": 1,
+      "receiverAcknowledgedBytes": 22,
+      "receiverAcknowledgedChunks": 1,
+      "individuallyObservedChunkAcks": 1,
+      "attempts": 1,
+      "retries": 0,
+      "elapsedMs": 14.5,
+      "payloadBytesPerSecond": 1517.2413793103447,
+      "failureDetectionMs": null,
+      "recoveryMs": null,
+      "observedAckGapMs": null,
+      "offeredAtMs": 12184.200000286102,
+      "acceptedAtMs": 13026.800000190735,
+      "completedAtMs": 13041.300000190735,
+      "verifiedHash": "bfdc6133033b107ec4b790cc70084cf9006d1c069edaeccffc278994d88fbac2",
+      "pathStats": [
+        {
+          "path": [
+            "peer_XKU9yAnqJlqR",
+            "peer_o_yWc404Jqx5"
+          ],
+          "attemptedChunks": 1,
+          "acknowledgedChunks": 1,
+          "deliveredBytes": 22,
+          "retries": 0,
+          "failures": 0,
+          "rttMs": 10.700000286102295
+        }
+      ],
+      "pathHistory": [
+        {
+          "type": "offer",
+          "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
+          "at": 12184.200000286102,
+          "path": [
+            "peer_XKU9yAnqJlqR",
+            "peer_o_yWc404Jqx5"
+          ]
+        },
+        {
+          "type": "accepted",
+          "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
+          "at": 13026.800000190735
+        },
+        {
+          "type": "chunk-scheduled",
+          "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
+          "at": 13027.599999904633,
+          "path": [
+            "peer_XKU9yAnqJlqR",
+            "peer_o_yWc404Jqx5"
+          ],
+          "chunkIndex": 0
+        },
+        {
+          "type": "receiver-ack",
+          "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
+          "at": 13038.5,
+          "path": [
+            "peer_XKU9yAnqJlqR",
+            "peer_o_yWc404Jqx5"
+          ],
+          "chunkIndex": 0
+        },
+        {
+          "type": "verified",
+          "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
+          "at": 13041.300000190735,
+          "path": [
+            "peer_XKU9yAnqJlqR",
+            "peer_o_yWc404Jqx5"
+          ]
+        }
+      ],
+      "error": null,
+      "limitations": "Sender-local monotonic time. ACK latency includes forwarding, hashing and browser scheduling. Fault timing is an application-level command, not physical Wi-Fi failure. Receiver byte evidence is reported by its authenticated overlay receipt; remote wall clocks are not subtracted."
+    }
+  ]
+}
