@@ -1,5 +1,7 @@
 # HOPNET CN Studio — distributed routing checkpoint
 
+Stabilization follow-up: see `STABILIZATION_20261022.md` for signed preparation declines, local-first cancellation, bounded message retries and late-ACK/deduplication guarantees. The architectural scope below is unchanged.
+
 ## Scope and preservation
 
 Branch: `codex/hopnet-cn-studio`, based on the existing Resilience Studio work at `1c6c99d`. Sentinel, UI commit `82b7a2a`, `feat/hopnet-lan`, and the previous review branch are preserved. No merge into main is authorized or performed.

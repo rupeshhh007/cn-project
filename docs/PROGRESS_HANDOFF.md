@@ -1,3 +1,9 @@
+# HOPNET CN Studio stabilization — 2026-10-22
+
+The three PR #3 stabilization findings are implemented: authenticated preparation/capacity declines, local-first route-independent cancellation with resource cleanup, and bounded distributed-message ACK/retry/deduplication with terminal late-ACK rejection. No styling/assets/layout were changed. Final checks: 56 unit/integration tests plus TypeScript/build passed; all eight sequential Chrome flows passed (3.9 minutes); npm high-severity audit found zero vulnerabilities. Desktop/mobile Routing captures were visually inspected. See `STABILIZATION_20261022.md` for semantics, regression evidence and remaining risks. Existing checkpoint history below is preserved and must not be mistaken for the current verification counts.
+
+---
+
 # HOPNET CN Studio checkpoint — 2026-10-21
 
 Current branch: `codex/hopnet-cn-studio`, extending preserved Resilience Studio commit `1c6c99d`. New work includes RTC hello/LSA flooding, independent LSDB/SPF/forwarding, locally routed messages and ACKs, per-router Routing inspectors/exports, observer-local convergence episodes, saved-link restoration, and control/data Replay filtering with historical router snapshots. File selection uses the local LSA graph; signed file forwarding remains source-routed. See `CN_STUDIO.md` for the exact gate status, protocol/trust definitions, demonstration and pending work; `CN_RESEARCH_DRAFT.md` is the implementation-backed paper extension.

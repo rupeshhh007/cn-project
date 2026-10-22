@@ -70,12 +70,6 @@ function App() {
   useEffect(() => { topologyRef.current = topologyEdges; }, [topologyEdges]);
   useEffect(() => { routeStrategyRef.current = routeStrategy; routerRef.current?.setStrategy(routeStrategy); }, [routeStrategy]);
   useEffect(() => {
-    const pending = conversations.filter((item) => item.direction === "outgoing" && item.status === "sent");
-    if (!pending.length) return;
-    const timer = setTimeout(() => setConversations((current) => current.map((item) => item.status === "sent" && Date.now() - item.at >= 30_000 ? { ...item, status: "failed" } : item)), Math.max(0, Math.min(...pending.map((item) => item.at + 30_000 - Date.now()))));
-    return () => clearTimeout(timer);
-  }, [conversations]);
-  useEffect(() => {
     let active = true;
     void fetch("/api/network", { cache: "no-store" })
       .then(async (response) => {
@@ -148,18 +142,18 @@ function App() {
         setRoutingGraph(graphRef.current);
       },
       event: (event) => {
-        addEvent(event.type.replaceAll("-", " "), event.detail, "REAL", { type: event.type, path: event.path, routerId: credentials.peer.id, controlOrigin: event.origin, plane: event.type.startsWith("packet") || event.type === "delivery-ack" ? "data" : "control" });
+        addEvent(event.type.replaceAll("-", " "), event.detail, "REAL", { type: event.type, path: event.path, routerId: credentials.peer.id, controlOrigin: event.origin, plane: event.type.startsWith("packet") || event.type.startsWith("message-") || event.type === "delivery-ack" ? "data" : "control" });
         if (event.type === "packet-forward" && event.path && event.path.length > 2) addEvent("Payload forwarded", "Distributed local forwarding-table decision", "REAL", { path: event.path });
       },
+      messageStatus: (id, status) => setConversations((current) => current.map((item) => item.id === id && item.direction === "outgoing" && item.status === "sent" ? { ...item,status } : item)),
       deliver: (packet) => {
         const source = peersRef.current.find((peer) => peer.id === packet.source)?.displayName ?? "peer";
         if (packet.purpose === "message") {
           addEvent(packet.trace.length > 2 ? "Routed message delivered" : `Message from ${source}`, packet.body, "REAL", { path: packet.trace, plane: "data" });
-          setConversations((current) => current.some((item) => item.id === packet.messageId) ? current : [...current, { id: packet.messageId, peerId: packet.source, direction: "incoming", body: packet.body, at: Date.now(), status: "delivered" }].slice(-300) as ConversationMessage[]);
+          setConversations((current) => current.some((item) => item.id === packet.messageId && item.peerId === packet.source) ? current : [...current, { id: packet.messageId, peerId: packet.source, direction: "incoming", body: packet.body, at: Date.now(), status: "delivered" }].slice(-300) as ConversationMessage[]);
         } else {
           addEvent("Message acknowledged", `${source} confirmed application receipt`, "REAL", { path: packet.trace, plane: "data" });
           if (packet.trace.length > 2) addEvent("Route receipt returned", "Receiver acknowledgement returned using local forwarding tables", "REAL", { path: packet.trace });
-          setConversations((current) => current.map((item) => item.id === packet.messageId && item.peerId === packet.source && item.direction === "outgoing" ? { ...item, status: "delivered" } : item));
         }
       },
     });
@@ -204,8 +198,7 @@ function App() {
         setConversations((current) => current.some((item) => item.id === packet.messageId) ? current : [...current, { id: packet.messageId, peerId, direction: "incoming", body: packet.body, at: Date.now(), status: "delivered" }].slice(-300) as ConversationMessage[]);
       }
       if (packet.kind === "message-ack") {
-        addEvent("Message acknowledged", `${source} confirmed application receipt`);
-        setConversations((current) => current.map((item) => item.id === packet.messageId && item.peerId === peerId && item.direction === "outgoing" ? { ...item, status: "delivered" } : item));
+        addEvent("Legacy acknowledgement observed", `${source}: legacy receipts cannot complete distributed messages.`);
       }
       if (packet.kind !== "routed-message" && packet.kind !== "route-receipt") return;
       const now = Date.now();
@@ -237,8 +230,7 @@ function App() {
             status: "delivered",
           });
         } else {
-          addEvent("Route receipt returned", `${packet.path.length - 1} hops · destination confirmed delivery`);
-          setConversations((current) => current.map((item) => item.id === packet.messageId && item.peerId === packet.sourcePeerId && item.direction === "outgoing" ? { ...item, status: "delivered" } : item));
+          addEvent("Legacy route receipt observed", "Distributed message success requires a matching pending ACK attempt.");
         }
         return;
       }

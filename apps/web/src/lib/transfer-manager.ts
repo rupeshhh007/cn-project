@@ -130,6 +130,7 @@ export class TransferManager {
     try {
       const bytes = new Uint8Array(await file.arrayBuffer());
       const { manifest, chunks } = await createManifest(file.name, file.type, bytes);
+      if (this.disposed || terminal(transfer.view.status)) return transferId;
       const paths = this.validPaths(destinationPeerId);
       transfer.manifest = manifest;
       transfer.chunks = chunks;
@@ -215,7 +216,8 @@ export class TransferManager {
       const transfer = this.outbound.get(packet.transferId) ?? this.inbound.get(packet.transferId);
       if (transfer && transfer.view.peerId === packet.sourcePeerId && !terminal(transfer.view.status)) {
         transfer.view = { ...transfer.view, status: "cancelled", error: "Cancelled by the other device." };
-        if ("accepted" in transfer) transfer.accepted = false;
+        if ("accepted" in transfer) { transfer.accepted = false; transfer.assembler.discard(); }
+        else { transfer.chunks = undefined; transfer.sends.clear(); transfer.lastRoute.clear(); transfer.sentAt.clear(); transfer.attempts.clear(); }
         this.record(transfer.view, "cancelled");
         this.emit(transfer.view);
       }
@@ -225,23 +227,7 @@ export class TransferManager {
   private receiveOffer(packet: Extract<TransferDataPacket, { kind: "transfer-offer" }>): void {
     if (this.inbound.has(packet.transferId)) return;
     if (!canVerifyWithWebCrypto()) {
-      this.dependencies.onEvent("File offer rejected", SECURE_FILE_ERROR);
-      const reverse = [...packet.path].reverse();
-      void this.sendAlong(reverse, {
-        protocolVersion: PROTOCOL_VERSION,
-        kind: "transfer-response",
-        transferId: packet.transferId,
-        sourcePeerId: this.dependencies.selfPeerId,
-        destinationPeerId: packet.sourcePeerId,
-        routeId: createUuid(),
-        nextHop: reverse[1]!,
-        path: reverse,
-        hopIndex: 1,
-        ttl: reverse.length + 2,
-        createdAt: Date.now(),
-        accepted: false,
-        reason: SECURE_FILE_ERROR,
-      }).catch((error: unknown) => this.dependencies.onEvent("File offer rejection failed", error instanceof Error ? error.message : "Peer unreachable"));
+      this.declineOffer(packet, SECURE_FILE_ERROR);
       return;
     }
     try {
@@ -267,8 +253,26 @@ export class TransferManager {
       this.emit(view);
       this.dependencies.onEvent("Incoming file offer", `${packet.manifest.name} · ${formatBytes(packet.manifest.size)} · consent required`);
     } catch (error) {
-      this.dependencies.onEvent("File offer rejected", errorMessage(error));
+      const partial = this.inbound.get(packet.transferId);
+      if (partial) {
+        partial.accepted = false;
+        partial.assembler.discard();
+        partial.view = { ...partial.view, status: "declined", error: errorMessage(error) };
+        this.emit(partial.view);
+      }
+      this.declineOffer(packet, errorMessage(error));
     }
+  }
+
+  private declineOffer(packet: Extract<TransferDataPacket, { kind: "transfer-offer" }>, reason: string): void {
+    this.dependencies.onEvent("File offer rejected", reason);
+    const reverse = [...packet.path].reverse();
+    void this.sendAlong(reverse, {
+      protocolVersion: PROTOCOL_VERSION, kind: "transfer-response", transferId: packet.transferId,
+      sourcePeerId: this.dependencies.selfPeerId, destinationPeerId: packet.sourcePeerId,
+      routeId: createUuid(), nextHop: reverse[1]!, path: reverse, hopIndex: 1,
+      ttl: reverse.length + 2, createdAt: Date.now(), accepted: false, reason: reason.slice(0, 160),
+    }).catch((error: unknown) => this.dependencies.onEvent("File offer rejection notification unavailable", errorMessage(error)));
   }
 
   private receiveResponse(packet: Extract<TransferDataPacket, { kind: "transfer-response" }>): void {
@@ -276,6 +280,8 @@ export class TransferManager {
     if (!transfer || transfer.view.peerId !== packet.sourcePeerId || transfer.view.status !== "offered") return;
     if (!packet.accepted) {
       transfer.view = { ...transfer.view, status: "declined", error: packet.reason ?? "Receiver declined the transfer." };
+      transfer.chunks = undefined;
+      transfer.sends.clear(); transfer.lastRoute.clear();
       this.emit(transfer.view);
       this.dependencies.onEvent("File offer declined", transfer.view.fileName);
       return;
@@ -316,6 +322,7 @@ export class TransferManager {
       }
       if (transfer.assembler.complete && transfer.view.status !== "verifying") await this.finishInbound(transfer);
     } catch (error) {
+      if (this.disposed || terminal(transfer.view.status)) return;
       transfer.view = { ...transfer.view, status: "failed", error: errorMessage(error) };
       this.emit(transfer.view);
       await this.sendCompletion(transfer, "rejected", undefined, errorMessage(error));
@@ -481,6 +488,7 @@ export class TransferManager {
       await this.sendCompletion(transfer, "verified", hash).catch(() => undefined);
       this.dependencies.onEvent("File integrity verified", `${transfer.view.fileName} · SHA-256 matched · ready to save`);
     } catch (error) {
+      if (this.disposed || terminal(transfer.view.status)) return;
       transfer.view = { ...transfer.view, status: "failed", error: errorMessage(error) };
       this.emit(transfer.view);
       await this.sendCompletion(transfer, "rejected", undefined, errorMessage(error));
@@ -591,10 +599,17 @@ export class TransferManager {
     const transfer = this.outbound.get(transferId) ?? this.inbound.get(transferId);
     if (!transfer || terminal(transfer.view.status)) return;
     transfer.view = { ...transfer.view, status: "cancelled", error: "Cancelled on this device." };
-    if ("accepted" in transfer) transfer.accepted = false;
+    if ("accepted" in transfer) { transfer.accepted = false; transfer.assembler.discard(); }
+    else { transfer.chunks = undefined; transfer.sends.clear(); transfer.lastRoute.clear(); transfer.sentAt.clear(); transfer.attempts.clear(); }
     this.record(transfer.view, "cancelled"); this.emit(transfer.view);
-    const path = this.validPaths(transfer.view.peerId)[0]!;
-    await this.sendAlong(path, { protocolVersion: PROTOCOL_VERSION, kind: "transfer-cancel", transferId, sourcePeerId: this.dependencies.selfPeerId, destinationPeerId: transfer.view.peerId, routeId: createUuid(), nextHop: path[1]!, path, hopIndex: 1, ttl: path.length + 2, createdAt: Date.now() });
+    try {
+      const path = this.validPaths(transfer.view.peerId)[0]!;
+      await this.sendAlong(path, { protocolVersion: PROTOCOL_VERSION, kind: "transfer-cancel", transferId, sourcePeerId: this.dependencies.selfPeerId, destinationPeerId: transfer.view.peerId, routeId: createUuid(), nextHop: path[1]!, path, hopIndex: 1, ttl: path.length + 2, createdAt: Date.now() });
+    } catch (error) {
+      transfer.view = { ...transfer.view, error: "Cancelled locally. Remote notification unavailable; cancel on the other device too if it is still waiting." };
+      this.record(transfer.view, "cancel-notification-unavailable"); this.emit(transfer.view);
+      this.dependencies.onEvent("Cancellation notification unavailable", errorMessage(error));
+    }
   }
 
   dispose(): void {

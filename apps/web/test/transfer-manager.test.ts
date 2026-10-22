@@ -3,6 +3,7 @@ import test from "node:test";
 import type { TransferDataPacket } from "@hopnet/protocol";
 import { TransferManager, type TransferView } from "../src/lib/transfer-manager.ts";
 import { experimentResult, resultsCsv } from "../src/lib/evidence.ts";
+import { createReceiptIdentity, verifyTransferPacket } from "../src/lib/receipt-identity.ts";
 
 async function waitFor(predicate: () => boolean, timeout = 5000) {
   const started = Date.now();
@@ -12,14 +13,15 @@ async function waitFor(predicate: () => boolean, timeout = 5000) {
   }
 }
 
-function pair(intercept?: (packet: TransferDataPacket) => boolean) {
+function pair(intercept?: (packet: TransferDataPacket) => boolean, identities?: Record<string, Awaited<ReturnType<typeof createReceiptIdentity>>>) {
   const views = new Map<string, TransferView>();
   const packets: TransferDataPacket[] = [];
   let available = true;
   let sender: TransferManager, receiver: TransferManager;
   const options = (self: string, other: string) => ({
     selfPeerId: self, getPaths: () => available ? [[self, other]] : [], isPermittedEdge: () => true,
-    sign: async (packet: TransferDataPacket) => packet, verify: async () => true, canOfferTo: () => true, isPathAvailable: () => available,
+    sign: async (packet: TransferDataPacket) => identities ? identities[self]!.sign(packet) : packet,
+    verify: async (packet: TransferDataPacket) => identities ? verifyTransferPacket(identities[other]!.publicKey,packet) : true, canOfferTo: () => true, isPathAvailable: () => available,
     onUpdate: (view: TransferView) => views.set(`${self}:${view.id}`, view), onEvent: () => {},
     send: async (_next: string, packet: TransferDataPacket) => {
       packets.push(packet);
@@ -41,6 +43,80 @@ test("a lost completion receipt is recovered by an idempotent final-chunk probe"
   assert.equal(network.views.get(`A:${id}`)?.acknowledgedChunks, 1);
   assert.equal(network.views.get(`B:${id}`)?.duplicateChunks, 1);
   assert.equal(network.packets.filter((packet) => packet.kind === "transfer-chunk").length, 2);
+});
+
+test("receiver capacity rejection is signed, releases the sender slot, and sends no chunks", async (t) => {
+  const identities = { A:await createReceiptIdentity(),B:await createReceiptIdentity() };
+  const network = pair((packet) => packet.kind === "transfer-cancel",identities); t.after(network.close);
+  // Lost cancel notifications leave two receiver offers pending while the
+  // sender correctly releases its own slots.
+  const held: string[] = [];
+  for (let index=0;index<2;index++) {
+    const id = await network.sender.offer(new File(["held"],`held-${index}.txt`),"B"); held.push(id);
+    await network.sender.cancel(id);
+  }
+  for (let index=0;index<3;index++) {
+    const id = await network.sender.offer(new File(["rejected"],"capacity.txt"),"B");
+    await waitFor(() => network.views.get(`A:${id}`)?.status === "declined");
+    const response = network.packets.find((p) => p.kind === "transfer-response" && p.transferId === id)!;
+    assert.equal(await verifyTransferPacket(identities.B.publicKey,response),true);
+    assert.match(network.views.get(`A:${id}`)!.error!,/two active/);
+  }
+  assert.equal(network.packets.some((p) => p.kind === "transfer-chunk"),false);
+  assert.equal(network.views.get(`B:${held[0]}`)?.status,"awaiting-acceptance");
+});
+
+test("authenticated offer preparation errors return an authenticated decline", async (t) => {
+  const identities={ A:await createReceiptIdentity(),B:await createReceiptIdentity() };
+  const network=pair((packet) => packet.kind === "transfer-offer",identities); t.after(network.close);
+  const id=await network.sender.offer(new File(["bad metadata"],"metadata.txt"),"B");
+  const offer=network.packets.find((p) => p.kind === "transfer-offer")!;
+  if(offer.kind !== "transfer-offer") throw new Error("missing offer");
+  await network.receiver.handle("A",await identities.A.sign({ ...offer,manifest:{ ...offer.manifest,chunkCount:2 } }));
+  await waitFor(() => network.views.get(`A:${id}`)?.status === "declined");
+  const decline=network.packets.find((p) => p.kind === "transfer-response")!;
+  assert.equal(await verifyTransferPacket(identities.B.publicKey,decline),true);
+  assert.match(network.views.get(`A:${id}`)!.error!,/chunk count/);
+  assert.equal(network.views.has(`B:${id}`),false);
+});
+
+test("a failed remote cancellation send does not reject or reopen local cancellation", async (t) => {
+  const network=pair((packet) => { if(packet.kind === "transfer-cancel") throw new Error("channel closed while signing"); return false; }); t.after(network.close);
+  const id=await network.sender.offer(new File(["cancel"],"cancel-send.txt"),"B");
+  await assert.doesNotReject(network.sender.cancel(id));
+  assert.equal(network.views.get(`A:${id}`)?.status,"cancelled");
+  assert.match(network.views.get(`A:${id}`)!.error!,/notification unavailable/);
+});
+
+test("outbound preparation cannot reopen an offer cancelled while reading file bytes", async (t) => {
+  const network=pair(); t.after(network.close);
+  let release!:(bytes:ArrayBuffer) => void;
+  const file=new File(["preparing"],"preparing.txt");
+  t.mock.method(file,"arrayBuffer",() => new Promise<ArrayBuffer>((resolve) => { release=resolve; }));
+  const offering=network.sender.offer(file,"B");
+  const preparing=[...network.views.values()].find((view) => view.status === "preparing")!;
+  await network.sender.cancel(preparing.id);
+  release(new TextEncoder().encode("preparing").buffer);
+  await offering;
+  assert.equal(network.views.get(`A:${preparing.id}`)?.status,"cancelled");
+  assert.equal(network.packets.some((packet) => packet.kind === "transfer-offer"),false);
+});
+
+for (const side of ["sender","receiver"] as const) test(`${side} cancellation succeeds without a route and is terminal after route restoration`, async (t) => {
+  const network = pair(); t.after(network.close);
+  const id = await network.sender.offer(new File(["cancel despite partition"],"partition.txt"),"B");
+  network.setAvailable(false);
+  await assert.doesNotReject(network[side].cancel(id));
+  const local = side === "sender" ? "A" : "B";
+  assert.equal(network.views.get(`${local}:${id}`)?.status,"cancelled");
+  assert.match(network.views.get(`${local}:${id}`)!.error!,/Cancelled locally.*notification unavailable/);
+  network.setAvailable(true);
+  await network[side].cancel(id);
+  assert.equal(network.views.get(`${local}:${id}`)?.status,"cancelled");
+  // Slot release is local; the other endpoint is deliberately not claimed cancelled.
+  assert.equal(network.views.get(`${local === "A" ? "B" : "A"}:${id}`)?.status,local === "A" ? "awaiting-acceptance" : "offered");
+  const next = await network.sender.offer(new File(["next"],"next.txt"),"B");
+  assert.ok(next);
 });
 
 test("duplicate and unbound acknowledgements cannot inflate receiver-confirmed bytes", async (t) => {

@@ -2,6 +2,8 @@
 
 ## Implemented
 
+- Stabilization from `19531dc`: signed offer-preparation/capacity declines; cancellation succeeds locally after route loss and releases resources; bounded message ACK tracking/retry with receiver deduplication, terminal failure and late-ACK rejection. No redesign.
+
 - Independent browser hello liveness, sequenced/aged LSA flooding, LSDB and local SPF/forwarding tables.
 - Hop-by-hop messages and independently routed receiver ACKs; trace/TTL/duplicate safeguards.
 - Dedicated Routing inspectors, before/after table episodes, observer-local reachable-component agreement and JSON/CSV exports.
@@ -11,12 +13,14 @@
 
 ## Verified
 
-- `npm run check`: 46 tests, TypeScript and production build pass.
-- `npm run test:e2e -- --workers=1`: seven Chrome flows pass, including actual selected-relay closure, rerouted/acknowledged messaging, signed file recovery, no-alternate failure, Lab/Replay interactions and six required responsive sizes.
+- `npm run check`: 56 tests, TypeScript and production build pass.
+- `npm run test:e2e -- --workers=1`: eight Chrome flows pass, including actual **mid-message** stalled-relay closure and exactly-one logical receiver delivery/accepted ACK, selected-relay closure, signed file recovery, no-alternate failure, Lab/Replay interactions and six required responsive sizes.
 - `npm audit --audit-level=high`: zero findings.
 - Actual screenshots and raw before/after router/file evidence are committed under `docs/`.
 
 Earlier failed/loaded runs and the corrections are documented in `docs/CN_STUDIO.md`; no timeout or physical result is fabricated. The production no-progress deadline and the 60-second recovery verification assertion were not extended.
+
+Current stabilization evidence, visual inspection and residual risks are recorded in `docs/STABILIZATION_20261022.md`; raw mid-message failure evidence is `docs/evidence/message-midflight-recovery.json`. Remote notification remains best effort and chat receipts remain cooperative, not endpoint-signed.
 
 ## Deliberately not claimed complete
 

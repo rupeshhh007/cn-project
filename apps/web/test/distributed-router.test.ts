@@ -10,12 +10,13 @@ function network() {
   const queue: Array<{ from: string; to: string; packet: DataPacket }> = [];
   const events: Record<string, RouterEvent[]> = Object.fromEntries(nodes.map((id) => [id, []]));
   const delivered: Record<string, Datagram[]> = Object.fromEntries(nodes.map((id) => [id, []]));
+  const statuses: Record<string, Array<{ id:string; status:string }>> = Object.fromEntries(nodes.map((id) => [id,[]]));
   const routers = new Map<string, DistributedRouter>();
-  for (const id of nodes) routers.set(id, new DistributedRouter({ self: id, peers: () => nodes, now: () => time, send: (to, packet) => queue.push({ from: id, to, packet: structuredClone(packet) }), update: () => {}, event: (event) => events[id]!.push(event), deliver: (packet) => delivered[id]!.push(packet) }));
+  for (const id of nodes) routers.set(id, new DistributedRouter({ self: id, peers: () => nodes, now: () => time, send: (to, packet) => queue.push({ from: id, to, packet: structuredClone(packet) }), update: () => {}, event: (event) => events[id]!.push(event), deliver: (packet) => delivered[id]!.push(packet), messageStatus:(messageId,status) => statuses[id]!.push({id:messageId,status}) }));
   const flush = () => { let count = 0; while (queue.length) { assert.ok(count++ < 10000, "control flood must terminate"); const item = queue.shift()!; routers.get(item.to)!.handle(item.from, item.packet); } };
   const link = (a: string, b: string, open: boolean) => { routers.get(a)!.setLink(b, open); routers.get(b)!.setLink(a, open); flush(); };
   const tick = (ms = 1000) => { time += ms; for (const r of routers.values()) r.tick(); flush(); };
-  return { routers, queue, delivered, events, flush, link, tick, advance: (ms:number) => { time += ms; }, now: () => time };
+  return { routers, queue, delivered, events, statuses, flush, link, tick, advance: (ms:number) => { time += ms; }, now: () => time };
 }
 
 test("hello exchanges originate LSAs, flood a diamond, and independently compute all next hops", () => {
@@ -32,6 +33,66 @@ test("hello exchanges originate LSAs, flood a diamond, and independently compute
   assert.deepEqual(n.delivered[D]![0]!.trace, [A,B,D]);
   assert.equal(n.delivered[A]![0]!.purpose, "ack");
   assert.equal(n.routers.get(B)!.snapshot().counters.forwarded, 2);
+});
+
+test("an in-flight message retries on a new local route after its first relay disappears", () => {
+  const n = network(); for (const [a,b] of [[A,B],[A,C],[B,D],[C,D]]) n.link(a!,b!,true); n.tick();
+  const id = n.routers.get(A)!.sendMessage(D,"recover the same logical message");
+  const first = n.queue.shift()!; assert.equal(first.to,B);
+  // The first transmission entered the failed relay, but never forwarded.
+  n.link(A,B,false); n.link(B,D,false);
+  n.tick(1500);
+  assert.equal(n.delivered[D]!.length,1);
+  assert.deepEqual(n.delivered[D]![0]!.trace,[A,C,D]);
+  assert.deepEqual(n.statuses[A],[{id,status:"delivered"}]);
+  assert.ok(n.events[A]!.some((event) => event.type === "message-retry"));
+});
+
+test("lost ACK retry re-ACKs the receiver's tombstone without delivering twice", () => {
+  const n = network(); n.link(A,B,true);
+  const id = n.routers.get(A)!.sendMessage(B,"one conversation bubble");
+  const first = n.queue.shift()!; n.routers.get(B)!.handle(A,first.packet);
+  const ack = n.queue.shift()!; assert.equal(ack.packet.kind,"router-data"); // intentionally lose it
+  n.tick(1500);
+  assert.equal(n.delivered[B]!.length,1);
+  assert.deepEqual(n.statuses[A],[{id,status:"delivered"}]);
+  // Even an ACK duplicate with a fresh packet ID cannot deliver twice.
+  if (ack.packet.kind === "router-data") n.routers.get(A)!.handle(B,{ ...ack.packet,packetId:crypto.randomUUID() });
+  assert.equal(n.delivered[A]!.length,1);
+});
+
+test("ACK deadline is terminal, late/wrong ACKs cannot succeed, and pending messages are bounded", () => {
+  const n = network(); n.link(A,B,true);
+  const id = n.routers.get(A)!.sendMessage(B,"unconfirmed");
+  const first = n.queue.shift()!;
+  if (first.packet.kind !== "router-data") throw new Error("missing message");
+  const ack: Datagram = { ...first.packet,packetId:crypto.randomUUID(),source:B,destination:A,trace:[B],purpose:"ack",body:"" };
+  n.routers.get(A)!.handle(B,{ ...ack,sequence:ack.sequence+1000 });
+  assert.equal(n.statuses[A]!.length,0);
+  n.advance(30001); n.routers.get(A)!.tick(); n.queue.length=0;
+  n.routers.get(A)!.handle(B,ack);
+  assert.deepEqual(n.statuses[A],[{id,status:"failed"}]);
+  assert.throws(() => n.routers.get(A)!.sendMessage(B,"reuse",id),/cannot be reused/);
+  // Restore hellos after clock advancement, then saturate the pending bound.
+  n.link(A,B,false); n.link(A,B,true);
+  for(let index=0;index<32;index++) n.routers.get(A)!.sendMessage(B,`pending ${index}`);
+  assert.throws(() => n.routers.get(A)!.sendMessage(B,"overflow"),/At most 32/);
+  n.queue.length=0; n.advance(30001); n.routers.get(A)!.tick(); n.queue.length=0;
+  assert.equal(n.statuses[A]!.filter((s) => s.status === "failed").length,33);
+});
+
+test("logical delivery tombstones survive packet-cache expiry and reject changed-content reuse", () => {
+  const n=network(); n.link(A,B,true); n.routers.get(A)!.sendMessage(B,"one body");
+  const first=n.queue.shift()!; n.routers.get(B)!.handle(A,first.packet); n.queue.length=0;
+  n.advance(61000); n.routers.get(B)!.tick(); n.queue.length=0;
+  if(first.packet.kind !== "router-data") throw new Error("missing message");
+  n.routers.get(B)!.handle(A,{ ...first.packet,packetId:crypto.randomUUID() });
+  assert.equal(n.delivered[B]!.length,1);
+  n.queue.length=0;
+  n.routers.get(B)!.handle(A,{ ...first.packet,packetId:crypto.randomUUID(),body:"different" });
+  assert.equal(n.delivered[B]!.length,1);
+  assert.equal(n.queue.length,0);
+  assert.ok(n.events[B]!.some((event) => event.detail.includes("different content")));
 });
 
 test("a flooded withdrawal recomputes tables and messages reroute without a coordinator graph", () => {

@@ -2,9 +2,9 @@
   "provenance": "AUTOMATED BROWSER EXPERIMENT",
   "failure": "Actual relay browser context closed",
   "beforeFailure": {
-    "id": "f7db8559-bd6e-4717-ac9f-7949fbf4aee1",
+    "id": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
     "direction": "send",
-    "peerId": "peer_5CQEnzFQLF8Y",
+    "peerId": "peer_WktI5rxebQ5B",
     "fileName": "resilience-proof.bin",
     "mime": "application/octet-stream",
     "size": 8388608,
@@ -14,68 +14,68 @@
     "acknowledgedBytes": 196608,
     "paths": [
       [
-        "peer_o9DZikV81LlA",
-        "peer_LWDP0hVwc_9N",
-        "peer_5CQEnzFQLF8Y"
+        "peer_XFVR5z8KT2u4",
+        "peer_d9zz-9rMx9oN",
+        "peer_WktI5rxebQ5B"
       ],
       [
-        "peer_o9DZikV81LlA",
-        "peer_PKpnqjcOdzuG",
-        "peer_5CQEnzFQLF8Y"
+        "peer_XFVR5z8KT2u4",
+        "peer_SWDKFyQpJPTq",
+        "peer_WktI5rxebQ5B"
       ]
     ],
     "recoveryCount": 0,
     "pathStats": [
       {
         "path": [
-          "peer_o9DZikV81LlA",
-          "peer_LWDP0hVwc_9N",
-          "peer_5CQEnzFQLF8Y"
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
         ],
         "attemptedChunks": 7,
         "acknowledgedChunks": 4,
         "deliveredBytes": 131072,
         "retries": 0,
         "failures": 0,
-        "rttMs": 119
+        "rttMs": 105.59999990463257
       },
       {
         "path": [
-          "peer_o9DZikV81LlA",
-          "peer_PKpnqjcOdzuG",
-          "peer_5CQEnzFQLF8Y"
+          "peer_XFVR5z8KT2u4",
+          "peer_SWDKFyQpJPTq",
+          "peer_WktI5rxebQ5B"
         ],
-        "attemptedChunks": 6,
+        "attemptedChunks": 7,
         "acknowledgedChunks": 2,
         "deliveredBytes": 65536,
         "retries": 0,
         "failures": 0,
-        "rttMs": 341.40000009536743
+        "rttMs": 225.90000009536743
       }
     ],
     "history": [
       {
         "type": "offer",
-        "transferId": "f7db8559-bd6e-4717-ac9f-7949fbf4aee1",
-        "at": 9834.5,
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 10617.60000038147,
         "path": [
-          "peer_o9DZikV81LlA",
-          "peer_LWDP0hVwc_9N",
-          "peer_5CQEnzFQLF8Y"
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
         ]
       },
       {
         "type": "accepted",
-        "transferId": "f7db8559-bd6e-4717-ac9f-7949fbf4aee1",
-        "at": 10330.900000095367
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 11041.700000286102
       }
     ],
-    "startedAt": 10330.900000095367
+    "startedAt": 11041.700000286102
   },
   "completed": {
-    "id": "f7db8559-bd6e-4717-ac9f-7949fbf4aee1",
+    "id": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
     "direction": "send",
-    "peerId": "peer_5CQEnzFQLF8Y",
+    "peerId": "peer_WktI5rxebQ5B",
     "fileName": "resilience-proof.bin",
     "mime": "application/octet-stream",
     "size": 8388608,
@@ -85,173 +85,305 @@
     "acknowledgedBytes": 8388608,
     "paths": [
       [
-        "peer_o9DZikV81LlA",
-        "peer_LWDP0hVwc_9N",
-        "peer_5CQEnzFQLF8Y"
+        "peer_XFVR5z8KT2u4",
+        "peer_d9zz-9rMx9oN",
+        "peer_WktI5rxebQ5B"
       ],
       [
-        "peer_o9DZikV81LlA",
-        "peer_PKpnqjcOdzuG",
-        "peer_5CQEnzFQLF8Y"
+        "peer_XFVR5z8KT2u4",
+        "peer_SWDKFyQpJPTq",
+        "peer_WktI5rxebQ5B"
       ]
     ],
-    "recoveryCount": 8,
+    "recoveryCount": 18,
     "pathStats": [
       {
         "path": [
-          "peer_o9DZikV81LlA",
-          "peer_LWDP0hVwc_9N",
-          "peer_5CQEnzFQLF8Y"
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
         ],
-        "attemptedChunks": 251,
-        "acknowledgedChunks": 251,
-        "deliveredBytes": 8224768,
-        "retries": 8,
+        "attemptedChunks": 258,
+        "acknowledgedChunks": 250,
+        "deliveredBytes": 8192000,
+        "retries": 18,
         "failures": 0,
-        "rttMs": 442.5
+        "rttMs": 175.69999980926514
       },
       {
         "path": [
-          "peer_o9DZikV81LlA",
-          "peer_PKpnqjcOdzuG",
-          "peer_5CQEnzFQLF8Y"
+          "peer_XFVR5z8KT2u4",
+          "peer_SWDKFyQpJPTq",
+          "peer_WktI5rxebQ5B"
         ],
-        "attemptedChunks": 13,
-        "acknowledgedChunks": 5,
-        "deliveredBytes": 163840,
+        "attemptedChunks": 16,
+        "acknowledgedChunks": 6,
+        "deliveredBytes": 196608,
         "retries": 0,
         "failures": 1,
-        "rttMs": 315.09999990463257
+        "rttMs": 332.2000002861023
       }
     ],
     "history": [
       {
         "type": "offer",
-        "transferId": "f7db8559-bd6e-4717-ac9f-7949fbf4aee1",
-        "at": 9834.5,
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 10617.60000038147,
         "path": [
-          "peer_o9DZikV81LlA",
-          "peer_LWDP0hVwc_9N",
-          "peer_5CQEnzFQLF8Y"
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
         ]
       },
       {
         "type": "accepted",
-        "transferId": "f7db8559-bd6e-4717-ac9f-7949fbf4aee1",
-        "at": 10330.900000095367
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 11041.700000286102
       },
       {
         "type": "retry-scheduled",
-        "transferId": "f7db8559-bd6e-4717-ac9f-7949fbf4aee1",
-        "at": 13660,
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 14346.200000286102,
         "path": [
-          "peer_o9DZikV81LlA",
-          "peer_LWDP0hVwc_9N",
-          "peer_5CQEnzFQLF8Y"
-        ],
-        "chunkIndex": 11
-      },
-      {
-        "type": "retry-scheduled",
-        "transferId": "f7db8559-bd6e-4717-ac9f-7949fbf4aee1",
-        "at": 13833.60000038147,
-        "path": [
-          "peer_o9DZikV81LlA",
-          "peer_LWDP0hVwc_9N",
-          "peer_5CQEnzFQLF8Y"
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
         ],
         "chunkIndex": 13
       },
       {
         "type": "retry-scheduled",
-        "transferId": "f7db8559-bd6e-4717-ac9f-7949fbf4aee1",
-        "at": 13894.300000190735,
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 14536.60000038147,
         "path": [
-          "peer_o9DZikV81LlA",
-          "peer_LWDP0hVwc_9N",
-          "peer_5CQEnzFQLF8Y"
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
         ],
         "chunkIndex": 15
       },
       {
         "type": "retry-scheduled",
-        "transferId": "f7db8559-bd6e-4717-ac9f-7949fbf4aee1",
-        "at": 14153.200000286102,
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 14564.900000095367,
         "path": [
-          "peer_o9DZikV81LlA",
-          "peer_LWDP0hVwc_9N",
-          "peer_5CQEnzFQLF8Y"
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
         ],
         "chunkIndex": 17
       },
       {
         "type": "retry-scheduled",
-        "transferId": "f7db8559-bd6e-4717-ac9f-7949fbf4aee1",
-        "at": 14375.900000095367,
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 14763.700000286102,
         "path": [
-          "peer_o9DZikV81LlA",
-          "peer_LWDP0hVwc_9N",
-          "peer_5CQEnzFQLF8Y"
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
         ],
         "chunkIndex": 19
       },
       {
         "type": "retry-scheduled",
-        "transferId": "f7db8559-bd6e-4717-ac9f-7949fbf4aee1",
-        "at": 14427.400000095367,
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 14917.60000038147,
         "path": [
-          "peer_o9DZikV81LlA",
-          "peer_LWDP0hVwc_9N",
-          "peer_5CQEnzFQLF8Y"
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
         ],
         "chunkIndex": 21
       },
       {
-        "type": "retry-scheduled",
-        "transferId": "f7db8559-bd6e-4717-ac9f-7949fbf4aee1",
-        "at": 14649.300000190735,
+        "type": "send-failed",
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 19939.400000095367,
         "path": [
-          "peer_o9DZikV81LlA",
-          "peer_LWDP0hVwc_9N",
-          "peer_5CQEnzFQLF8Y"
+          "peer_XFVR5z8KT2u4",
+          "peer_SWDKFyQpJPTq",
+          "peer_WktI5rxebQ5B"
+        ],
+        "chunkIndex": 29
+      },
+      {
+        "type": "send-failed",
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 24944.300000190735,
+        "path": [
+          "peer_XFVR5z8KT2u4",
+          "peer_SWDKFyQpJPTq",
+          "peer_WktI5rxebQ5B"
+        ],
+        "chunkIndex": 31
+      },
+      {
+        "type": "path-unavailable",
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 24959.400000095367,
+        "path": [
+          "peer_XFVR5z8KT2u4",
+          "peer_SWDKFyQpJPTq",
+          "peer_WktI5rxebQ5B"
+        ]
+      },
+      {
+        "type": "retry-scheduled",
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 24962.5,
+        "path": [
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
         ],
         "chunkIndex": 23
       },
       {
-        "type": "path-unavailable",
-        "transferId": "f7db8559-bd6e-4717-ac9f-7949fbf4aee1",
-        "at": 15260.400000095367,
-        "path": [
-          "peer_o9DZikV81LlA",
-          "peer_PKpnqjcOdzuG",
-          "peer_5CQEnzFQLF8Y"
-        ]
-      },
-      {
         "type": "retry-scheduled",
-        "transferId": "f7db8559-bd6e-4717-ac9f-7949fbf4aee1",
-        "at": 15260.60000038147,
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 24970.60000038147,
         "path": [
-          "peer_o9DZikV81LlA",
-          "peer_LWDP0hVwc_9N",
-          "peer_5CQEnzFQLF8Y"
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
         ],
         "chunkIndex": 25
       },
       {
-        "type": "verified",
-        "transferId": "f7db8559-bd6e-4717-ac9f-7949fbf4aee1",
-        "at": 47338.7000002861,
+        "type": "retry-scheduled",
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 24977.400000095367,
         "path": [
-          "peer_o9DZikV81LlA",
-          "peer_LWDP0hVwc_9N",
-          "peer_5CQEnzFQLF8Y"
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
+        ],
+        "chunkIndex": 27
+      },
+      {
+        "type": "retry-scheduled",
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 24992.60000038147,
+        "path": [
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
+        ],
+        "chunkIndex": 29
+      },
+      {
+        "type": "retry-scheduled",
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 24998.5,
+        "path": [
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
+        ],
+        "chunkIndex": 31
+      },
+      {
+        "type": "retry-scheduled",
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 45589.800000190735,
+        "path": [
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
+        ],
+        "chunkIndex": 231
+      },
+      {
+        "type": "retry-scheduled",
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 45634,
+        "path": [
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
+        ],
+        "chunkIndex": 232
+      },
+      {
+        "type": "retry-scheduled",
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 45735.10000038147,
+        "path": [
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
+        ],
+        "chunkIndex": 233
+      },
+      {
+        "type": "retry-scheduled",
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 45924.2000002861,
+        "path": [
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
+        ],
+        "chunkIndex": 234
+      },
+      {
+        "type": "retry-scheduled",
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 45948,
+        "path": [
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
+        ],
+        "chunkIndex": 235
+      },
+      {
+        "type": "retry-scheduled",
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 46260.300000190735,
+        "path": [
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
+        ],
+        "chunkIndex": 236
+      },
+      {
+        "type": "retry-scheduled",
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 47156.60000038147,
+        "path": [
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
+        ],
+        "chunkIndex": 237
+      },
+      {
+        "type": "retry-scheduled",
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 47847.7000002861,
+        "path": [
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
+        ],
+        "chunkIndex": 238
+      },
+      {
+        "type": "verified",
+        "transferId": "ada7fcd6-3aa2-49b3-8649-3955c1795b15",
+        "at": 49139.800000190735,
+        "path": [
+          "peer_XFVR5z8KT2u4",
+          "peer_d9zz-9rMx9oN",
+          "peer_WktI5rxebQ5B"
         ]
       }
     ],
-    "startedAt": 10330.900000095367,
+    "startedAt": 11041.700000286102,
     "verifiedHash": "2107effc55047b86e1aede2400e23b14bdf4c8614ce0ffa4b6a77123caf20f76",
-    "completedAt": 47338.7000002861
+    "completedAt": 49139.800000190735
   },
   "downloadedSha256": "2107effc55047b86e1aede2400e23b14bdf4c8614ce0ffa4b6a77123caf20f76"
 }

@@ -8,6 +8,7 @@ export type Neighbor = { id: string; channelOpen: boolean; active: boolean; last
 export type Advertisement = { origin: string; sequence: number; receivedAt: number; expiresAt: number; neighbors: Array<{ id: string; rttMs: number }> };
 export type ForwardingEntry = { destination: string; nextHop: string; path: string[]; cost: number };
 export type RouterEvent = { type: string; detail: string; path?: string[]; packetId?: string; origin?: string };
+type PendingMessage = { packet: Datagram; sequences: Set<number>; attempts: number; deadline: number; retryAt: number };
 export type RouterSnapshot = {
   id: string; observedAt: number; strategy: RouteStrategy; digest: string;
   receivedLocallyAt?: number;
@@ -20,10 +21,13 @@ type Dependencies = {
   self: string; peers: () => string[]; send: (peer: string, packet: DataPacket) => void;
   update: (snapshot: RouterSnapshot, reports: RouterSnapshot[]) => void;
   event: (event: RouterEvent) => void; deliver: (packet: Datagram) => void;
+  messageStatus?: (messageId: string, status: "delivered" | "failed") => void;
   now?: () => number;
 };
 
 const HELLO_INTERVAL = 1000, DEAD_INTERVAL = 4500, REFRESH_INTERVAL = 6000, MAX_AGE = 18000;
+const MESSAGE_DEADLINE = 30_000, MESSAGE_RETRY_INTERVAL = 1500, MESSAGE_MAX_ATTEMPTS = 8;
+const MAX_PENDING_MESSAGES = 32, MAX_SESSION_MESSAGES = 4096;
 
 /** A bounded, cooperative link-state overlay. The coordinator is NOT its LSDB.
  * All control packets and reports traverse authorized, open RTCDataChannels.
@@ -36,6 +40,12 @@ export class DistributedRouter {
   private reports = new Map<string, { value: RouterSnapshot; receivedAt: number; sequence: number }>();
   private seen = new Map<string, number>();
   private pending = new Map<string, number>();
+  private messages = new Map<string, PendingMessage>();
+  private usedMessageIds = new Set<string>();
+  // Session-long tombstones are never evicted to make room for new deliveries.
+  // Reject at capacity rather than redeliver an old ID after cache eviction.
+  private deliveredMessages = new Map<string, string>();
+  private disposed = false;
   private table: ForwardingEntry[] = [];
   private strategy: RouteStrategy = "minimum-hops";
   private sequence = 0;
@@ -57,7 +67,11 @@ export class DistributedRouter {
   }
 
   start() { this.timer ??= setInterval(() => this.tick(), 250); }
-  dispose() { clearInterval(this.timer); this.timer = undefined; }
+  dispose() {
+    this.disposed = true; clearInterval(this.timer); this.timer = undefined;
+    for (const id of this.messages.keys()) this.dependencies.messageStatus?.(id,"failed");
+    this.messages.clear(); this.usedMessageIds.clear(); this.deliveredMessages.clear(); this.seen.clear(); this.pending.clear();
+  }
   setStrategy(strategy: RouteStrategy) { if (this.strategy !== strategy) { this.strategy = strategy; this.recompute(true); this.publish(); } }
 
   setLink(id: string, open: boolean) {
@@ -75,6 +89,7 @@ export class DistributedRouter {
   }
 
   tick() {
+    if (this.disposed) return;
     const now = this.now();
     for (const neighbor of this.neighbors.values()) {
       if (neighbor.active && now - neighbor.lastHello > DEAD_INTERVAL) {
@@ -93,6 +108,23 @@ export class DistributedRouter {
     for (const [key, expires] of this.seen) if (expires <= now) this.seen.delete(key);
     for (const [key, sent] of this.pending) if (now - sent > DEAD_INTERVAL) this.pending.delete(key);
     if (now - this.lastLsa >= REFRESH_INTERVAL) this.originate();
+    for (const [id, message] of this.messages) {
+      if (now >= message.deadline) {
+        this.messages.delete(id);
+        this.event("message-failed", `${id}: receiver ACK deadline expired; delivery remains unconfirmed.`);
+        this.dependencies.messageStatus?.(id,"failed");
+      } else if (now >= message.retryAt && message.attempts < MESSAGE_MAX_ATTEMPTS) {
+        message.retryAt = now + MESSAGE_RETRY_INTERVAL;
+        const nextHop = this.table.find((row) => row.destination === message.packet.destination)?.nextHop;
+        if (!nextHop || !this.neighbors.get(nextHop)?.active) continue;
+        const packet = { ...message.packet, packetId:createUuid(), sequence:++this.helloSequence };
+        message.sequences.add(packet.sequence); message.attempts++;
+        try {
+          this.forward(packet);
+          this.event("message-retry", `${id}: attempt ${message.attempts}; stable message ID, fresh packet ID and local next hop.`, [this.dependencies.self,nextHop]);
+        } catch { /* The fixed deadline still bounds channel-loss recovery. */ }
+      }
+    }
     if (this.convergence && !this.convergence.settledAt && now - this.convergence.lastChangeAt >= 1000) {
       this.convergence.settledAt = now;
       this.event("local-converged", `Local forwarding table stable for 1000 ms; observation window ${(now - this.convergence.startedAt).toFixed(1)} ms`);
@@ -110,6 +142,7 @@ export class DistributedRouter {
 
   handle(from: string, packet: DataPacket): boolean {
     if (packet.kind !== "router-control" && packet.kind !== "router-data") return false;
+    if (this.disposed) return true;
     if (!this.neighbors.get(from)?.channelOpen || !this.dependencies.peers().includes(from)) { this.drop("unbound ingress", [from]); return true; }
     if (packet.kind === "router-data") { this.receiveData(from, packet); return true; }
     const now = this.now();
@@ -164,8 +197,16 @@ export class DistributedRouter {
 
   sendMessage(destination: string, body: string, messageId = createUuid()) {
     if (!body.trim() || body.length > 8192) throw new Error("A routed message requires 1–8192 characters.");
+    if (this.disposed) throw new Error("This router is stopped.");
+    if (this.messages.size >= MAX_PENDING_MESSAGES) throw new Error("At most 32 messages may await receiver acknowledgement.");
+    if (this.usedMessageIds.has(messageId)) throw new Error("Message IDs cannot be reused in this session.");
+    if (this.usedMessageIds.size >= MAX_SESSION_MESSAGES) throw new Error("Message session capacity reached. Start a fresh room.");
     const packet: Datagram = { kind: "router-data", protocolVersion: 1, packetId: createUuid(), messageId, source: this.dependencies.self, destination, sequence: ++this.helloSequence, ttl: 8, trace: [this.dependencies.self], purpose: "message", body };
-    this.forward(packet); return messageId;
+    const message: PendingMessage = { packet, sequences:new Set([packet.sequence]),attempts:1,deadline:this.now()+MESSAGE_DEADLINE,retryAt:this.now()+MESSAGE_RETRY_INTERVAL };
+    this.messages.set(messageId,message); this.usedMessageIds.add(messageId);
+    try { this.forward(packet); }
+    catch (cause) { this.messages.delete(messageId); throw cause; }
+    return messageId;
   }
 
   graph(): GraphEdge[] {
@@ -193,9 +234,27 @@ export class DistributedRouter {
     this.seen.set(key, this.now() + 60000);
     const trace = [...packet.trace, this.dependencies.self];
     if (packet.destination === this.dependencies.self) {
-      this.counters.received++;
-      this.event(packet.purpose === "ack" ? "delivery-ack" : "packet-delivered", `${packet.messageId} reached destination`, trace);
-      this.dependencies.deliver({ ...packet, trace });
+      if (packet.purpose === "ack") {
+        const message = this.messages.get(packet.messageId);
+        if (!message || this.now() >= message.deadline || packet.source !== message.packet.destination || !message.sequences.has(packet.sequence) || packet.body !== "") {
+          this.drop("Unmatched, expired or terminal message ACK",trace); return;
+        }
+        this.messages.delete(packet.messageId);
+        this.dependencies.messageStatus?.(packet.messageId,"delivered");
+      }
+      const deliveryKey = `${packet.source}:${packet.messageId}`;
+      const previous = this.deliveredMessages.get(deliveryKey);
+      if (packet.purpose === "message" && previous !== undefined && previous !== packet.body) { this.drop("Message ID reused with different content",trace); return; }
+      if (packet.purpose === "message" && previous === undefined && this.deliveredMessages.size >= MAX_SESSION_MESSAGES) { this.drop("Receiver message deduplication capacity reached",trace); return; }
+      if (packet.purpose === "ack" || previous === undefined) {
+        this.counters.received++;
+        if (packet.purpose === "message") this.deliveredMessages.set(deliveryKey,packet.body);
+        this.event(packet.purpose === "ack" ? "delivery-ack" : "packet-delivered", `${packet.messageId} reached destination`, trace);
+        this.dependencies.deliver({ ...packet, trace });
+      } else {
+        this.counters.duplicates++;
+        this.event("message-duplicate", `${packet.messageId}: duplicate delivery suppressed; returning ACK for this attempt.`,trace);
+      }
       if (packet.purpose === "message") {
         try { this.forward({ ...packet, packetId: createUuid(), source: this.dependencies.self, destination: packet.source, purpose: "ack", body: "", trace: [this.dependencies.self], ttl: 8 }); }
         catch { this.drop("destination received payload but ACK has no return route", trace); }
