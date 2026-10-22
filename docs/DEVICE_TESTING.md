@@ -2,6 +2,8 @@
 
 Automated browser tests are not a substitute for this gate. Record every device, browser, OS, network, and result. Do not mark a step passed without evidence from the physical devices.
 
+For the current presentation, use [PHYSICAL_DEMO_GUIDE.md](PHYSICAL_DEMO_GUIDE.md): two-device direct verification, four-physical-router diamond, reload recovery, repeatable fault/restore, negative cases and exact evidence checklist. User-reported one-MacBook/one-phone observations are separately qualified in [MANUAL_LAN_REPORTED.md](evidence/MANUAL_LAN_REPORTED.md); they are not a four-physical-device pass.
+
 ## 1. Preflight the host
 
 On Mac A, from the repository:

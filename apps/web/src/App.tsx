@@ -9,11 +9,11 @@ import type { Experiment, ExperimentConfig, NetworkEvent } from "./lib/evidence.
 import { createReceiptIdentity, verifyTransferPacket } from "./lib/receipt-identity.ts";
 import { transferPaths } from "./lib/experiment-paths.ts";
 import { DistributedRouter, type RouterSnapshot } from "./lib/distributed-router.ts";
+import {type Credentials,claimTabLease,readSession,saveSession,forgetSession,readAdmission,saveAdmission,clearAdmission,joinAttempt,type PendingAdmission} from "./lib/room-session.ts";
 
 export type ConversationMessage = { id: string; peerId: string; direction: "incoming" | "outgoing"; body: string; at: number; status: "sent" | "delivered" | "failed" };
 
-type Credentials = { roomId: string; inviteSecret: string; hostToken?: string; peer: Peer; sessionToken: string };
-type JoinRequest = { requestId: string; displayName: string; deviceCategory: DeviceCategory };
+type JoinRequest = { requestId: string; displayName: string; deviceCategory: DeviceCategory; expiresAt?: number };
 type EventItem = NetworkEvent;
 export type NetworkInfo = {
   protocol: "http" | "https";
@@ -31,6 +31,41 @@ const invitedSecret = query.get("invite") ?? "";
 
 function App() {
   const [credentials, setCredentials] = useState<Credentials | null>(null);
+  const [recoveryNotice,setRecoveryNotice]=useState("");
+  const [recoveryState,setRecoveryState]=useState("checking");
+  const [pendingAdmission,setPendingAdmission]=useState<PendingAdmission>();
+  const joinKeyRef=useRef(joinAttempt(invitedRoom));
+  const adoptSession=async (value:Credentials) => {
+    await claimTabLease(value.peer.id);
+    const stored=saveSession({version:1,roomId:value.roomId,peerId:value.peer.id,sessionToken:value.sessionToken});
+    if(!stored) setRecoveryNotice("Tab storage is unavailable; reloading will require admission again.");
+    clearAdmission(); setPendingAdmission(undefined); setJoinPending(false);
+    peersRef.current=[];setPeers([]);setLinks({});setTopologyEdges([]);setObservedLinks([]);setRoutingGraph([]);setRouterReports([]);setConversations([]);setEvents([]);setTransfers([]);setExperiments([]);setFaultedEdges({});setJoinRequests([]);
+    receiptIdentityRef.current=undefined;
+    history.replaceState(null,"",location.pathname); setCredentials(value); setRecoveryState("ready");
+  };
+  const resumeSession=async (manual=false,isActive=()=>true) => {
+    const saved=readSession();
+    if(!saved || invitedRoom && invitedRoom!==saved.roomId) { setRecoveryState("ready"); return; }
+    if(!navigator.locks && !manual) { setRecoveryState("manual"); setRecoveryNotice("Resume replaces any previous connection for this session. Do not reuse a cloned tab as an independent device."); return; }
+    setRecoveryState("restoring");
+    try {
+      await claimTabLease(saved.peerId); if(!isActive()) return;
+      saved.attemptId ??= createUuid(); saveSession(saved);
+      const response=await fetch(`/api/rooms/${encodeURIComponent(saved.roomId)}/resume`,{method:"POST",headers:{authorization:`Bearer ${saved.sessionToken}`,"content-type":"application/json"},body:JSON.stringify({attemptId:saved.attemptId}),cache:"no-store",signal:AbortSignal.timeout(8000)});
+      if(!isActive()) return;
+      if(response.status===401 || response.status===404) { forgetSession(); setRecoveryNotice("Session expired: the coordinator no longer recognizes this room. Create a new room or open a fresh invitation."); setRecoveryState("ready"); return; }
+      if(!response.ok) throw new Error("The coordinator could not restore this session. Retry when it is reachable.");
+      await adoptSession(await response.json());
+      setRecoveryNotice("Session restored. Reload cleared history and interrupted active transfers. Channels and routes are learned afresh.");
+    } catch(cause) { if(isActive()) { setRecoveryState("retry"); setRecoveryNotice(cause instanceof Error ? cause.message:"Session recovery unavailable."); } }
+  };
+  useEffect(() => {
+    let active=true;
+    const waiting=readAdmission(); if(waiting) {setPendingAdmission(waiting);setJoinPending(true);}
+    void resumeSession(false,()=>active);
+    return () => {active=false;};
+  },[]);
   const [peers, setPeers] = useState<Peer[]>([]);
   const [links, setLinks] = useState<Record<string, LinkState>>({});
   const [topologyEdges, setTopologyEdges] = useState<TopologyEdge[]>([]);
@@ -98,8 +133,12 @@ function App() {
     if (!credentials) return;
     if (window.isSecureContext && crypto.subtle) receiptIdentityRef.current ??= createReceiptIdentity();
     const protocol = location.protocol === "https:" ? "wss:" : "ws:";
-    const socket = new WebSocket(`${protocol}//${location.host}/signal?token=${encodeURIComponent(credentials.sessionToken)}`);
-    socketRef.current = socket;
+    let socket: WebSocket;
+    let stopped = false;
+    let reconnectTimer: ReturnType<typeof setTimeout> | undefined;
+    let reconnectAttempt = 0;
+    let replaced = false;
+    let lastHeartbeat = performance.now();
     const syncTopology = (nextEdges: TopologyEdge[], knownPeers: Peer[]) => {
       setTopologyEdges(nextEdges);
       topologyRef.current = nextEdges;
@@ -109,7 +148,7 @@ function App() {
       const adjacent = new Set(nextEdges.flatMap((edge) => edge.a === credentials.peer.id ? [edge.b] : edge.b === credentials.peer.id ? [edge.a] : []));
       for (const peer of knownPeers) {
         if (peer.id === credentials.peer.id) continue;
-        if (adjacent.has(peer.id) && peer.coordinatorConnected) manager.ensure(peer.id);
+        if (adjacent.has(peer.id) && peer.coordinatorConnected && socket?.readyState === WebSocket.OPEN) manager.ensure(peer.id);
         if (!adjacent.has(peer.id)) manager.close(peer.id);
       }
     };
@@ -118,12 +157,12 @@ function App() {
     const reportedStates = new Map<string, string>();
     const manager = new PeerManager(
       credentials.peer.id,
-      (targetPeerId, signal) => socket.send(JSON.stringify({ type: "signal", targetPeerId, signal })),
+      (targetPeerId, signal) => { if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: "signal", targetPeerId, signal })); },
       (state) => {
         router?.setLink(state.peerId, state.state === "direct");
         setLinks((current) => ({ ...current, [state.peerId]: state }));
         const signature = `${state.state}:${state.rttMs}`;
-        if (socket.readyState === WebSocket.OPEN && state.state !== "new" && reportedStates.get(state.peerId) !== signature && topologyRef.current.some((edge) => canonicalEdge(edge.a, edge.b) === canonicalEdge(credentials.peer.id, state.peerId))) {
+        if (socket?.readyState === WebSocket.OPEN && state.state !== "new" && reportedStates.get(state.peerId) !== signature && topologyRef.current.some((edge) => canonicalEdge(edge.a, edge.b) === canonicalEdge(credentials.peer.id, state.peerId))) {
           reportedStates.set(state.peerId, signature);
           socket.send(JSON.stringify({ type: "link-state", peerId: state.peerId, state: state.state, rttMs: state.rttMs }));
         }
@@ -133,6 +172,7 @@ function App() {
     managerRef.current = manager;
     router = new DistributedRouter({
       self: credentials.peer.id,
+      generation: (id) => peersRef.current.find((peer) => peer.id === id)?.generation ?? (id === credentials.peer.id ? credentials.peer.generation ?? 0 : 0),
       peers: () => peersRef.current.map((peer) => peer.id),
       send: (id, packet) => manager.sendPacket(id, packet),
       update: (state, reports) => {
@@ -242,33 +282,67 @@ function App() {
       manager.sendPacket(nextHop, { ...packet, nextHop, hopIndex: packet.hopIndex + 1, ttl: packet.ttl - 1 });
       addEvent("Payload forwarded", `${source} → ${peersRef.current.find((peer) => peer.id === nextHop)?.displayName ?? "next hop"}`);
     };
-    socket.onopen = () => {
-      setCoordinatorState("connected"); addEvent("Coordinator connected", "Authenticated signaling socket is open");
-      void receiptIdentityRef.current?.then((identity) => { if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: "publish-receipt-key", publicKey: identity.publicKey })); }).catch(() => setError("Secure transfer identity could not initialize. Check trusted HTTPS and reload."));
+    const restarted = (peer: Peer) => {
+      const previous = peersRef.current.find((item) => item.id === peer.id);
+      if (previous && (previous.generation ?? 0) !== (peer.generation ?? 0)) {
+        peersRef.current = peersRef.current.map((item) => item.id === peer.id ? peer : item);
+        manager.close(peer.id); router?.resetPeer(peer.id); transferManager.peerRestarted(peer.id);
+        addEvent("Peer session restarted", `${peer.displayName}: fresh channels, keys and routing incarnation required`);
+      }
     };
-    socket.onclose = () => setCoordinatorState("disconnected");
-    socket.onerror = () => setError("The coordinator connection failed.");
+    const connect = () => {
+      if (stopped) return;
+      socket = new WebSocket(`${protocol}//${location.host}/signal?token=${encodeURIComponent(credentials.sessionToken)}`);
+      const currentSocket = socket;
+      socketRef.current = socket;
+      setCoordinatorState("connecting");
+    socket.onopen = () => {
+      if (stopped || socket !== currentSocket) return;
+      reconnectAttempt = 0; reportedStates.clear(); lastHeartbeat=performance.now();
+      setCoordinatorState("connected"); addEvent("Coordinator connected", "Authenticated signaling socket is open");
+      void receiptIdentityRef.current?.then((identity) => { if (!stopped && currentSocket.readyState === WebSocket.OPEN) currentSocket.send(JSON.stringify({ type: "publish-receipt-key", publicKey: identity.publicKey })); }).catch(() => setError("Secure transfer identity could not initialize. Check trusted HTTPS and reload."));
+    };
+    socket.onclose = ({ code }) => {
+      if (stopped || socket !== currentSocket) return;
+      setCoordinatorState("disconnected");
+      if (code === 4001) { replaced=true; setError("This session was replaced by another connection. Existing channels may remain active; reload to reclaim this tab's session."); return; }
+      reconnectTimer = setTimeout(() => {
+        void fetch(`/api/rooms/${credentials.roomId}/session`, {headers:{authorization:`Bearer ${credentials.sessionToken}`},cache:"no-store",signal:AbortSignal.timeout(8000)})
+          .then((response) => {
+            if (stopped) return;
+            if (response.status === 401 || response.status === 404) {
+              forgetSession(); setRecoveryNotice("Session expired or coordinator restarted. Open a fresh invitation or create a new room."); setCredentials(null); return;
+            }
+            connect();
+          }).catch(() => { if (!stopped) connect(); });
+      }, Math.min(15_000, 750 * 2 ** Math.min(reconnectAttempt++, 5)));
+    };
+    socket.onerror = () => { if (!stopped && socket === currentSocket) setCoordinatorState("reconnecting"); };
     socket.onmessage = ({ data }) => {
+      if (stopped || socket !== currentSocket) return;
       let json: unknown;
       try { json = JSON.parse(data); } catch { return; }
       const parsed = serverSocketMessageSchema.safeParse(json);
       if (!parsed.success) return;
       const item = parsed.data;
-      if (item.type === "peer-key-updated") {
+      if (item.type === "heartbeat-ack") { lastHeartbeat=performance.now();
+      } else if (item.type === "peer-key-updated") {
         peersRef.current = peersRef.current.map((peer) => peer.id === item.peerId ? { ...peer, receiptPublicKey: item.publicKey } : peer);
         setPeers(peersRef.current);
       } else if (item.type === "room-snapshot") {
+        for (const peer of item.peers) restarted(peer);
         setPeers(item.peers);
         peersRef.current = item.peers;
         setObservedLinks(item.links);
         observedRef.current = item.links;
         syncTopology(item.edges, item.peers);
         addEvent("Room snapshot received", "Coordinator membership and permitted topology observed");
-      } else if (item.type === "peer-joined") {
-        setPeers((current) => [...current.filter((peer) => peer.id !== item.peer.id), item.peer]);
+      } else if (item.type === "peer-restarted" || item.type === "peer-joined") {
+        restarted(item.peer);
         peersRef.current = [...peersRef.current.filter((peer) => peer.id !== item.peer.id), item.peer];
-        if (topologyRef.current.some((edge) => (edge.a === credentials.peer.id && edge.b === item.peer.id) || (edge.b === credentials.peer.id && edge.a === item.peer.id))) manager.ensure(item.peer.id);
-        addEvent("Peer joined", `${item.peer.displayName} is connected to the coordinator`);
+        setPeers(peersRef.current);
+        if (item.peer.coordinatorConnected && topologyRef.current.some((edge) => (edge.a === credentials.peer.id && edge.b === item.peer.id) || (edge.b === credentials.peer.id && edge.a === item.peer.id))) manager.ensure(item.peer.id);
+        if(item.type === "peer-joined") addEvent("Peer joined", `${item.peer.displayName} is connected to the coordinator`);
       } else if (item.type === "peer-left") {
         peersRef.current = peersRef.current.map((peer) => peer.id === item.peerId ? { ...peer, coordinatorConnected: false } : peer);
         setPeers(peersRef.current);
@@ -284,13 +358,25 @@ function App() {
         addEvent("WebRTC link changed", item.link.state, "REAL", { path: [item.link.a, item.link.b] });
       } else if (item.type === "join-requested") {
         setJoinRequests((current) => [...current.filter((request) => request.requestId !== item.requestId), item]);
+      } else if (item.type === "pending-requests") {
+        setJoinRequests(item.requests);
       } else if (item.type === "relay-data") {
         addEvent("Fallback relay received", item.payload);
       } else if (item.type === "error") {
         setError(item.message);
       }
     };
-    return () => { router?.dispose(); routerRef.current = undefined; socket.close(); manager.closeAll(); transferManager.dispose(); transferManagerRef.current = undefined; };
+    };
+    connect();
+    const heartbeat=setInterval(() => {
+      if(socket.readyState!==WebSocket.OPEN) return;
+      if(performance.now()-lastHeartbeat>30_000) {socket.close(4000,"Heartbeat deadline exceeded");return;}
+      socket.send(JSON.stringify({type:"heartbeat",sentAt:Date.now()}));
+    },10_000);
+    const reconcile=setInterval(() => {if(socket.readyState===WebSocket.OPEN) syncTopology(topologyRef.current,peersRef.current);},5000);
+    const wake = () => { if (!stopped && !replaced && socket.readyState === WebSocket.CLOSED) {clearTimeout(reconnectTimer);connect();} };
+    window.addEventListener("online",wake);
+    return () => { stopped = true; clearInterval(reconcile); clearInterval(heartbeat); clearTimeout(reconnectTimer); window.removeEventListener("online",wake); router?.dispose(); routerRef.current = undefined; socket.close(); manager.closeAll(); transferManager.dispose(); transferManagerRef.current = undefined; };
   }, [credentials]);
 
   const remotePeers = peers.filter((peer) => peer.id !== credentials?.peer.id);
@@ -305,30 +391,48 @@ function App() {
     setError("");
     const response = await fetch("/api/rooms", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ displayName, deviceCategory }) });
     if (!response.ok) throw new Error("Could not create the room.");
-    setCredentials(await response.json());
+    await adoptSession(await response.json());
   };
 
   const joinRoom = async (displayName: string, deviceCategory: DeviceCategory) => {
     setError("");
-    const response = await fetch(`/api/rooms/${encodeURIComponent(invitedRoom)}/join`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ displayName, deviceCategory, inviteSecret: invitedSecret }) });
+    const response = await fetch(`/api/rooms/${encodeURIComponent(invitedRoom)}/join`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ displayName, deviceCategory, inviteSecret: invitedSecret, requestKey: joinKeyRef.current }) });
     if (!response.ok) throw new Error("This invitation is invalid or expired.");
     const requested = await response.json();
     setJoinPending(true);
     addEvent("Admission requested", "Waiting for the room host to approve this device");
-    const timer = window.setInterval(async () => {
-      const status = await fetch(`/api/rooms/${encodeURIComponent(invitedRoom)}/join/${encodeURIComponent(requested.requestId)}`, { headers: { "x-hopnet-claim": requested.claimToken } });
-      if (!status.ok) return;
-      const result = await status.json();
-      if (result.status === "approved") {
-        window.clearInterval(timer);
-        setJoinPending(false);
-        setCredentials({ roomId: invitedRoom, inviteSecret: invitedSecret, peer: result.peer, sessionToken: result.sessionToken });
-      }
-    }, 1200);
+    const waiting = {roomId:invitedRoom,requestId:requested.requestId,claimToken:requested.claimToken,startedAt:Date.now()};
+    saveAdmission(waiting); setPendingAdmission(waiting);
   };
+
+  useEffect(() => {
+    if (!pendingAdmission || credentials) return;
+    let stopped=false;
+    let timer:ReturnType<typeof setTimeout>;
+    const controller=new AbortController();
+    const finish=(notice:string) => {clearAdmission();setPendingAdmission(undefined);setJoinPending(false);joinKeyRef.current=createUuid();setError(notice);};
+    const poll=async () => {
+      if (Date.now()-pendingAdmission.startedAt>=15*60_000) {finish("Admission expired. Request a new invitation from the host.");return;}
+      try {
+        const response=await fetch(`/api/rooms/${encodeURIComponent(pendingAdmission.roomId)}/join/${encodeURIComponent(pendingAdmission.requestId)}`,{headers:{"x-hopnet-claim":pendingAdmission.claimToken},cache:"no-store",signal:AbortSignal.any([controller.signal,AbortSignal.timeout(8000)])});
+        if(stopped) return;
+        if(response.status===404 || response.status===401 || response.status===403) {finish("Admission expired or invalid. Request to join again.");return;}
+        if(!response.ok) throw new Error("Coordinator unreachable. Retrying admission until its 15-minute deadline.");
+        const result=await response.json();
+        if(result.status==="rejected") {finish("The host declined this request. You may request admission again.");return;}
+        if(result.status==="approved") {await adoptSession({roomId:pendingAdmission.roomId,inviteSecret:invitedSecret,peer:result.peer,sessionToken:result.sessionToken});setError("");return;}
+        setError("");
+      } catch(cause) {if(stopped) return;setError(cause instanceof Error ? cause.message:"Coordinator unreachable; retrying admission.");}
+      if(!stopped) timer=setTimeout(() => void poll(),1200);
+    };
+    void poll();
+    return () => {stopped=true;controller.abort();clearTimeout(timer);};
+  },[pendingAdmission,credentials]);
 
   const approve = async (requestId: string) => {
     if (!credentials?.hostToken) return;
+    setError("");
+    try {
     const response = await fetch(`/api/rooms/${credentials.roomId}/approve`, { method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${credentials.hostToken}` }, body: JSON.stringify({ requestId }) });
     if (!response.ok) {
       const failure = await response.json().catch(() => ({})) as { message?: string };
@@ -336,6 +440,7 @@ function App() {
     }
     setJoinRequests((current) => current.filter((request) => request.requestId !== requestId));
     addEvent("Peer admitted", "Host approval created a short-lived authenticated peer session");
+    } catch {setError("Admission could not reach the coordinator. Retry after signaling reconnects; the request remains pending.");}
   };
 
   const ping = () => {
@@ -421,7 +526,7 @@ function App() {
   const restoreRelay = (peerId: string) => {
     if (credentials?.peer.role !== "host" || socketRef.current?.readyState !== WebSocket.OPEN) return;
     const online = new Set(peers.filter((peer) => peer.coordinatorConnected).map((peer) => peer.id));
-    if (!online.has(peerId)) { setError("Rejoin the relay browser before restoring its links."); return; }
+    if (!online.has(peerId)) { setError("Restore signaling in the relay tab before restoring its links. Reload resumes a valid session without new admission."); return; }
     const restored = new Map(topologyEdges.map((edge) => [canonicalEdge(edge.a, edge.b), edge]));
     for (const edge of faultedEdges[peerId] ?? []) if (online.has(edge.a) && online.has(edge.b)) restored.set(canonicalEdge(edge.a, edge.b), edge);
     if (restored.size > 20) { setError("Restoring these links would exceed the 20-link classroom limit. Remove another permitted link first."); return; }
@@ -434,11 +539,20 @@ function App() {
     try { await transferManagerRef.current?.cancel(id); } catch (cause) { setError(cause instanceof Error ? cause.message : "Cancellation could not reach the other peer."); }
   };
 
-  if (!credentials) return <Entry invited={Boolean(invitedRoom && invitedSecret)} pending={joinPending} networkInfo={networkInfo} onCreate={createRoom} onJoin={joinRoom} error={error} />;
+  const reject = async (requestId:string) => {
+    if(!credentials?.hostToken) return;
+    try {
+      const response=await fetch(`/api/rooms/${credentials.roomId}/reject`,{method:"POST",headers:{"content-type":"application/json",authorization:`Bearer ${credentials.hostToken}`},body:JSON.stringify({requestId})});
+      if(!response.ok) throw new Error("Request expired or already admitted. Reopen the invitation panel.");
+      setJoinRequests((current) => current.filter((request) => request.requestId!==requestId));
+    } catch(cause) {setError(cause instanceof Error ? cause.message:"Admission rejection failed.");}
+  };
+  const recovery = <section className="session-recovery" role="status">{recoveryNotice}{credentials && recoveryNotice && <button aria-label="Dismiss recovery notice" onClick={() => setRecoveryNotice("")}>×</button>}{["manual","retry"].includes(recoveryState) && <><button onClick={() => void resumeSession(true)}>Resume session</button><button onClick={() => {forgetSession();setRecoveryState("ready");setRecoveryNotice("Saved session forgotten. Existing membership was not revoked.");}}>Forget saved session</button></>}</section>;
+  if (!credentials) return <>{recovery}<Entry invited={Boolean(invitedRoom && invitedSecret)} pending={joinPending || recoveryState==="checking" || recoveryState==="restoring"} networkInfo={networkInfo} onCreate={createRoom} onJoin={joinRoom} error={error} /></>;
 
   const inviteUrl = `${invitationOrigin}/?room=${encodeURIComponent(credentials.roomId)}&invite=${encodeURIComponent(credentials.inviteSecret)}`;
   const inviteQrUrl = `/api/rooms/${credentials.roomId}/qr?invite=${encodeURIComponent(credentials.inviteSecret)}&origin=${encodeURIComponent(invitationOrigin)}`;
-  return <RoomSurface routingGraph={routingGraph} routerState={routerState} routerReports={routerReports} self={credentials.peer} peers={peers} links={links} observedLinks={observedLinks} topologyEdges={topologyEdges} selectedPeer={selectedPeer} selectedLink={selectedLink} selectedRoute={selectedRoute} routeStrategy={routeStrategy} events={events} transfers={transfers} coordinatorState={coordinatorState} networkInfo={networkInfo} invitationOrigin={invitationOrigin} inviteUrl={inviteUrl} inviteQrUrl={inviteQrUrl} joinRequests={joinRequests} message={message} error={error} onInvitationOrigin={setInvitationOrigin} onSelectPeer={(id) => setSelectedPeerId(id)} onApprove={(id) => void approve(id)} onToggleEdge={toggleTopologyEdge} onRouteStrategy={setRouteStrategy} onMessage={setMessage} onSend={sendMessage} onFile={offerFile} onTransferResponse={respondToTransfer} onPing={ping} onFallback={relayFallback} onClearError={() => setError("")} conversations={conversations} experiments={experiments} onExperiment={startExperiment} onFault={faultRelay} onRestore={restoreRelay} restorablePeers={Object.keys(faultedEdges)} onCancelTransfer={cancelTransfer} />;
+  return <>{recovery}<RoomSurface onReject={(id) => void reject(id)} routingGraph={routingGraph} routerState={routerState} routerReports={routerReports} self={credentials.peer} peers={peers} links={links} observedLinks={observedLinks} topologyEdges={topologyEdges} selectedPeer={selectedPeer} selectedLink={selectedLink} selectedRoute={selectedRoute} routeStrategy={routeStrategy} events={events} transfers={transfers} coordinatorState={coordinatorState} networkInfo={networkInfo} invitationOrigin={invitationOrigin} inviteUrl={inviteUrl} inviteQrUrl={inviteQrUrl} joinRequests={joinRequests} message={message} error={error} onInvitationOrigin={setInvitationOrigin} onSelectPeer={(id) => setSelectedPeerId(id)} onApprove={(id) => void approve(id)} onToggleEdge={toggleTopologyEdge} onRouteStrategy={setRouteStrategy} onMessage={setMessage} onSend={sendMessage} onFile={offerFile} onTransferResponse={respondToTransfer} onPing={ping} onFallback={relayFallback} onClearError={() => setError("")} conversations={conversations} experiments={experiments} onExperiment={startExperiment} onFault={faultRelay} onRestore={restoreRelay} restorablePeers={Object.keys(faultedEdges)} onCancelTransfer={cancelTransfer} /></>;
 }
 
 function isTransferPacket(packet: DataPacket): packet is TransferDataPacket {
@@ -449,8 +563,9 @@ function Entry({ invited, pending, networkInfo, onCreate, onJoin, error }: { inv
   const [name, setName] = useState("");
   const [category, setCategory] = useState<DeviceCategory>(/iPhone|Android/i.test(navigator.userAgent) ? "phone" : "laptop");
   const [busy, setBusy] = useState(false);
+  const [submitError,setSubmitError]=useState("");
   const title = invited ? "Step into the room." : "A network you can touch.";
-  const submit = async () => { if (!name.trim() || pending) return; setBusy(true); try { await (invited ? onJoin(name.trim(), category) : onCreate(name.trim(), category)); } finally { setBusy(false); } };
+  const submit = async () => { if (!name.trim() || pending) return; setBusy(true);setSubmitError(""); try { await (invited ? onJoin(name.trim(), category) : onCreate(name.trim(), category)); } catch(cause) {setSubmitError(cause instanceof Error ? cause.message:"Connection unavailable. Please retry.");} finally { setBusy(false); } };
   return <main className="entry-shell">
     <header className="entry-brand">HOPNET <span>The Network You Can Touch</span></header>
     <section className="entry-copy"><h1>{title}</h1><p>Real devices. Direct data channels. Routes you can see, test, and break safely.</p></section>
@@ -462,6 +577,7 @@ function Entry({ invited, pending, networkInfo, onCreate, onJoin, error }: { inv
       <div className="entry-network"><i className={window.isSecureContext ? "secure" : "warning"}/><span>{invited ? `Coordinator ${location.host}` : networkInfo?.preferredOrigin ? `Invites use ${new URL(networkInfo.preferredOrigin).host}` : "Discovering your LAN address…"}<small>{window.isSecureContext ? "Secure browser context" : "Trusted HTTPS required for verified file transfer"}</small></span></div>
       <p className="entry-note">Only devices you approve can enter. HOPNET does not scan your LAN.</p>
       {error && <p className="error-text">{error}</p>}
+      {submitError && <p className="error-text" role="alert">{submitError}</p>}
     </section>
   </main>;
 }

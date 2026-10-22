@@ -23,10 +23,10 @@ const createRoomSchema = z.object({
   displayName: z.string().min(1).max(80),
   deviceCategory: deviceCategorySchema,
 });
-const joinRoomSchema = createRoomSchema.extend({ inviteSecret: z.string().min(8).max(100) });
+const joinRoomSchema = createRoomSchema.extend({ inviteSecret: z.string().min(8).max(100), requestKey:z.string().uuid().optional() });
 const approveSchema = z.object({ requestId: z.string().min(8) });
 
-type Session = { token: string; peer: Peer; socket?: WebSocket };
+type Session = { token: string; peer: Peer; socket?: WebSocket; lastResumeId?:string };
 type JoinRequest = {
   id: string;
   claimToken: string;
@@ -35,6 +35,7 @@ type JoinRequest = {
   createdAt: number;
   status: "pending" | "approved" | "rejected";
   session?: Session;
+  requestKey?: string;
 };
 type Room = {
   id: string;
@@ -51,6 +52,18 @@ type Room = {
 const rooms = new Map<string, Room>();
 const tokenIndex = new Map<string, { room: Room; session: Session }>();
 const roomTtlMs = 12 * 60 * 60 * 1_000;
+const joinTtlMs = 15 * 60_000;
+
+function pendingRequests(room:Room) {
+  return [...room.joins.values()].filter((join) => join.status === "pending").map((join) => ({ requestId:join.id,displayName:join.displayName,deviceCategory:join.deviceCategory,expiresAt:join.createdAt+joinTtlMs }));
+}
+function syncAdmissions(room:Room) {
+  for (const join of room.joins.values()) if(Date.now()-join.createdAt>=joinTtlMs) room.joins.delete(join.id);
+  const rejected=[...room.joins.values()].filter((join) => join.status === "rejected");
+  for(const join of rejected.slice(0,Math.max(0,rejected.length-20))) room.joins.delete(join.id);
+  const host=[...room.sessions.values()].find((session) => session.peer.role === "host");
+  send(host?.socket,{ type:"pending-requests",requests:pendingRequests(room) });
+}
 
 const id = (prefix: string) => `${prefix}_${crypto.randomBytes(9).toString("base64url")}`;
 const secret = () => crypto.randomBytes(24).toString("base64url");
@@ -100,6 +113,48 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
   // Fastify's overloads cannot express a server that is selected between HTTP and
   // HTTPS at runtime. The returned API remains the common FastifyInstance surface.
   const app = Fastify({ logger: process.env.NODE_ENV === "test" ? false : { serializers: { req: requestLogFields } }, bodyLimit: 96 * 1024, ...(https ? { https } : {}) } as never) as unknown as FastifyInstance;
+  app.addHook("onRequest",async (request,reply) => { if(request.url.startsWith("/api/rooms")) reply.header("cache-control","no-store"); });
+  const authenticated = (request: { headers:{ authorization?:string }; params:unknown }) => {
+    const indexed=tokenIndex.get(bearer(request.headers.authorization) ?? "");
+    return indexed?.room.id === (request.params as {roomId:string}).roomId ? indexed : undefined;
+  };
+  app.get("/api/rooms/:roomId/session",async (request,reply) => {
+    const indexed=authenticated(request);
+    if(!indexed) return reply.code(401).send({error:"SESSION_EXPIRED"});
+    return {peer:publicPeer(indexed.session)};
+  });
+  app.post("/api/rooms/:roomId/resume",async (request,reply) => {
+    const indexed=authenticated(request);
+    const parsed=z.object({attemptId:z.string().uuid()}).safeParse(request.body);
+    if(!indexed) return reply.code(401).send({error:"SESSION_EXPIRED"});
+    if(!parsed.success) return reply.code(400).send({error:"INVALID_REQUEST"});
+    const {room,session}=indexed;
+    if(session.lastResumeId !== parsed.data.attemptId) {
+      session.lastResumeId=parsed.data.attemptId;
+      const old=session.socket; session.socket=undefined; old?.close(4001,"Session restarted");
+      session.peer={...session.peer,generation:(session.peer.generation ?? 0)+1,receiptPublicKey:undefined};
+      for(const [key,link] of room.links) if(link.a===session.peer.id || link.b===session.peer.id) {
+        room.linkReports.delete(key); room.links.delete(key);
+        broadcast(room,{type:"link-state-updated",link:{...link,state:"closed",rttMs:undefined,updatedAt:Date.now()}});
+      }
+      broadcast(room,{type:"peer-restarted",peer:publicPeer(session)});
+    }
+    return {roomId:room.id,inviteSecret:room.inviteSecret,hostToken:session.peer.role === "host" ? room.hostToken:undefined,peer:publicPeer(session),sessionToken:session.token};
+  });
+  app.get("/api/rooms/:roomId/pending",async (request,reply) => {
+    const room=rooms.get((request.params as {roomId:string}).roomId);
+    if(!room || bearer(request.headers.authorization)!==room.hostToken) return reply.code(403).send({error:"HOST_AUTH_REQUIRED"});
+    syncAdmissions(room); return {requests:pendingRequests(room)};
+  });
+  app.post("/api/rooms/:roomId/reject",async (request,reply) => {
+    const room=rooms.get((request.params as {roomId:string}).roomId);
+    if(!room || bearer(request.headers.authorization)!==room.hostToken) return reply.code(403).send({error:"HOST_AUTH_REQUIRED"});
+    syncAdmissions(room);
+    const parsed=approveSchema.safeParse(request.body);
+    const join=parsed.success ? room.joins.get(parsed.data.requestId):undefined;
+    if(!join || join.status==="approved") return reply.code(409).send({error:"REQUEST_NO_LONGER_PENDING"});
+    join.status="rejected"; syncAdmissions(room); return {status:"rejected"};
+  });
 
   app.get("/api/health", async () => ({ status: "ok", service: "hopnet-coordinator", rooms: rooms.size }));
   app.get("/api/network", async (_request, reply) => reply.header("cache-control", "no-store").send({
@@ -151,7 +206,10 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
     if (!room || !parsed.success || !secretsEqual(parsed.data.inviteSecret, room.inviteSecret)) {
       return reply.code(404).send({ error: "ROOM_NOT_FOUND" });
     }
-    if (room.joins.size >= 20) return reply.code(429).send({ error: "TOO_MANY_JOIN_REQUESTS" });
+    syncAdmissions(room);
+    const previous=parsed.data.requestKey ? [...room.joins.values()].find((join) => join.requestKey===parsed.data.requestKey):undefined;
+    if(previous) return reply.code(202).send({requestId:previous.id,claimToken:previous.claimToken,status:previous.status});
+    if (pendingRequests(room).length >= 20) return reply.code(429).send({ error: "TOO_MANY_JOIN_REQUESTS" });
     const join: JoinRequest = {
       id: id("join"),
       claimToken: secret(),
@@ -159,16 +217,19 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
       deviceCategory: parsed.data.deviceCategory,
       createdAt: Date.now(),
       status: "pending",
+      requestKey:parsed.data.requestKey,
     };
     room.joins.set(join.id, join);
     const host = [...room.sessions.values()].find((item) => item.peer.role === "host");
     send(host?.socket, { type: "join-requested", requestId: join.id, displayName: join.displayName, deviceCategory: join.deviceCategory });
+    syncAdmissions(room);
     return reply.code(202).send({ requestId: join.id, claimToken: join.claimToken, status: join.status });
   });
 
   app.get("/api/rooms/:roomId/join/:requestId", async (request, reply) => {
     const { roomId, requestId } = request.params as { roomId: string; requestId: string };
     const room = rooms.get(roomId);
+    if(room) syncAdmissions(room);
     const join = room?.joins.get(requestId);
     const claimToken = request.headers["x-hopnet-claim"];
     if (!join || claimToken !== join.claimToken) return reply.code(404).send({ error: "JOIN_NOT_FOUND" });
@@ -182,8 +243,10 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
     const token = bearer(request.headers.authorization);
     if (!room || token !== room.hostToken) return reply.code(403).send({ error: "HOST_AUTH_REQUIRED" });
     if (!parsed.success) return reply.code(400).send({ error: "INVALID_REQUEST" });
+    syncAdmissions(room);
     const join = room.joins.get(parsed.data.requestId);
-    if (!join || join.status !== "pending") return reply.code(404).send({ error: "JOIN_NOT_FOUND" });
+    if(join?.status === "approved" && join.session) return {status:"approved",peer:join.session.peer};
+    if (!join || join.status !== "pending") return reply.code(409).send({ error:"REQUEST_NO_LONGER_PENDING",message:"This request expired or is no longer pending." });
     if (room.sessions.size >= MAX_ROOM_PEERS) return reply.code(409).send({ error: "ROOM_CAPACITY", message: `This classroom room supports up to ${MAX_ROOM_PEERS} admitted peers, including the host. Create another room for a new session.` });
     const peerId = id("peer");
     const session: Session = {
@@ -200,6 +263,7 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
     join.status = "approved";
     join.session = session;
     room.sessions.set(peerId, session);
+    syncAdmissions(room);
     tokenIndex.set(session.token, { room, session });
     const host = [...room.sessions.values()].find((item) => item.peer.role === "host")!;
     room.edges.push({ a: host.peer.id, b: peerId });
@@ -235,6 +299,7 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
     broadcast(room, { type: "peer-joined", peer: publicPeer(session) }, session.peer.id);
 
     socket.on("message", (raw) => {
+      if(session.socket !== socket) return;
       const rawBytes = Array.isArray(raw) ? raw.reduce((total, item) => total + item.byteLength, 0) : raw.byteLength;
       if (rawBytes > 96 * 1024) return socket.close(1009, "Message too large");
       let json: unknown;
@@ -306,6 +371,8 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
       }
     });
 
+    if(session.peer.role === "host") syncAdmissions(room);
+
     socket.on("close", () => {
       if (session.socket !== socket) return;
       session.socket = undefined;
@@ -330,7 +397,7 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
   const cleanup = setInterval(() => {
     const now = Date.now();
     for (const [roomId, room] of rooms) {
-      for (const [joinId, join] of room.joins) if (now - join.createdAt > 15 * 60_000) room.joins.delete(joinId);
+      syncAdmissions(room);
       if (now - room.createdAt > roomTtlMs && [...room.sessions.values()].every((item) => !item.socket)) {
         for (const session of room.sessions.values()) tokenIndex.delete(session.token);
         rooms.delete(roomId);

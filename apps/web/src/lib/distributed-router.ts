@@ -5,7 +5,7 @@ import { createUuid } from "./id.ts";
 type Control = Extract<DataPacket, { kind: "router-control" }>;
 export type Datagram = Extract<DataPacket, { kind: "router-data" }>;
 export type Neighbor = { id: string; channelOpen: boolean; active: boolean; lastHello: number; rttMs: number };
-export type Advertisement = { origin: string; sequence: number; receivedAt: number; expiresAt: number; neighbors: Array<{ id: string; rttMs: number }> };
+export type Advertisement = { origin: string; generation?:number; sequence: number; receivedAt: number; expiresAt: number; neighbors: Array<{ id: string; rttMs: number }> };
 export type ForwardingEntry = { destination: string; nextHop: string; path: string[]; cost: number };
 export type RouterEvent = { type: string; detail: string; path?: string[]; packetId?: string; origin?: string };
 type PendingMessage = { packet: Datagram; sequences: Set<number>; attempts: number; deadline: number; retryAt: number };
@@ -23,6 +23,7 @@ type Dependencies = {
   event: (event: RouterEvent) => void; deliver: (packet: Datagram) => void;
   messageStatus?: (messageId: string, status: "delivered" | "failed") => void;
   now?: () => number;
+  generation?: (id:string) => number;
 };
 
 const HELLO_INTERVAL = 1000, DEAD_INTERVAL = 4500, REFRESH_INTERVAL = 6000, MAX_AGE = 18000;
@@ -73,6 +74,14 @@ export class DistributedRouter {
     this.messages.clear(); this.usedMessageIds.clear(); this.deliveredMessages.clear(); this.seen.clear(); this.pending.clear();
   }
   setStrategy(strategy: RouteStrategy) { if (this.strategy !== strategy) { this.strategy = strategy; this.recompute(true); this.publish(); } }
+  resetPeer(id:string) {
+    this.neighbors.delete(id); this.database.delete(id); this.highestSequence.delete(id); this.reports.delete(id);
+    for(const [messageId,message] of this.messages) if(message.packet.destination===id) {
+      this.messages.delete(messageId); this.dependencies.messageStatus?.(messageId,"failed");
+      this.event("message-failed",`${messageId}: receiver restarted; delivery is unconfirmed. Send a new message explicitly.`);
+    }
+    this.originate(); this.publish();
+  }
 
   setLink(id: string, open: boolean) {
     const old = this.neighbors.get(id);
@@ -146,6 +155,7 @@ export class DistributedRouter {
     if (!this.neighbors.get(from)?.channelOpen || !this.dependencies.peers().includes(from)) { this.drop("unbound ingress", [from]); return true; }
     if (packet.kind === "router-data") { this.receiveData(from, packet); return true; }
     const now = this.now();
+    if((packet.generation ?? 0)!==(this.dependencies.generation?.(packet.origin) ?? 0)) { this.drop("Stale router incarnation"); return true; }
     if (packet.type === "hello" || packet.type === "hello-ack") {
       if (packet.origin !== from) { this.drop("hello origin does not match channel"); return true; }
       const neighbor = this.neighbors.get(from)!;
@@ -176,7 +186,7 @@ export class DistributedRouter {
       if (!packet.neighbors || new Set(packet.neighbors.map((n) => n.id)).size !== packet.neighbors.length || packet.neighbors.some((n) => n.id === packet.origin || !this.dependencies.peers().includes(n.id))) { this.drop("invalid LSA neighbors"); return true; }
       if ((this.highestSequence.get(packet.origin) ?? -1) >= packet.sequence) { this.counters.duplicates++; return true; }
       this.highestSequence.set(packet.origin, packet.sequence);
-      this.database.set(packet.origin, { origin: packet.origin, sequence: packet.sequence, receivedAt: now, expiresAt: now + MAX_AGE - packet.ageMs, neighbors: packet.neighbors });
+      this.database.set(packet.origin, { origin: packet.origin, generation:packet.generation ?? 0, sequence: packet.sequence, receivedAt: now, expiresAt: now + MAX_AGE - packet.ageMs, neighbors: packet.neighbors });
       this.counters.lsaReceived++;
       this.event("lsa-received", `LSA ${packet.sequence} from ${packet.origin} via ${from}`, [from, this.dependencies.self], packet.origin);
       this.recompute(); this.flood(packet, from); this.update();
@@ -201,7 +211,7 @@ export class DistributedRouter {
     if (this.messages.size >= MAX_PENDING_MESSAGES) throw new Error("At most 32 messages may await receiver acknowledgement.");
     if (this.usedMessageIds.has(messageId)) throw new Error("Message IDs cannot be reused in this session.");
     if (this.usedMessageIds.size >= MAX_SESSION_MESSAGES) throw new Error("Message session capacity reached. Start a fresh room.");
-    const packet: Datagram = { kind: "router-data", protocolVersion: 1, packetId: createUuid(), messageId, source: this.dependencies.self, destination, sequence: ++this.helloSequence, ttl: 8, trace: [this.dependencies.self], purpose: "message", body };
+    const packet: Datagram = { kind: "router-data", protocolVersion: 1, packetId: createUuid(), messageId, source: this.dependencies.self, destination, sourceGeneration:this.dependencies.generation?.(this.dependencies.self) ?? 0,destinationGeneration:this.dependencies.generation?.(destination) ?? 0, sequence: ++this.helloSequence, ttl: 8, trace: [this.dependencies.self], purpose: "message", body };
     const message: PendingMessage = { packet, sequences:new Set([packet.sequence]),attempts:1,deadline:this.now()+MESSAGE_DEADLINE,retryAt:this.now()+MESSAGE_RETRY_INTERVAL };
     this.messages.set(messageId,message); this.usedMessageIds.add(messageId);
     try { this.forward(packet); }
@@ -227,6 +237,7 @@ export class DistributedRouter {
   }
 
   private receiveData(from: string, packet: Datagram) {
+    if((packet.sourceGeneration ?? 0)!==(this.dependencies.generation?.(packet.source) ?? 0) || (packet.destinationGeneration ?? 0)!==(this.dependencies.generation?.(packet.destination) ?? 0)) {this.drop("Stale message endpoint incarnation",packet.trace);return;}
     if (packet.trace.at(-1) !== from || packet.trace[0] !== packet.source || packet.trace.includes(this.dependencies.self) || new Set(packet.trace).size !== packet.trace.length || !this.dependencies.peers().includes(packet.source) || !this.dependencies.peers().includes(packet.destination)) { this.drop("trace or endpoint invariant", packet.trace); return; }
     const key = `${packet.source}:${packet.packetId}`;
     if (this.seen.has(key)) { this.counters.duplicates++; this.event("packet-duplicate", packet.packetId); return; }
@@ -256,7 +267,7 @@ export class DistributedRouter {
         this.event("message-duplicate", `${packet.messageId}: duplicate delivery suppressed; returning ACK for this attempt.`,trace);
       }
       if (packet.purpose === "message") {
-        try { this.forward({ ...packet, packetId: createUuid(), source: this.dependencies.self, destination: packet.source, purpose: "ack", body: "", trace: [this.dependencies.self], ttl: 8 }); }
+        try { this.forward({ ...packet, packetId: createUuid(), source: this.dependencies.self, destination: packet.source,sourceGeneration:packet.destinationGeneration,destinationGeneration:packet.sourceGeneration, purpose: "ack", body: "", trace: [this.dependencies.self], ttl: 8 }); }
         catch { this.drop("destination received payload but ACK has no return route", trace); }
       }
     } else if (packet.ttl <= 1 || trace.length >= 8) this.drop("TTL exhausted", trace);
@@ -277,7 +288,7 @@ export class DistributedRouter {
 
   private originate() {
     this.lastLsa = this.now();
-    const lsa: Advertisement = { origin: this.dependencies.self, sequence: ++this.sequence, receivedAt: this.now(), expiresAt: this.now() + MAX_AGE, neighbors: [...this.neighbors.values()].filter((n) => n.active).map((n) => ({ id: n.id, rttMs: Math.round(n.rttMs) })).sort((a, b) => a.id.localeCompare(b.id)) };
+    const lsa: Advertisement = { origin: this.dependencies.self, generation:this.dependencies.generation?.(this.dependencies.self) ?? 0, sequence: ++this.sequence, receivedAt: this.now(), expiresAt: this.now() + MAX_AGE, neighbors: [...this.neighbors.values()].filter((n) => n.active).map((n) => ({ id: n.id, rttMs: Math.round(n.rttMs) })).sort((a, b) => a.id.localeCompare(b.id)) };
     this.database.set(lsa.origin, lsa); this.counters.lsaSent++;
     this.event("lsa-originated", `LSA ${lsa.sequence}: ${lsa.neighbors.length} direct neighbors`);
     this.recompute(); this.flood(this.lsaPacket(lsa));
@@ -303,8 +314,8 @@ export class DistributedRouter {
     this.update();
   }
 
-  private control(type: Control["type"], sequence: number): Control { return { kind: "router-control", protocolVersion: 1, type, origin: this.dependencies.self, sequence, ttl: 8, ageMs: 0 }; }
-  private lsaPacket(lsa: Advertisement): Control { return { ...this.control("lsa", lsa.sequence), origin: lsa.origin, neighbors: lsa.neighbors, ageMs: Math.max(0, MAX_AGE - (lsa.expiresAt - this.now())) }; }
+  private control(type: Control["type"], sequence: number): Control { return { kind: "router-control", protocolVersion: 1, type, origin: this.dependencies.self,generation:this.dependencies.generation?.(this.dependencies.self) ?? 0, sequence, ttl: 8, ageMs: 0 }; }
+  private lsaPacket(lsa: Advertisement): Control { return { ...this.control("lsa", lsa.sequence), origin: lsa.origin,generation:lsa.generation ?? 0, neighbors: lsa.neighbors, ageMs: Math.max(0, MAX_AGE - (lsa.expiresAt - this.now())) }; }
   private hello(id: string) { const seq = ++this.helloSequence; this.pending.set(`${id}:${seq}`, this.now()); this.counters.helloSent++; this.send(id, this.control("hello", seq)); }
   private send(to: string, packet: Control) { try { this.dependencies.send(to, packet); this.counters.controlBytes += new TextEncoder().encode(JSON.stringify(packet)).length; } catch { /* Closed-channel callbacks or hello deadline withdraw the link. */ } }
   private flood(packet: Control, except?: string) { if (packet.ttl <= 1) return; for (const n of this.neighbors.values()) if (n.active && n.id !== except) this.send(n.id, { ...packet, ttl: packet.ttl - 1 }); }

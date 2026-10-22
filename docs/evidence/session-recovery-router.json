@@ -1,0 +1,139 @@
+{
+  "provenance": "RTC-FLOODED ROUTER OBSERVATIONS",
+  "observer": "peer_qqT6zPdcGfZ1",
+  "snapshots": [
+    {
+      "id": "peer_qqT6zPdcGfZ1",
+      "observedAt": 3875.699999809265,
+      "strategy": "minimum-hops",
+      "digest": "[[\"peer_qqT6zPdcGfZ1\",\"peer_sQn0a8rXSE8r\",1]]",
+      "neighbors": [
+        {
+          "id": "peer_sQn0a8rXSE8r",
+          "channelOpen": true,
+          "active": true,
+          "lastHello": 2874.5999999046326,
+          "rttMs": 2.0999999046325684
+        }
+      ],
+      "lsdb": [
+        {
+          "origin": "peer_qqT6zPdcGfZ1",
+          "generation": 1,
+          "sequence": 5,
+          "receivedAt": 1608.2999997138977,
+          "expiresAt": 19608.299999713898,
+          "neighbors": [
+            {
+              "id": "peer_sQn0a8rXSE8r",
+              "rttMs": 500
+            }
+          ]
+        },
+        {
+          "origin": "peer_sQn0a8rXSE8r",
+          "generation": 1,
+          "sequence": 2,
+          "receivedAt": 1615.5999999046326,
+          "expiresAt": 19615.400000095367,
+          "neighbors": [
+            {
+              "id": "peer_qqT6zPdcGfZ1",
+              "rttMs": 500
+            }
+          ]
+        }
+      ],
+      "table": [
+        {
+          "destination": "peer_sQn0a8rXSE8r",
+          "nextHop": "peer_sQn0a8rXSE8r",
+          "path": [
+            "peer_qqT6zPdcGfZ1",
+            "peer_sQn0a8rXSE8r"
+          ],
+          "cost": 1
+        }
+      ],
+      "counters": {
+        "helloSent": 5,
+        "helloReceived": 4,
+        "lsaSent": 5,
+        "lsaReceived": 2,
+        "duplicates": 0,
+        "recomputations": 4,
+        "forwarded": 0,
+        "received": 1,
+        "dropped": 0,
+        "controlBytes": 3486
+      },
+      "convergence": {
+        "startedAt": 1330.1999998092651,
+        "lastChangeAt": 1616.5,
+        "before": [],
+        "after": [
+          {
+            "destination": "peer_sQn0a8rXSE8r",
+            "nextHop": "peer_sQn0a8rXSE8r",
+            "path": [
+              "peer_qqT6zPdcGfZ1",
+              "peer_sQn0a8rXSE8r"
+            ],
+            "cost": 1
+          }
+        ],
+        "settledAt": 2623.699999809265
+      }
+    },
+    {
+      "id": "peer_sQn0a8rXSE8r",
+      "observedAt": 133.90000009536743,
+      "strategy": "minimum-hops",
+      "digest": "[]",
+      "neighbors": [
+        {
+          "id": "peer_qqT6zPdcGfZ1",
+          "channelOpen": true,
+          "active": true,
+          "lastHello": 133.09999990463257,
+          "rttMs": 500
+        }
+      ],
+      "lsdb": [
+        {
+          "origin": "peer_sQn0a8rXSE8r",
+          "generation": 1,
+          "sequence": 2,
+          "receivedAt": 133.59999990463257,
+          "expiresAt": 18133.599999904633,
+          "neighbors": [
+            {
+              "id": "peer_qqT6zPdcGfZ1",
+              "rttMs": 500
+            }
+          ]
+        }
+      ],
+      "table": [],
+      "counters": {
+        "helloSent": 1,
+        "helloReceived": 1,
+        "lsaSent": 2,
+        "lsaReceived": 0,
+        "duplicates": 0,
+        "recomputations": 1,
+        "forwarded": 0,
+        "received": 0,
+        "dropped": 0,
+        "controlBytes": 478
+      },
+      "convergence": {
+        "startedAt": 76.69999980926514,
+        "lastChangeAt": 76.69999980926514,
+        "before": [],
+        "after": []
+      },
+      "receivedLocallyAt": 1617.7999997138977
+    }
+  ]
+}

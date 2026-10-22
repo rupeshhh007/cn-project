@@ -38,6 +38,7 @@ export type Props = {
   onInvitationOrigin: (origin: string) => void;
   onSelectPeer: (peerId: string) => void;
   onApprove: (requestId: string) => void;
+  onReject: (requestId: string) => void;
   onToggleEdge: (a: string, b: string) => void;
   onRouteStrategy: (strategy: RouteStrategy) => void;
   onMessage: (message: string) => void;
@@ -91,16 +92,17 @@ function DesktopRoom(props: Props) {
   }, [view]);
   const [inviteCopied, setInviteCopied] = useState(false);
   const [copyError, setCopyError] = useState("");
+  const [invitationOpen,setInvitationOpen]=useState(false);
   const orderedPeers = useMemo(() => [props.self, ...props.peers.filter((peer) => peer.id !== props.self.id)], [props.peers, props.self]);
   const pointByPeer = new Map(orderedPeers.map((peer, index) => [peer.id, positions[index % positions.length]]));
   const routeEdges = new Set((props.selectedRoute ?? []).slice(1).map((id, index) => canonicalEdge(props.selectedRoute![index], id)));
   const liveEdges = new Set(props.observedLinks.filter((link) => link.state === "direct").map((link) => canonicalEdge(link.a, link.b)));
   const reachable = new Set([props.self.id]);
-  for (let pass = 0; pass < orderedPeers.length; pass += 1) for (const edge of props.topologyEdges) {
-    if (liveEdges.has(canonicalEdge(edge.a, edge.b)) && (reachable.has(edge.a) || reachable.has(edge.b))) { reachable.add(edge.a); reachable.add(edge.b); }
+  for (let pass = 0; pass < orderedPeers.length; pass += 1) for (const edge of props.routingGraph) {
+    if (reachable.has(edge.a) || reachable.has(edge.b)) { reachable.add(edge.a); reachable.add(edge.b); }
   }
   const panelOpen = Boolean(props.selectedPeer) || view === "lab";
-  const showInvite = props.self.role === "host" && (orderedPeers.length === 1 || props.joinRequests.length > 0 || view === "lab");
+  const showInvite = props.self.role === "host" && (orderedPeers.length === 1 || props.joinRequests.length > 0 || invitationOpen);
 
   const chooseView = (next: View) => {
     setView(next);
@@ -112,12 +114,13 @@ function DesktopRoom(props: Props) {
     <header className="top-bar">
       <div className="wordmark"><strong>HOPNET</strong><i /><span>The Network You Can Touch</span></div>
       <Navigation active={view} onSelect={chooseView} />
+      {props.self.role === "host" && <button className="soft-button invitation-toggle" onClick={() => {setInvitationOpen(true);chooseView("space");}}>Room invitation{props.joinRequests.length ? ` (${props.joinRequests.length})` : ""}</button>}
       <button className={`status-orb ${props.coordinatorState}`} onClick={() => chooseView("lab")} aria-label={`Coordinator ${props.coordinatorState}`}><span /><span /></button>
     </header>
 
     {view === "space" ? <><motion.section className={`hero-command ${orderedPeers.length > 1 ? "compact" : ""}`} initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .65, ease: [0.16, 1, 0.3, 1] }}>
       <h1>Touch a device. See the route.</h1>
-      <p><i />{orderedPeers.filter((peer) => peer.id === props.self.id ? props.coordinatorState === "connected" : peer.coordinatorConnected).length} peers present <span /> {Object.values(props.links).filter((link) => link.state === "direct").length ? "Direct WebRTC" : "Awaiting a peer"}</p>
+      <p><i />{orderedPeers.length} admitted · {orderedPeers.filter((peer) => peer.id === props.self.id ? props.coordinatorState === "connected" : peer.coordinatorConnected).length} signaling connected <span /> {Object.values(props.links).filter((link) => link.state === "direct").length ? "Direct WebRTC" : "Awaiting a peer"}</p>
     </motion.section>
 
     <section ref={boardRef} className={`spatial-board ${panelOpen ? "with-panel" : ""}`} aria-label="Live network peers">
@@ -143,9 +146,9 @@ function DesktopRoom(props: Props) {
       {orderedPeers.length === 1 && <div className="room-ready"><span>Your room is ready.</span><p>Invite a physical device. It appears here after you approve it.</p></div>}
     </section>
 
-    <AnimatePresence mode="wait">
+    <div className="room-panel-layer">
       {showInvite ? <motion.aside key="room" className="room-panel glass-panel" initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }}>
-        <div className="panel-heading"><span>PRIVATE LAN ROOM</span></div>
+        <div className="panel-heading"><span>PRIVATE LAN ROOM</span><button aria-label="Close room invitation" onClick={() => setInvitationOpen(false)}>×</button></div>
         <img src={props.inviteQrUrl} alt="QR code to join this HOPNET room" />
         <strong>Bring another device into the space.</strong>
         {props.networkInfo?.interfaces.length ? <label className="invitation-origin">Invitation address<select aria-label="Invitation address" value={props.invitationOrigin} onChange={(event) => props.onInvitationOrigin(event.target.value)}>{props.networkInfo.interfaces.map((item) => <option key={item.id} value={item.origin}>{item.address} · {item.name}{item.recommended ? " · recommended" : ""}</option>)}</select></label> : null}
@@ -153,15 +156,17 @@ function DesktopRoom(props: Props) {
         {copyError && <p className="session-note" role="alert">{copyError}</p>}
         <NetworkDoctor {...props} />
         <TransferShelf compact transfers={props.transfers} peers={props.peers} self={props.self} onResponse={props.onTransferResponse} />
-        {props.joinRequests.map((request) => <div className="admission" key={request.requestId}><span>{request.displayName}<small>{request.deviceCategory} requests entry</small></span><button onClick={() => props.onApprove(request.requestId)}>Admit</button></div>)}
+        {props.joinRequests.map((request) => <div className="admission" key={request.requestId}><span>{request.displayName}<small>{request.deviceCategory} requests entry</small></span><button onClick={() => props.onApprove(request.requestId)}>Admit</button><button onClick={() => props.onReject(request.requestId)}>Reject</button></div>)}
         {orderedPeers.length > 1 && <Topology peers={orderedPeers} edges={props.topologyEdges} onToggle={props.onToggleEdge} />}
       </motion.aside> : props.selectedPeer ? <motion.aside key={props.selectedPeer.id} className="peer-inspector" initial={{ opacity: 0, x: 28, scale: .96 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 28 }} transition={{ type: "spring", stiffness: 340, damping: 30 }}>
-        <div className="inspector-top"><DeviceAsset category={props.selectedPeer.deviceCategory} /><div><h2>{props.selectedPeer.displayName}</h2><p><i />{props.selectedPeer.coordinatorConnected ? "Online" : "Offline"}</p></div><button aria-label="Close peer inspector" onClick={() => props.onSelectPeer("")}>×</button></div>
+        <div className="inspector-top"><DeviceAsset category={props.selectedPeer.deviceCategory} /><div><h2>{props.selectedPeer.displayName}</h2><p><i />{props.selectedPeer.coordinatorConnected ? "Signaling connected" : "Signaling disconnected"}</p></div><button aria-label="Close peer inspector" onClick={() => props.onSelectPeer("")}>×</button></div>
         <button className="inspector-action" onClick={() => chooseView("routing")}>Inspect distributed routing tables</button>
         <div className="inspector-section">
           <InfoRow icon="swap" label={props.selectedLink?.state === "direct" ? "Direct WebRTC" : props.selectedRoute ? `${props.selectedRoute.length - 1}-hop overlay` : "Route unavailable"} value={props.selectedLink?.state === "direct" ? props.selectedLink.candidateType ?? "Candidate selected" : props.selectedRoute ? "Established overlay links" : "No usable path"} />
-          <InfoRow icon="clock" label="Measured RTT" value={props.selectedLink?.state === "direct" && props.selectedLink.rttMs !== undefined ? `${props.selectedLink.rttMs} ms` : props.selectedRoute?.length === 2 ? "Run a ping" : "Not measured end-to-end"} />
+          <InfoRow icon="clock" label={props.selectedLink?.state === "direct" && performance.now()-(props.selectedLink.measuredAt ?? -Infinity)<30_000 ? "Measured RTT" : "RTT · historical or unmeasured"} value={props.selectedLink?.rttMs !== undefined ? `${props.selectedLink.rttMs} ms · last direct sample` : props.selectedRoute?.length === 2 ? "Run a ping" : "Not measured end-to-end"} />
           <InfoRow icon="pulse" label="Direct-link app bytes" value={props.selectedLink ? `${props.selectedLink.bytesSent} ↑  ${props.selectedLink.bytesReceived} ↓` : "0 ↑  0 ↓"} />
+          <InfoRow icon="route" label="Hello neighbor / destination" value={`${props.routerState?.neighbors.find((neighbor) => neighbor.id === props.selectedPeer?.id)?.active ? "Active" : "Not active"} / ${props.selectedRoute ? "Reachable" : "Unreachable"}`} />
+          <p className="session-note">Channel: {props.selectedLink?.channelState ?? "not established"}. Byte counters are recorded connection totals, not live throughput. Signaling and data connectivity are independent.</p>
         </div>
         <label className="policy-control">Path strategy<select value={props.routeStrategy} onChange={(event) => props.onRouteStrategy(event.target.value as RouteStrategy)}><option value="minimum-hops">Minimum hops</option><option value="lowest-latency">Lowest observed RTT</option><option value="adaptive">Adaptive resilience</option></select></label>
         {props.selectedRoute && <div className="route-chip">{props.selectedRoute.map((id) => orderedPeers.find((peer) => peer.id === id)?.displayName ?? "peer").join(" → ")}</div>}
@@ -173,11 +178,20 @@ function DesktopRoom(props: Props) {
         <button className="fallback-action" onClick={props.onFallback} disabled={!props.message.trim()}>Use explicit coordinator fallback</button>
         {props.selectedLink?.error && <p className="inline-error">{props.selectedLink.error}</p>}
       </motion.aside> : null}
-    </AnimatePresence></> : <section className="studio-workspace" aria-label={`${view} workspace`}>{view === "routing" ? <RoutingWorkspace {...props}/> : view === "send" ? <SendWorkspace {...props}/> : view === "lab" ? <LabWorkspace {...props}/> : <ReplayWorkspace events={props.events}/>}</section>}
+    </div></> : <section className="studio-workspace" aria-label={`${view} workspace`}>{view === "routing" ? <RoutingWorkspace {...props}/> : view === "send" ? <SendWorkspace {...props}/> : view === "lab" ? <LabWorkspace {...props}/> : <ReplayWorkspace events={props.events}/>}</section>}
 
     {view === "space" && <EventRibbon events={props.events} expanded={false} />}
     {props.error && <button className="error-toast" onClick={props.onClearError}>{props.error}</button>}
   </main>;
+}
+
+function MobileInvitation(props:Props) {
+  const [feedback,setFeedback]=useState("");
+  return <>
+    {props.networkInfo?.interfaces.length ? <label className="invitation-origin">Invitation address<select aria-label="Invitation address" value={props.invitationOrigin} onChange={(event) => props.onInvitationOrigin(event.target.value)}>{props.networkInfo.interfaces.map((item) => <option key={item.id} value={item.origin}>{item.address} · {item.name}</option>)}</select></label> : null}
+    <button className="soft-button" onClick={() => {if(!navigator.clipboard) {setFeedback("Clipboard unavailable. Scan the QR using trusted HTTPS.");return;} void navigator.clipboard.writeText(props.inviteUrl).then(() => setFeedback("Invitation copied")).catch(() => setFeedback("Clipboard unavailable. Scan the QR using trusted HTTPS."));}}>Copy invitation</button>
+    {feedback && <p role="status">{feedback}</p>}
+  </>;
 }
 
 function MobileRoom(props: Props) {
@@ -197,21 +211,23 @@ function MobileRoom(props: Props) {
   return <main className="hopnet-shell mobile-room">
     <Atmosphere />
     <header className="mobile-header"><div><strong>HOPNET</strong><span>The Network You Can Touch</span></div><div className="mobile-status"><span><i className="green"/>Coordinator {props.coordinatorState}</span><span><i/> {directCount ? "Direct WebRTC ready" : "Waiting for direct WebRTC"}</span></div></header>
+    {props.self.role === "host" && <button className="soft-button invitation-toggle" onClick={() => setTab("room")}>Room invitation{props.joinRequests.length ? ` (${props.joinRequests.length})` : ""}</button>}
 
     {tab === "room" && <>
       <section className="relay-hero"><div className="relay-symbol"><Icon name="route"/></div><div><h1>You’re part of the route.</h1><strong>Keep HOPNET open while relaying.</strong><p>Your phone can forward permitted messages and files between other peers.</p></div></section>
       <section className="mobile-peer-card mobile-room-list">
         <h2>Room participants</h2>
-        <p>{props.peers.filter((peer) => peer.coordinatorConnected || peer.id === props.self.id).length} peers present</p>
+        <p>{props.peers.length} admitted · {props.peers.filter((peer) => peer.id === props.self.id ? props.coordinatorState === "connected" : peer.coordinatorConnected).length} signaling connected</p>
         {props.peers.map((peer) => <div className="mobile-room-peer" key={peer.id}>
           <DeviceAsset category={peer.deviceCategory}/>
-          <div><strong>{peer.displayName}{peer.id === props.self.id ? " · you" : ""}</strong><small>{peer.id === props.self.id ? props.coordinatorState : peer.coordinatorConnected ? "Coordinator connected" : "Disconnected"}</small></div>
+          <div><strong>{peer.displayName}{peer.id === props.self.id ? " · you" : ""}</strong><small>{peer.id === props.self.id ? `Signaling ${props.coordinatorState}` : peer.coordinatorConnected ? "Signaling connected" : "Signaling disconnected · data plane independent"}</small></div>
           {peer.id !== props.self.id && <button onClick={() => { props.onSelectPeer(peer.id); setTab("messages"); }}>Open</button>}
         </div>)}
         {props.self.role === "host" && <div className="mobile-room-invite">
           <img src={props.inviteQrUrl} alt="QR code to join this HOPNET room"/>
           <small>Scan to request admission</small>
-          {props.joinRequests.map((request) => <button key={request.requestId} onClick={() => props.onApprove(request.requestId)}>Admit {request.displayName}</button>)}
+          <MobileInvitation {...props}/>
+          {props.joinRequests.map((request) => <div className="admission" key={request.requestId}><span>{request.displayName}</span><button onClick={() => props.onApprove(request.requestId)}>Admit</button><button onClick={() => props.onReject(request.requestId)}>Reject</button></div>)}
         </div>}
         <NetworkDoctor {...props}/>
         <button className="primary-button" onClick={() => setTab("lab")}>Open Resilience Lab</button>
@@ -222,7 +238,8 @@ function MobileRoom(props: Props) {
       {remotePeers.length ? <section className="mobile-peer-card">
         <div className="mobile-peer-head"><DeviceAsset category={props.selectedPeer?.deviceCategory ?? "other"}/><div><h2>{props.selectedPeer?.displayName}</h2><p><i />{props.selectedPeer?.coordinatorConnected ? "Coordinator connected" : "Signaling offline"}</p></div></div>
         <div className="mobile-route"><span /><b>{routeNames?.join(" → ") ?? "No data route available"}</b><span /></div>
-        <div className="mobile-measure"><div><small>DATA PLANE</small><strong>{props.selectedLink?.state === "direct" ? "Direct WebRTC" : props.selectedRoute ? `${props.selectedRoute.length - 1}-hop overlay` : "Unavailable"}</strong></div><div><small>MEASURED RTT</small><strong>{props.selectedLink?.state === "direct" && props.selectedLink.rttMs !== undefined ? `${props.selectedLink.rttMs} ms` : "Not measured"}</strong></div></div>
+        <div className="mobile-measure"><div><small>DATA PLANE</small><strong>{props.selectedLink?.state === "direct" ? "Direct WebRTC" : props.selectedRoute ? `${props.selectedRoute.length - 1}-hop overlay` : "Unavailable"}</strong></div><div><small>{props.selectedLink?.state === "direct" && performance.now()-(props.selectedLink.measuredAt ?? -Infinity)<30_000 ? "MEASURED RTT" : "LAST RTT · HISTORICAL"}</small><strong>{props.selectedLink?.rttMs !== undefined ? `${props.selectedLink.rttMs} ms` : "Not measured"}</strong></div></div>
+        <p className="session-note">Channel {props.selectedLink?.channelState ?? "not established"} · Hello neighbor {props.routerState?.neighbors.find((neighbor) => neighbor.id===props.selectedPeer?.id)?.active ? "active" : "not active"} · Destination {props.selectedRoute ? "reachable" : "unreachable"}</p>
         <div className="mobile-peer-actions"><button onClick={props.onPing} disabled={props.selectedLink?.state !== "direct"}>Ping over WebRTC</button><select aria-label="Selected peer" value={props.selectedPeer?.id} onChange={(event) => props.onSelectPeer(event.target.value)}>{remotePeers.map((peer) => <option key={peer.id} value={peer.id}>{peer.displayName}</option>)}</select></div>
         <FilePicker disabled={!props.selectedRoute || !secureFiles} onFile={props.onFile}/>
         {!secureFiles && <p className="secure-transfer-note mobile">Verified file transfer requires trusted HTTPS on this device. Ask the host for the HTTPS LAN address and install the trusted local CA certificate.</p>}

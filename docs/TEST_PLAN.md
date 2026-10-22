@@ -36,3 +36,7 @@ No screenshot or automated localhost test substitutes for this gate.
 - Continuous trace snapshots are disabled to avoid observer overhead; recorded protocol data and actual screenshots are saved under `docs/evidence/` and `docs/screenshots/`.
 
 The required automated commands are `npm run check`, `npm run test:e2e`, and `npm audit --audit-level=high`. A single-worker browser run is useful for reproducible timing. Parallel localhost browser timing is not a physical-device benchmark.
+
+# Session/reliability gate — 22 October 2026
+
+See `SESSION_RECOVERY_20261022.md` for A–O coverage, source-level root causes, per-tab capability/security semantics and failed-attempt disclosure. `tests/e2e/session-recovery.spec.ts` covers actual reload/RTC rebuild, authoritative host recovery, rejected/expired admission, clone rejection, signaling/data-plane separation, active-transfer interruption and repeated diamond restoration. The physical gate is `PHYSICAL_DEMO_GUIDE.md`; user-reported prior LAN observations are separate in `evidence/MANUAL_LAN_REPORTED.md`. Historical test descriptions above remain archived context, not new physical results.

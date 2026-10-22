@@ -47,3 +47,11 @@ This extension requires matching current HOPNET clients. It is not compatible wi
 - Explicit fallback is size-limited and visibly classified; it is never described as peer-to-peer.
 - Invitation QR origins are restricted to coordinator-discovered interfaces and never inferred from an untrusted `Host` header.
 - Network-discovery and QR responses are `no-store`; invitation secrets remain bearer capabilities and must be redacted from evidence.
+
+# Session recovery extension — 22 October 2026
+
+Authenticated POST `/api/rooms/:roomId/resume` accepts a UUID attemptId with the existing session Bearer capability, preserves membership and permitted edges, clears the ephemeral receipt key/link observations and rotates the peer generation. The same attempt is idempotent. A fresh runtime republishes a new key; no private key is persisted. GET `/session` validates existing identity. GET `/pending` and POST `/reject` require the host capability. The authenticated host socket receives `pending-requests` snapshots on connection/mutation; claim tokens are never in that snapshot. Join retry UUIDs deduplicate admission requests; pending/claim TTL is 15 minutes, with 20 pending and 20 rejected tombstones maximum.
+
+`Peer.generation`, control-packet generation, LSA observation generation and data-packet sourceGeneration/destinationGeneration distinguish authenticated reload incarnations from old packets. Omitted generations mean legacy zero; generations come from coordinator membership, not flooded reports. Old incarnations cannot revive an LSA watermark or complete/deliver a new-incarnation message. Endpoint restart fails pending messages/transfers honestly; relay restart can still use existing alternate-route recovery. **Reload every peer after upgrading**; do not mix protocol implementations in the presentation. Protocol version stays 1 with optional additive fields; this is not a promise that old clients understand recovery semantics.
+
+See `SESSION_RECOVERY_20261022.md` for the trust model, browser-storage limits and lifecycle. The existing networking/transfer contract above is preserved.

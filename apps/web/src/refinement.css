@@ -174,3 +174,18 @@ button:not(:disabled):active { filter: brightness(.97); }
   *, *::before, *::after { scroll-behavior: auto !important; }
   .spatial-device, .device-render, .primary-nav button { transition: none; }
 }
+/* Recovery is independent of the spatial canvas; never covers its controls. */
+.session-recovery:empty { display:none; }
+.session-recovery { position:relative;z-index:20;padding:10px 24px;background:#edf2ff;color:#26375e;font-size:13px;line-height:1.5; }
+.session-recovery button { margin-left:12px;border:1px solid #b7c8ed;border-radius:12px;padding:8px 12px;background:#fff;color:inherit; }
+.invitation-toggle { white-space:nowrap;min-height:40px; }
+.top-bar>.invitation-toggle { width:auto;flex:0 0 auto;padding:10px 14px; }
+.top-bar>.primary-nav { flex-shrink:0; }
+.top-bar>.wordmark { min-width:0; }
+@media(min-width:1101px) and (max-width:1500px) { .top-bar .wordmark span,.top-bar .wordmark i {display:none;} }
+.panel-heading button { margin-left:auto;background:transparent;border:0;font-size:24px;color:inherit;cursor:pointer; }
+.mobile-room-invite .invitation-origin { width:100%; }
+.admission { gap:8px; }
+.admission button { flex-shrink:0; }
+@media(max-width:1100px) and (min-width:681px) { .wordmark span,.wordmark i {display:none;} .top-bar {gap:10px;} }
+@media(max-width:680px) { .session-recovery {padding:10px 16px;} .mobile-room>.invitation-toggle {align-self:flex-start;margin:0 0 16px;} .mobile-room-invite {overflow-wrap:anywhere;} }

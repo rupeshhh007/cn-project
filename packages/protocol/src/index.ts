@@ -15,6 +15,7 @@ export const peerSchema = z.object({
   coordinatorConnected: z.boolean(),
   joinedAt: z.string().datetime(),
   receiptPublicKey: z.string().max(120).optional(),
+  generation: z.number().int().nonnegative().optional(),
 });
 export type Peer = z.infer<typeof peerSchema>;
 
@@ -68,6 +69,8 @@ export const clientSocketMessageSchema = z.discriminatedUnion("type", [
 export type ClientSocketMessage = z.infer<typeof clientSocketMessageSchema>;
 
 export const serverSocketMessageSchema = z.discriminatedUnion("type", [
+  z.object({ type:z.literal("pending-requests"),requests:z.array(z.object({ requestId:z.string(),displayName:z.string(),deviceCategory:deviceCategorySchema,expiresAt:z.number() })).max(20) }),
+  z.object({ type:z.literal("peer-restarted"),peer:peerSchema }),
   z.object({ type: z.literal("peer-key-updated"), peerId: z.string(), publicKey: z.string().max(120) }),
   z.object({ type: z.literal("room-snapshot"), selfPeerId: z.string(), peers: z.array(peerSchema), edges: z.array(topologyEdgeSchema), links: z.array(overlayLinkSchema) }),
   z.object({ type: z.literal("peer-joined"), peer: peerSchema }),
@@ -88,7 +91,7 @@ const forwardingEntrySchema = z.object({ destination: routerId, nextHop: routerI
 export const routerObservationSchema = z.object({
   id: routerId, observedAt: localTime, strategy: z.enum(["minimum-hops", "lowest-latency", "adaptive"]), digest: z.string().max(6000),
   neighbors: z.array(z.object({ id: routerId, channelOpen: z.boolean(), active: z.boolean(), lastHello: localTime, rttMs: z.number().finite().min(0).max(60_000) })).max(8),
-  lsdb: z.array(z.object({ origin: routerId, sequence: z.number().int().nonnegative(), receivedAt: localTime, expiresAt: localTime, neighbors: z.array(z.object({ id: routerId, rttMs: z.number().finite().min(0).max(60_000) })).max(8) })).max(8),
+  lsdb: z.array(z.object({ origin: routerId, generation:z.number().int().nonnegative().optional(), sequence: z.number().int().nonnegative(), receivedAt: localTime, expiresAt: localTime, neighbors: z.array(z.object({ id: routerId, rttMs: z.number().finite().min(0).max(60_000) })).max(8) })).max(8),
   table: z.array(forwardingEntrySchema).max(8),
   counters: z.object({ helloSent: localTime, helloReceived: localTime, lsaSent: localTime, lsaReceived: localTime, duplicates: localTime, recomputations: localTime, forwarded: localTime, received: localTime, dropped: localTime, controlBytes: localTime }),
   convergence: z.object({ startedAt: localTime, lastChangeAt: localTime, settledAt: localTime.optional(), agreementAt: localTime.optional(), before: z.array(forwardingEntrySchema).max(8), after: z.array(forwardingEntrySchema).max(8) }).nullable(),
@@ -96,13 +99,14 @@ export const routerObservationSchema = z.object({
 
 export const dataPacketSchema = z.discriminatedUnion("kind", [
   z.object({ protocolVersion: z.literal(1), kind: z.literal("router-control"),
-    type: z.enum(["hello", "hello-ack", "lsa", "report"]), origin: z.string().min(8).max(80),
+    type: z.enum(["hello", "hello-ack", "lsa", "report"]), origin: z.string().min(8).max(80), generation:z.number().int().nonnegative().optional(),
     sequence: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER), ttl: z.number().int().min(1).max(8),
     ageMs: z.number().min(0).max(30_000),
     neighbors: z.array(z.object({ id: z.string().min(8).max(80), rttMs: z.number().min(0).max(60_000) })).max(8).optional(),
     report: z.string().max(24_000).optional(),
   }),
   z.object({ protocolVersion: z.literal(1), kind: z.literal("router-data"),
+    sourceGeneration:z.number().int().nonnegative().optional(), destinationGeneration:z.number().int().nonnegative().optional(),
     packetId: z.string().uuid(), messageId: z.string().uuid(), source: z.string().min(8).max(80), destination: z.string().min(8).max(80),
     sequence: z.number().int().nonnegative(), ttl: z.number().int().min(1).max(8), trace: z.array(z.string().min(8).max(80)).min(1).max(8),
     purpose: z.enum(["message", "ack"]), body: z.string().max(8192),

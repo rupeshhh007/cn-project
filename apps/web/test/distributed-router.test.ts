@@ -19,6 +19,41 @@ function network() {
   return { routers, queue, delivered, events, statuses, flush, link, tick, advance: (ms:number) => { time += ms; }, now: () => time };
 }
 
+test("authoritative incarnation reset accepts a restarted LSA but rejects old high-sequence floods",() => {
+  let generation=0;
+  const router=new DistributedRouter({self:A,peers:()=>[A,B],generation:(id)=>id===B ? generation:0,now:()=>100,send:()=>{},update:()=>{},event:()=>{},deliver:()=>{}});
+  router.setLink(B,true);
+  const lsa:Extract<DataPacket,{kind:"router-control"}>={kind:"router-control",protocolVersion:1,type:"lsa",origin:B,generation:0,sequence:500,ttl:8,ageMs:0,neighbors:[{id:A,rttMs:1}]};
+  router.handle(B,lsa);assert.equal(router.snapshot().lsdb.find((row)=>row.origin===B)?.sequence,500);
+  generation=1;router.resetPeer(B);router.setLink(B,true);
+  router.handle(B,{...lsa,generation:1,sequence:1});
+  assert.equal(router.snapshot().lsdb.find((row)=>row.origin===B)?.sequence,1);
+  router.handle(B,{...lsa,sequence:501});
+  assert.equal(router.snapshot().lsdb.find((row)=>row.origin===B)?.sequence,1);
+  assert.ok(router.snapshot().counters.dropped>0);
+  router.dispose();
+});
+
+test("endpoint reload fails its pending messages; relay restart preserves alternate-route recovery",() => {
+  const n=network();for(const [a,b] of [[A,B],[A,C],[B,D],[C,D]]) n.link(a!,b!,true);n.tick();
+  const id=n.routers.get(A)!.sendMessage(D,"pending during relay restart");
+  n.queue.length=0;n.routers.get(A)!.resetPeer(B);n.link(B,D,false);n.tick(1500);
+  assert.deepEqual(n.statuses[A],[{id,status:"delivered"}]);
+  const second=n.routers.get(A)!.sendMessage(D,"endpoint restart is not silent replay");n.queue.length=0;
+  n.routers.get(A)!.resetPeer(D);n.tick(1500);
+  assert.deepEqual(n.statuses[A]![1],{id:second,status:"failed"});
+});
+
+test("a delayed datagram from before an endpoint reload cannot be delivered in the fresh incarnation",() => {
+  let generation=0,delivered=0;
+  const router=new DistributedRouter({self:B,peers:()=>[A,B],generation:(id)=>id===B ? generation:0,send:()=>{},update:()=>{},event:()=>{},deliver:()=>{delivered++;}});
+  router.setLink(A,true);
+  const packet:Extract<DataPacket,{kind:"router-data"}>={kind:"router-data",protocolVersion:1,packetId:crypto.randomUUID(),messageId:crypto.randomUUID(),source:A,destination:B,sourceGeneration:0,destinationGeneration:0,sequence:1,ttl:8,trace:[A],purpose:"message",body:"queued before reload"};
+  generation=1;router.handle(A,packet);assert.equal(delivered,0);
+  router.handle(A,{...packet,destinationGeneration:1});assert.equal(delivered,1);
+  router.dispose();
+});
+
 test("hello exchanges originate LSAs, flood a diamond, and independently compute all next hops", () => {
   const n = network();
   for (const [a,b] of [[A,B],[A,C],[B,D],[C,D]]) n.link(a!,b!,true);

@@ -13,6 +13,18 @@ async function waitFor(predicate: () => boolean, timeout = 5000) {
   }
 }
 
+test("endpoint restart interrupts an offer honestly, releases the sender slot and ignores late consent",async (t) => {
+  const n=pair();t.after(n.close);
+  const id=await n.sender.offer(new File(["reload"],"reload.txt"),"B");
+  n.sender.peerRestarted("unrelated-relay");assert.equal(n.views.get(`A:${id}`)?.status,"offered");
+  n.sender.peerRestarted("B");assert.equal(n.views.get(`A:${id}`)?.status,"failed");
+  assert.match(n.views.get(`A:${id}`)?.error ?? "",/refreshed or restarted/);
+  await n.receiver.respond(id,true);
+  assert.equal(n.views.get(`A:${id}`)?.status,"failed");
+  assert.equal(n.packets.some((packet)=>packet.kind==="transfer-chunk"),false);
+  await n.sender.offer(new File(["fresh offer"],"fresh.txt"),"B");
+});
+
 function pair(intercept?: (packet: TransferDataPacket) => boolean, identities?: Record<string, Awaited<ReturnType<typeof createReceiptIdentity>>>) {
   const views = new Map<string, TransferView>();
   const packets: TransferDataPacket[] = [];

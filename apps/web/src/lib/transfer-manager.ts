@@ -612,6 +612,16 @@ export class TransferManager {
     }
   }
 
+  peerRestarted(peerId:string):void {
+    for(const transfer of [...this.inbound.values(),...this.outbound.values()]) {
+      if(transfer.view.peerId!==peerId || terminal(transfer.view.status)) continue;
+      transfer.view={...transfer.view,status:"failed",error:"Peer refreshed or restarted. This transfer was interrupted; offer and accept a new transfer."};
+      if("accepted" in transfer) { transfer.accepted=false; transfer.assembler.discard(); }
+      else { transfer.chunks=undefined; transfer.sends.clear(); transfer.lastRoute.clear(); }
+      this.record(transfer.view,"peer-restarted"); this.emit(transfer.view);
+    }
+  }
+
   dispose(): void {
     this.disposed = true;
     clearInterval(this.cleanupTimer);
