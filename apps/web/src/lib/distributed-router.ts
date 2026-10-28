@@ -9,6 +9,12 @@ export type Advertisement = { origin: string; generation?:number; sequence: numb
 export type ForwardingEntry = { destination: string; nextHop: string; path: string[]; cost: number };
 export type RouterEvent = { type: string; detail: string; path?: string[]; packetId?: string; origin?: string };
 type PendingMessage = { packet: Datagram; sequences: Set<number>; attempts: number; deadline: number; retryAt: number };
+export type RoutePulse = {
+  id: string; destination: string; status: "pending" | "received" | "failed";
+  startedAt: number; completedAt?: number; roundTripMs?: number;
+  outboundPath?: string[]; returnPath?: string[]; error?: string; strategy: RouteStrategy;
+};
+type PendingPulse = { view: RoutePulse; sequence: number; firstHop: string };
 export type RouterSnapshot = {
   id: string; observedAt: number; strategy: RouteStrategy; digest: string;
   receivedLocallyAt?: number;
@@ -24,6 +30,7 @@ type Dependencies = {
   messageStatus?: (messageId: string, status: "delivered" | "failed") => void;
   now?: () => number;
   generation?: (id:string) => number;
+  pulse?: (result: RoutePulse) => void;
 };
 
 const HELLO_INTERVAL = 1000, DEAD_INTERVAL = 4500, REFRESH_INTERVAL = 6000, MAX_AGE = 18000;
@@ -42,6 +49,8 @@ export class DistributedRouter {
   private seen = new Map<string, number>();
   private pending = new Map<string, number>();
   private messages = new Map<string, PendingMessage>();
+  private activePulse?: PendingPulse;
+  private lastPulseAt = -Infinity;
   private usedMessageIds = new Set<string>();
   // Session-long tombstones are never evicted to make room for new deliveries.
   // Reject at capacity rather than redeliver an old ID after cache eviction.
@@ -70,6 +79,7 @@ export class DistributedRouter {
   start() { this.timer ??= setInterval(() => this.tick(), 250); }
   dispose() {
     this.disposed = true; clearInterval(this.timer); this.timer = undefined;
+    this.failPulse("This browser session ended; receipt unconfirmed.");
     for (const id of this.messages.keys()) this.dependencies.messageStatus?.(id,"failed");
     this.messages.clear(); this.usedMessageIds.clear(); this.deliveredMessages.clear(); this.seen.clear(); this.pending.clear();
   }
@@ -80,6 +90,7 @@ export class DistributedRouter {
       this.messages.delete(messageId); this.dependencies.messageStatus?.(messageId,"failed");
       this.event("message-failed",`${messageId}: receiver restarted; delivery is unconfirmed. Send a new message explicitly.`);
     }
+    if (this.activePulse?.view.destination === id) this.failPulse("Receiver restarted; send a new pulse after routes return.");
     this.originate(); this.publish();
   }
 
@@ -100,6 +111,7 @@ export class DistributedRouter {
   tick() {
     if (this.disposed) return;
     const now = this.now();
+    if (this.activePulse && now - this.activePulse.view.startedAt >= 8000) this.failPulse("No receiver receipt within 8 seconds. Delivery is unconfirmed; check the route and keep peers foregrounded.");
     for (const neighbor of this.neighbors.values()) {
       if (neighbor.active && now - neighbor.lastHello > DEAD_INTERVAL) {
         neighbor.active = false;
@@ -219,6 +231,36 @@ export class DistributedRouter {
     return messageId;
   }
 
+  sendPulse(destination: string): string {
+    if (this.disposed) throw new Error("This router is stopped.");
+    if (this.activePulse) throw new Error("A route pulse is already in flight.");
+    if (this.now() - this.lastPulseAt < 1000) throw new Error("Wait one second between route pulses.");
+    const route = this.table.find((row) => row.destination === destination);
+    if (!route || destination === this.dependencies.self || !this.dependencies.peers().includes(destination)) throw new Error("No established route to this peer.");
+    const id = createUuid(), sequence = ++this.helloSequence;
+    const view: RoutePulse = { id, destination, status: "pending", startedAt: this.now(), strategy: this.strategy };
+    this.activePulse = { view, sequence, firstHop: route.nextHop };
+    this.lastPulseAt = view.startedAt;
+    this.dependencies.pulse?.(structuredClone(view));
+    this.event("probe-sent", "On-demand route pulse; awaiting a receiver receipt.", [this.dependencies.self, route.nextHop]);
+    try {
+      this.forward({ kind: "router-data", protocolVersion: 1, packetId: createUuid(), messageId: id,
+        source: this.dependencies.self, destination, sourceGeneration: this.dependencies.generation?.(this.dependencies.self) ?? 0,
+        destinationGeneration: this.dependencies.generation?.(destination) ?? 0, sequence, ttl: 8,
+        trace: [this.dependencies.self], purpose: "probe", body: "" });
+    } catch { this.failPulse("The next-hop channel closed before transmission; receipt unconfirmed."); }
+    return id;
+  }
+
+  private failPulse(error: string) {
+    const pending = this.activePulse;
+    if (!pending) return;
+    this.activePulse = undefined;
+    const view: RoutePulse = { ...pending.view, status: "failed", completedAt: this.now(), error };
+    this.dependencies.pulse?.(view);
+    this.event("probe-failed", error);
+  }
+
   graph(): GraphEdge[] {
     const edges: GraphEdge[] = [], known = this.dependencies.peers();
     for (const lsa of this.database.values()) for (const n of lsa.neighbors) {
@@ -244,6 +286,34 @@ export class DistributedRouter {
     if (this.seen.size >= 4096) this.seen.delete(this.seen.keys().next().value!);
     this.seen.set(key, this.now() + 60000);
     const trace = [...packet.trace, this.dependencies.self];
+    if (packet.purpose === "probe" || packet.purpose === "probe-ack") {
+      if (packet.body !== "" || trace.length > 8 || trace.some((id) => !this.dependencies.peers().includes(id)) || packet.purpose === "probe" && packet.probePath !== undefined) { this.drop("Invalid route pulse payload", trace); return; }
+      if (packet.destination === this.dependencies.self) {
+        if (packet.purpose === "probe") {
+          this.event("probe-arrived", "Route pulse reached this receiver; returning its observed outward trail.", trace);
+          try { this.forward({ ...packet, packetId: createUuid(), source: this.dependencies.self, destination: packet.source,
+            sourceGeneration: packet.destinationGeneration, destinationGeneration: packet.sourceGeneration,
+            purpose: "probe-ack", probePath: trace, trace: [this.dependencies.self], ttl: 8 }); }
+          catch { this.drop("Route pulse arrived but no return route is established", trace); }
+        } else {
+          const pending = this.activePulse, outward = packet.probePath;
+          if (!pending || this.now() - pending.view.startedAt >= 8000 || pending.view.id !== packet.messageId || pending.sequence !== packet.sequence || pending.view.destination !== packet.source ||
+            !outward || outward.length < 2 || outward.length > 8 || outward[0] !== this.dependencies.self || outward[1] !== pending.firstHop || outward.at(-1) !== packet.source ||
+            new Set(outward).size !== outward.length || outward.some((id) => !this.dependencies.peers().includes(id))) {
+            this.drop("Unmatched, expired or invalid route pulse receipt", trace); return;
+          }
+          this.activePulse = undefined;
+          this.dependencies.pulse?.({ ...pending.view, status: "received", completedAt: this.now(), roundTripMs: Math.max(0, this.now() - pending.view.startedAt), outboundPath: [...outward], returnPath: trace });
+          this.event("probe-received", "Receiver-reported hop trail returned. RTT is sender-local and includes forwarding/browser scheduling.", outward);
+        }
+      } else if (packet.ttl <= 1 || trace.length >= 8) this.drop("Route pulse TTL exhausted", trace);
+      else {
+        try { this.forward({ ...packet, trace, ttl: packet.ttl - 1 }); this.counters.forwarded++; }
+        catch { this.drop("Route pulse has no usable next hop", trace); }
+      }
+      this.update();
+      return;
+    }
     if (packet.destination === this.dependencies.self) {
       if (packet.purpose === "ack") {
         const message = this.messages.get(packet.messageId);

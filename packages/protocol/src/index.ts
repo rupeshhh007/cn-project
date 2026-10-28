@@ -109,7 +109,8 @@ export const dataPacketSchema = z.discriminatedUnion("kind", [
     sourceGeneration:z.number().int().nonnegative().optional(), destinationGeneration:z.number().int().nonnegative().optional(),
     packetId: z.string().uuid(), messageId: z.string().uuid(), source: z.string().min(8).max(80), destination: z.string().min(8).max(80),
     sequence: z.number().int().nonnegative(), ttl: z.number().int().min(1).max(8), trace: z.array(z.string().min(8).max(80)).min(1).max(8),
-    purpose: z.enum(["message", "ack"]), body: z.string().max(8192),
+    purpose: z.enum(["message", "ack", "probe", "probe-ack"]), body: z.string().max(8192),
+    probePath: z.array(routerId).min(2).max(8).optional(),
   }),
   z.object({
     protocolVersion: z.literal(PROTOCOL_VERSION),

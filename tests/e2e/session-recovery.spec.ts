@@ -14,17 +14,28 @@ async function hostRoom(page:Page) {
 }
 async function request(page:Page,url:string,name:string) {
   await page.goto(url);await page.getByLabel("Device name").fill(name);await page.getByLabel("Device type").selectOption(/Phone|Android/.test(name) ? "phone":"laptop");await page.getByRole("button",{name:"Request to join"}).click();
+  await expect(page.getByRole("button",{name:"Waiting for host approval…"})).toBeDisabled();
 }
 async function admit(host:Page,page:Page,url:string,name:string) {
   await request(page,url,name);await host.getByRole("button",{name:"Admit",exact:true}).click();
   await expect(page.getByText("Direct WebRTC",{exact:true}).first()).toBeVisible({timeout:15000});
 }
 
-test("host reload recovers missed admission; mobile reload preserves identity and renegotiates actual RTC",async ({browser})=>{
+test("host reload recovers missed admission; mobile reload preserves identity and renegotiates actual RTC",async ({browser},testInfo)=>{
   test.setTimeout(60_000);
   const hc=await browser.newContext({viewport:{width:1440,height:900}}),pc=await browser.newContext({viewport:{width:390,height:844}});
+  const signalEvents:unknown[]=[];
+  const observe=(page:Page,side:string)=>page.on("websocket",(socket)=>{
+    const record=(direction:string,payload:string|Buffer)=>{
+      try {
+        const packet=JSON.parse(payload.toString());
+        signalEvents.push({side,direction,type:packet.type,source:packet.sourcePeerId,target:packet.targetPeerId,description:packet.signal?.description?.type,candidate:Boolean(packet.signal?.candidate),generation:packet.peer?.generation,error:packet.type==="error" ? packet.code:undefined});
+      } catch { /* Only bounded, redacted signal metadata is diagnostic evidence. */ }
+    };
+    socket.on("framesent",({payload})=>record("sent",payload));socket.on("framereceived",({payload})=>record("received",payload));
+  });
   try {
-    const host=await hc.newPage(),phone=await pc.newPage();const url=await hostRoom(host);const before=await stored(host);
+    const host=await hc.newPage(),phone=await pc.newPage();observe(host,"host");observe(phone,"phone");const url=await hostRoom(host);const before=await stored(host);
     await host.screenshot({path:screen("desktop-before"),mask:[host.getByRole("img",{name:"QR code to join this HOPNET room"})]});
     await request(phone,url,"Android Relay");
     await phone.reload();await expect(phone.getByRole("button",{name:"Waiting for host approval…"})).toBeDisabled();
@@ -77,7 +88,7 @@ test("host reload recovers missed admission; mobile reload preserves identity an
     await clone.addInitScript((session)=>sessionStorage.setItem("hopnet.tab-session.v1",JSON.stringify(session)),await stored(host));
     await clone.goto("/");await expect(clone.getByText(/This session is already open in another tab/)).toBeVisible();
     expect((await stored(host)).peerId).toBe(before.peerId);
-  } finally {await hc.close();await pc.close();}
+  } finally {await testInfo.attach("redacted-signaling-lifecycle.json",{body:JSON.stringify(signalEvents.slice(-500),null,2),contentType:"application/json"});await hc.close();await pc.close();}
 });
 
 test("signaling outage preserves live RTC; endpoint refresh during active file fails honestly",async ({browser})=>{
@@ -98,10 +109,16 @@ test("signaling outage preserves live RTC; endpoint refresh during active file f
     await expect(host.getByText("RTC survives signaling loss")).toBeAttached();
     await phone.reload();await expect(phone.getByText("Direct WebRTC",{exact:true}).first()).toBeVisible({timeout:15000});
     await expect(phone.locator(".mobile-status").getByText("Coordinator connected")).toBeVisible();
+    // Slow actual receiver processing so the reload is provably mid-transfer,
+    // not a race against an already verified localhost completion. No transport,
+    // hashing, signing, chunk data or receipt implementation is replaced.
+    const cpu=await pc.newCDPSession(phone);await cpu.send("Emulation.setCPUThrottlingRate",{rate:8});
     await host.getByLabel("Choose file to send").setInputFiles({name:"refresh-interruption.bin",mimeType:"application/octet-stream",buffer:Buffer.alloc(8*1024*1024,79)});
     await phone.getByRole("button",{name:"Accept refresh-interruption.bin"}).click();
     await expect.poll(async ()=>JSON.parse(await host.getByTestId("transfer-send").getByTestId("transfer-evidence").textContent() ?? "{}").acknowledgedChunks,{timeout:15000}).toBeGreaterThan(0);
+    const partial=JSON.parse(await host.getByTestId("transfer-send").getByTestId("transfer-evidence").textContent() ?? "{}");expect(partial.acknowledgedChunks).toBeLessThan(partial.totalChunks);
     await phone.reload();
+    await cpu.send("Emulation.setCPUThrottlingRate",{rate:1});
     await expect(host.getByTestId("transfer-send")).toHaveAttribute("data-status","failed",{timeout:15000});
     await expect(host.locator("span").filter({hasText:/^Peer refreshed or restarted/})).toBeVisible();
     await expect(phone.getByText("Direct WebRTC",{exact:true}).first()).toBeVisible({timeout:15000});

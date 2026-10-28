@@ -3,6 +3,7 @@ import type { Props } from "./RoomSurface.tsx";
 import { deviceAsset } from "../lib/device-assets.ts";
 import { exportFile } from "../lib/evidence.ts";
 import type { RouterSnapshot } from "../lib/distributed-router.ts";
+import { RoutePulsePanel } from "./RoutePulse.tsx";
 
 export function RoutingWorkspace(props: Props) {
   const [routerId, setRouterId] = useState(props.self.id);
@@ -19,6 +20,7 @@ export function RoutingWorkspace(props: Props) {
   };
   return <div className="routing-workspace">
     <header className="studio-heading"><span className="studio-eyebrow">HOPNET CN STUDIO · DISTRIBUTED CONTROL PLANE</span><h1>Every peer, a router.</h1><p>Hello → flood → learn → compute → forward. These tables are computed inside the browsers, not assigned by the coordinator.</p><div className="routing-exports"><button onClick={() => exportFile("hopnet-routers.json", JSON.stringify({ provenance: "RTC-FLOODED ROUTER OBSERVATIONS", observer: props.self.id, snapshots }, null, 2), "application/json")}>Export router evidence</button><button onClick={() => exportFile("hopnet-forwarding.csv", csv(), "text/csv")}>Export forwarding CSV</button></div></header>
+    <RoutePulsePanel {...props}/>
     <div className="routing-columns"><nav className="router-rail" aria-label="Router inspectors">{props.peers.map((peer) => {
       const report = snapshots.find((s) => s.id === peer.id);
       return <button key={peer.id} aria-pressed={routerId === peer.id} onClick={() => { setRouterId(peer.id); setDestination(""); }}><img src={deviceAsset(peer.deviceCategory).source} alt=""/><span>{peer.displayName}<small>{peer.id === props.self.id ? "This browser · local truth" : report ? "Received over the overlay" : "No fresh router report"}</small></span></button>;

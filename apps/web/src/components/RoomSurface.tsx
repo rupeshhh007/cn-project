@@ -10,10 +10,12 @@ import type { Experiment, ExperimentConfig, NetworkEvent } from "../lib/evidence
 import { Conversation, LabWorkspace, ReplayWorkspace, SendWorkspace } from "./Studio.tsx";
 import { deviceAsset } from "../lib/device-assets.ts";
 import { RoutingWorkspace } from "./RoutingWorkspace.tsx";
-import type { RouterSnapshot } from "../lib/distributed-router.ts";
+import type { RouterSnapshot, RoutePulse } from "../lib/distributed-router.ts";
 
 export type Props = {
   routerState?: RouterSnapshot;
+  pulses: RoutePulse[];
+  onPulse: (destination: string) => void;
   routerReports: RouterSnapshot[];
   routingGraph: GraphEdge[];
   self: Peer;
@@ -161,6 +163,7 @@ function DesktopRoom(props: Props) {
       </motion.aside> : props.selectedPeer ? <motion.aside key={props.selectedPeer.id} className="peer-inspector" initial={{ opacity: 0, x: 28, scale: .96 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 28 }} transition={{ type: "spring", stiffness: 340, damping: 30 }}>
         <div className="inspector-top"><DeviceAsset category={props.selectedPeer.deviceCategory} /><div><h2>{props.selectedPeer.displayName}</h2><p><i />{props.selectedPeer.coordinatorConnected ? "Signaling connected" : "Signaling disconnected"}</p></div><button aria-label="Close peer inspector" onClick={() => props.onSelectPeer("")}>×</button></div>
         <button className="inspector-action" onClick={() => chooseView("routing")}>Inspect distributed routing tables</button>
+        <button className="inspector-action" onClick={() => chooseView("routing")}><Icon name="pulse"/>Route Pulse · trace this peer</button>
         <div className="inspector-section">
           <InfoRow icon="swap" label={props.selectedLink?.state === "direct" ? "Direct WebRTC" : props.selectedRoute ? `${props.selectedRoute.length - 1}-hop overlay` : "Route unavailable"} value={props.selectedLink?.state === "direct" ? props.selectedLink.candidateType ?? "Candidate selected" : props.selectedRoute ? "Established overlay links" : "No usable path"} />
           <InfoRow icon="clock" label={props.selectedLink?.state === "direct" && performance.now()-(props.selectedLink.measuredAt ?? -Infinity)<30_000 ? "Measured RTT" : "RTT · historical or unmeasured"} value={props.selectedLink?.rttMs !== undefined ? `${props.selectedLink.rttMs} ms · last direct sample` : props.selectedRoute?.length === 2 ? "Run a ping" : "Not measured end-to-end"} />
@@ -241,6 +244,7 @@ function MobileRoom(props: Props) {
         <div className="mobile-measure"><div><small>DATA PLANE</small><strong>{props.selectedLink?.state === "direct" ? "Direct WebRTC" : props.selectedRoute ? `${props.selectedRoute.length - 1}-hop overlay` : "Unavailable"}</strong></div><div><small>{props.selectedLink?.state === "direct" && performance.now()-(props.selectedLink.measuredAt ?? -Infinity)<30_000 ? "MEASURED RTT" : "LAST RTT · HISTORICAL"}</small><strong>{props.selectedLink?.rttMs !== undefined ? `${props.selectedLink.rttMs} ms` : "Not measured"}</strong></div></div>
         <p className="session-note">Channel {props.selectedLink?.channelState ?? "not established"} · Hello neighbor {props.routerState?.neighbors.find((neighbor) => neighbor.id===props.selectedPeer?.id)?.active ? "active" : "not active"} · Destination {props.selectedRoute ? "reachable" : "unreachable"}</p>
         <div className="mobile-peer-actions"><button onClick={props.onPing} disabled={props.selectedLink?.state !== "direct"}>Ping over WebRTC</button><select aria-label="Selected peer" value={props.selectedPeer?.id} onChange={(event) => props.onSelectPeer(event.target.value)}>{remotePeers.map((peer) => <option key={peer.id} value={peer.id}>{peer.displayName}</option>)}</select></div>
+        <button className="soft-button" onClick={() => setTab("routing")}>Open Route Pulse</button>
         <FilePicker disabled={!props.selectedRoute || !secureFiles} onFile={props.onFile}/>
         {!secureFiles && <p className="secure-transfer-note mobile">Verified file transfer requires trusted HTTPS on this device. Ask the host for the HTTPS LAN address and install the trusted local CA certificate.</p>}
       </section> : <section className="mobile-peer-card mobile-invite">
@@ -328,7 +332,7 @@ function NetworkDoctor(props: Props) {
   const direct = Object.values(props.links).some((link) => link.state === "direct");
   const measured = Object.values(props.links).some((link) => link.rttMs !== undefined);
   const checks = [
-    { label: "LAN invitation", detail: new URL(props.invitationOrigin).host, ready: Boolean(props.networkInfo?.interfaces.length) },
+    { label: props.networkInfo?.mode === "hosted" ? "Hosted invitation" : "LAN invitation", detail: new URL(props.invitationOrigin).host, ready: Boolean(props.networkInfo?.preferredOrigin) },
     { label: "Coordinator", detail: props.coordinatorState, ready: props.coordinatorState === "connected" },
     { label: "Direct data channel", detail: direct ? "RTCDataChannel open" : "Needs a second device", ready: direct },
     { label: "Measured echo", detail: measured ? "Receiver response observed" : "Run a WebRTC ping", ready: measured },

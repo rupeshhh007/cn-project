@@ -1,3 +1,13 @@
+# HOPNET Route Pulse and deployment readiness — 2026-10-29
+
+Continues the preserved, already-pushed recovery checkpoint `19fcaf4` on `codex/hopnet-cn-studio`; PR #3 remains a draft targeting `feat/hopnet-lan`. Route Pulse adds bounded, on-demand RTC overlay probes with receiver-reported outward/return trails, sender-local RTT, actual path-change indication, data-plane Replay events and JSON export. Existing font, spatial assets, signed transfers, routing, Lab and Replay are preserved. See `ROUTE_PULSE.md` for protocol bounds, visual QA and failed-run disclosures.
+
+Final local verification: `npm run check` passed all **75 unit/integration tests**, TypeScript and production build; `npm run test:e2e -- --workers=1` passed **13**, with **one explicitly skipped public-host-only test** (4.6 minutes); `npm audit --audit-level=high` found **zero vulnerabilities**. Desktop 1440×900 and mobile 390×844 Route Pulse/Routing captures were opened and visually inspected. Browser plugin unavailable: existing Chrome/Playwright fallback was used. Recovery fault scheduling uses explicitly documented receiver CPU emulation and genuine RTC bytes/receipts; no physical speed or five-device result is inferred. One intermittent admission negotiation timeout did not recur in three diagnostic repeats or the final complete gate; physical browser suspension remains a risk.
+
+Public deployment configuration is prepared for the user's explicitly confirmed **My Workspace / free Render service**, with same-origin frontend/API/WSS, allow-listed public HTTPS invitations, bounded room creation and patched transitive URI dependencies. See `DEPLOYMENT.md` for the actual deployment record, live-only verification command and free-tier/LAN limits. A local pass is not public-deployment or physical-device proof. No merge is authorized.
+
+---
+
 # HOPNET physical-device reliability checkpoint — 2026-10-22
 
 Implemented from `852f105` on `codex/hopnet-cn-studio`, draft PR #3 targeting `feat/hopnet-lan`. Reload resumes the same authorized peer from per-tab capability storage, rotates its ephemeral signing/router incarnation, and rebuilds permitted RTC/Hello/LSA state without new admission. Host-only authoritative pending snapshots repair missed notifications; deduplicated/expiring requests support approve/reject and bounded waiting-screen recovery. Permanent desktop/mobile Room invitation controls preserve the original visual system. Signaling, channel, Hello neighbor, route and historical metrics are distinguished. Endpoint refresh honestly interrupts files/messages; relay reload and repeated logical fault/restore preserve alternate-route recovery. Panel transitions no longer strand pending admissions or retain duplicate interactive inspectors.

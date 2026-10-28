@@ -10,6 +10,7 @@ export type LanInterface = {
 };
 
 export type NetworkConfig = {
+  mode: "lan" | "hosted";
   protocol: "http" | "https";
   port: number;
   interfaces: LanInterface[];
@@ -54,8 +55,17 @@ export function createNetworkConfig(
   protocol: "http" | "https",
   port: number,
   interfaces = discoverLanInterfaces(protocol, port),
+  publicOrigin?: string,
 ): NetworkConfig {
+  if (publicOrigin) {
+    const url = new URL(publicOrigin);
+    if (url.protocol !== "https:" || url.username || url.password || url.pathname !== "/" || url.search || url.hash) throw new Error("Hosted HOPNET requires a trusted HTTPS origin without a path or credentials.");
+    // TLS terminates at the hosting proxy. Never publish its private interfaces
+    // or derive invitations from untrusted Host/Forwarded request headers.
+    return { mode: "hosted", protocol: "https", port: Number(url.port || 443), interfaces: [], preferredOrigin: url.origin, localOrigin: url.origin, secure: true };
+  }
   return {
+    mode: "lan",
     protocol,
     port,
     interfaces,
@@ -67,6 +77,7 @@ export function createNetworkConfig(
 
 export function selectPublicOrigin(config: NetworkConfig, requestedOrigin?: string): string | null {
   const allowed = new Set(config.interfaces.map((item) => item.origin));
+  if (config.mode === "hosted" && config.preferredOrigin) allowed.add(config.preferredOrigin);
   if (!requestedOrigin) return config.preferredOrigin;
   let normalized: string;
   try {

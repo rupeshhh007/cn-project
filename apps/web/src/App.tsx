@@ -8,7 +8,7 @@ import { RoomSurface } from "./components/RoomSurface.tsx";
 import type { Experiment, ExperimentConfig, NetworkEvent } from "./lib/evidence.ts";
 import { createReceiptIdentity, verifyTransferPacket } from "./lib/receipt-identity.ts";
 import { transferPaths } from "./lib/experiment-paths.ts";
-import { DistributedRouter, type RouterSnapshot } from "./lib/distributed-router.ts";
+import { DistributedRouter, type RouterSnapshot, type RoutePulse } from "./lib/distributed-router.ts";
 import {type Credentials,claimTabLease,readSession,saveSession,forgetSession,readAdmission,saveAdmission,clearAdmission,joinAttempt,type PendingAdmission} from "./lib/room-session.ts";
 
 export type ConversationMessage = { id: string; peerId: string; direction: "incoming" | "outgoing"; body: string; at: number; status: "sent" | "delivered" | "failed" };
@@ -16,6 +16,7 @@ export type ConversationMessage = { id: string; peerId: string; direction: "inco
 type JoinRequest = { requestId: string; displayName: string; deviceCategory: DeviceCategory; expiresAt?: number };
 type EventItem = NetworkEvent;
 export type NetworkInfo = {
+  mode?: "lan" | "hosted";
   protocol: "http" | "https";
   port: number;
   interfaces: Array<{ id: string; name: string; address: string; origin: string; kind: "private" | "link-local" | "other"; recommended: boolean }>;
@@ -42,6 +43,7 @@ function App() {
     clearAdmission(); setPendingAdmission(undefined); setJoinPending(false);
     peersRef.current=[];setPeers([]);setLinks({});setTopologyEdges([]);setObservedLinks([]);setRoutingGraph([]);setRouterReports([]);setConversations([]);setEvents([]);setTransfers([]);setExperiments([]);setFaultedEdges({});setJoinRequests([]);
     receiptIdentityRef.current=undefined;
+    setPulses([]);
     history.replaceState(null,"",location.pathname); setCredentials(value); setRecoveryState("ready");
   };
   const resumeSession=async (manual=false,isActive=()=>true) => {
@@ -74,6 +76,7 @@ function App() {
   const [routeStrategy, setRouteStrategy] = useState<RouteStrategy>("minimum-hops");
   const [routerState, setRouterState] = useState<RouterSnapshot>();
   const [routerReports, setRouterReports] = useState<RouterSnapshot[]>([]);
+  const [pulses, setPulses] = useState<RoutePulse[]>([]);
   const [routingGraph, setRoutingGraph] = useState<GraphEdge[]>([]);
   const routerRef = useRef<DistributedRouter | undefined>(undefined);
   const routerObservationRef = useRef<RouterSnapshot | undefined>(undefined);
@@ -182,10 +185,11 @@ function App() {
         setRoutingGraph(graphRef.current);
       },
       event: (event) => {
-        addEvent(event.type.replaceAll("-", " "), event.detail, "REAL", { type: event.type, path: event.path, routerId: credentials.peer.id, controlOrigin: event.origin, plane: event.type.startsWith("packet") || event.type.startsWith("message-") || event.type === "delivery-ack" ? "data" : "control" });
+        addEvent(event.type.replaceAll("-", " "), event.detail, "REAL", { type: event.type, path: event.path, routerId: credentials.peer.id, controlOrigin: event.origin, plane: event.type.startsWith("packet") || event.type.startsWith("message-") || event.type.startsWith("probe-") || event.type === "delivery-ack" ? "data" : "control" });
         if (event.type === "packet-forward" && event.path && event.path.length > 2) addEvent("Payload forwarded", "Distributed local forwarding-table decision", "REAL", { path: event.path });
       },
       messageStatus: (id, status) => setConversations((current) => current.map((item) => item.id === id && item.direction === "outgoing" && item.status === "sent" ? { ...item,status } : item)),
+      pulse: (result) => { if (!stopped) setPulses((current) => [result, ...current.filter((item) => item.id !== result.id)].slice(0, 6)); },
       deliver: (packet) => {
         const source = peersRef.current.find((peer) => peer.id === packet.source)?.displayName ?? "peer";
         if (packet.purpose === "message") {
@@ -448,6 +452,14 @@ function App() {
     try { managerRef.current?.ping(selectedPeer.id); addEvent("Direct ping sent", `RTCDataChannel → ${selectedPeer.displayName}`); } catch (cause) { setError(cause instanceof Error ? cause.message : "Ping failed"); }
   };
 
+  const sendPulse = (destination: string) => {
+    setError("");
+    try {
+      if (!routerRef.current) throw new Error("The local router is not ready.");
+      routerRef.current.sendPulse(destination);
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Route pulse could not start."); }
+  };
+
   const sendMessage = () => {
     if (!credentials || !selectedPeer || !message.trim()) return;
     try {
@@ -552,7 +564,7 @@ function App() {
 
   const inviteUrl = `${invitationOrigin}/?room=${encodeURIComponent(credentials.roomId)}&invite=${encodeURIComponent(credentials.inviteSecret)}`;
   const inviteQrUrl = `/api/rooms/${credentials.roomId}/qr?invite=${encodeURIComponent(credentials.inviteSecret)}&origin=${encodeURIComponent(invitationOrigin)}`;
-  return <>{recovery}<RoomSurface onReject={(id) => void reject(id)} routingGraph={routingGraph} routerState={routerState} routerReports={routerReports} self={credentials.peer} peers={peers} links={links} observedLinks={observedLinks} topologyEdges={topologyEdges} selectedPeer={selectedPeer} selectedLink={selectedLink} selectedRoute={selectedRoute} routeStrategy={routeStrategy} events={events} transfers={transfers} coordinatorState={coordinatorState} networkInfo={networkInfo} invitationOrigin={invitationOrigin} inviteUrl={inviteUrl} inviteQrUrl={inviteQrUrl} joinRequests={joinRequests} message={message} error={error} onInvitationOrigin={setInvitationOrigin} onSelectPeer={(id) => setSelectedPeerId(id)} onApprove={(id) => void approve(id)} onToggleEdge={toggleTopologyEdge} onRouteStrategy={setRouteStrategy} onMessage={setMessage} onSend={sendMessage} onFile={offerFile} onTransferResponse={respondToTransfer} onPing={ping} onFallback={relayFallback} onClearError={() => setError("")} conversations={conversations} experiments={experiments} onExperiment={startExperiment} onFault={faultRelay} onRestore={restoreRelay} restorablePeers={Object.keys(faultedEdges)} onCancelTransfer={cancelTransfer} /></>;
+  return <>{recovery}<RoomSurface pulses={pulses} onPulse={sendPulse} onReject={(id) => void reject(id)} routingGraph={routingGraph} routerState={routerState} routerReports={routerReports} self={credentials.peer} peers={peers} links={links} observedLinks={observedLinks} topologyEdges={topologyEdges} selectedPeer={selectedPeer} selectedLink={selectedLink} selectedRoute={selectedRoute} routeStrategy={routeStrategy} events={events} transfers={transfers} coordinatorState={coordinatorState} networkInfo={networkInfo} invitationOrigin={invitationOrigin} inviteUrl={inviteUrl} inviteQrUrl={inviteQrUrl} joinRequests={joinRequests} message={message} error={error} onInvitationOrigin={setInvitationOrigin} onSelectPeer={(id) => setSelectedPeerId(id)} onApprove={(id) => void approve(id)} onToggleEdge={toggleTopologyEdge} onRouteStrategy={setRouteStrategy} onMessage={setMessage} onSend={sendMessage} onFile={offerFile} onTransferResponse={respondToTransfer} onPing={ping} onFallback={relayFallback} onClearError={() => setError("")} conversations={conversations} experiments={experiments} onExperiment={startExperiment} onFault={faultRelay} onRestore={restoreRelay} restorablePeers={Object.keys(faultedEdges)} onCancelTransfer={cancelTransfer} /></>;
 }
 
 function isTransferPacket(packet: DataPacket): packet is TransferDataPacket {

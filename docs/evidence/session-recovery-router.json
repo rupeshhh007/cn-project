@@ -1,44 +1,44 @@
 {
   "provenance": "RTC-FLOODED ROUTER OBSERVATIONS",
-  "observer": "peer_qqT6zPdcGfZ1",
+  "observer": "peer_5XD5tssuNeJS",
   "snapshots": [
     {
-      "id": "peer_qqT6zPdcGfZ1",
-      "observedAt": 3875.699999809265,
+      "id": "peer_5XD5tssuNeJS",
+      "observedAt": 4673.099999904633,
       "strategy": "minimum-hops",
-      "digest": "[[\"peer_qqT6zPdcGfZ1\",\"peer_sQn0a8rXSE8r\",1]]",
+      "digest": "[[\"peer_5XD5tssuNeJS\",\"peer_bWNmEd-1yPzJ\",1]]",
       "neighbors": [
         {
-          "id": "peer_sQn0a8rXSE8r",
+          "id": "peer_bWNmEd-1yPzJ",
           "channelOpen": true,
           "active": true,
-          "lastHello": 2874.5999999046326,
-          "rttMs": 2.0999999046325684
+          "lastHello": 3922.4000000953674,
+          "rttMs": 1.5999999046325684
         }
       ],
       "lsdb": [
         {
-          "origin": "peer_qqT6zPdcGfZ1",
+          "origin": "peer_5XD5tssuNeJS",
           "generation": 1,
           "sequence": 5,
-          "receivedAt": 1608.2999997138977,
-          "expiresAt": 19608.299999713898,
+          "receivedAt": 1459.0999999046326,
+          "expiresAt": 19459.099999904633,
           "neighbors": [
             {
-              "id": "peer_sQn0a8rXSE8r",
+              "id": "peer_bWNmEd-1yPzJ",
               "rttMs": 500
             }
           ]
         },
         {
-          "origin": "peer_sQn0a8rXSE8r",
+          "origin": "peer_bWNmEd-1yPzJ",
           "generation": 1,
           "sequence": 2,
-          "receivedAt": 1615.5999999046326,
-          "expiresAt": 19615.400000095367,
+          "receivedAt": 1459.5,
+          "expiresAt": 19459.5,
           "neighbors": [
             {
-              "id": "peer_qqT6zPdcGfZ1",
+              "id": "peer_5XD5tssuNeJS",
               "rttMs": 500
             }
           ]
@@ -46,18 +46,18 @@
       ],
       "table": [
         {
-          "destination": "peer_sQn0a8rXSE8r",
-          "nextHop": "peer_sQn0a8rXSE8r",
+          "destination": "peer_bWNmEd-1yPzJ",
+          "nextHop": "peer_bWNmEd-1yPzJ",
           "path": [
-            "peer_qqT6zPdcGfZ1",
-            "peer_sQn0a8rXSE8r"
+            "peer_5XD5tssuNeJS",
+            "peer_bWNmEd-1yPzJ"
           ],
           "cost": 1
         }
       ],
       "counters": {
         "helloSent": 5,
-        "helloReceived": 4,
+        "helloReceived": 5,
         "lsaSent": 5,
         "lsaReceived": 2,
         "duplicates": 0,
@@ -65,75 +65,110 @@
         "forwarded": 0,
         "received": 1,
         "dropped": 0,
-        "controlBytes": 3486
+        "controlBytes": 5060
       },
       "convergence": {
-        "startedAt": 1330.1999998092651,
-        "lastChangeAt": 1616.5,
+        "startedAt": 1277.0999999046326,
+        "lastChangeAt": 1459.5,
         "before": [],
         "after": [
           {
-            "destination": "peer_sQn0a8rXSE8r",
-            "nextHop": "peer_sQn0a8rXSE8r",
+            "destination": "peer_bWNmEd-1yPzJ",
+            "nextHop": "peer_bWNmEd-1yPzJ",
             "path": [
-              "peer_qqT6zPdcGfZ1",
-              "peer_sQn0a8rXSE8r"
+              "peer_5XD5tssuNeJS",
+              "peer_bWNmEd-1yPzJ"
             ],
             "cost": 1
           }
         ],
-        "settledAt": 2623.699999809265
+        "settledAt": 2568.5999999046326
       }
     },
     {
-      "id": "peer_sQn0a8rXSE8r",
-      "observedAt": 133.90000009536743,
+      "id": "peer_bWNmEd-1yPzJ",
+      "observedAt": 3303.2000002861023,
       "strategy": "minimum-hops",
-      "digest": "[]",
+      "digest": "[[\"peer_5XD5tssuNeJS\",\"peer_bWNmEd-1yPzJ\",1]]",
       "neighbors": [
         {
-          "id": "peer_qqT6zPdcGfZ1",
+          "id": "peer_5XD5tssuNeJS",
           "channelOpen": true,
           "active": true,
-          "lastHello": 133.09999990463257,
-          "rttMs": 500
+          "lastHello": 2554.5,
+          "rttMs": 1.799999713897705
         }
       ],
       "lsdb": [
         {
-          "origin": "peer_sQn0a8rXSE8r",
+          "origin": "peer_bWNmEd-1yPzJ",
           "generation": 1,
           "sequence": 2,
-          "receivedAt": 133.59999990463257,
-          "expiresAt": 18133.599999904633,
+          "receivedAt": 89.30000019073486,
+          "expiresAt": 18089.300000190735,
           "neighbors": [
             {
-              "id": "peer_qqT6zPdcGfZ1",
+              "id": "peer_5XD5tssuNeJS",
+              "rttMs": 500
+            }
+          ]
+        },
+        {
+          "origin": "peer_5XD5tssuNeJS",
+          "generation": 1,
+          "sequence": 5,
+          "receivedAt": 91.2000002861023,
+          "expiresAt": 18091.200000286102,
+          "neighbors": [
+            {
+              "id": "peer_bWNmEd-1yPzJ",
               "rttMs": 500
             }
           ]
         }
       ],
-      "table": [],
+      "table": [
+        {
+          "destination": "peer_5XD5tssuNeJS",
+          "nextHop": "peer_5XD5tssuNeJS",
+          "path": [
+            "peer_bWNmEd-1yPzJ",
+            "peer_5XD5tssuNeJS"
+          ],
+          "cost": 1
+        }
+      ],
       "counters": {
-        "helloSent": 1,
-        "helloReceived": 1,
+        "helloSent": 4,
+        "helloReceived": 3,
         "lsaSent": 2,
-        "lsaReceived": 0,
+        "lsaReceived": 1,
         "duplicates": 0,
-        "recomputations": 1,
+        "recomputations": 2,
         "forwarded": 0,
-        "received": 0,
+        "received": 1,
         "dropped": 0,
-        "controlBytes": 478
+        "controlBytes": 2049
       },
       "convergence": {
-        "startedAt": 76.69999980926514,
-        "lastChangeAt": 76.69999980926514,
+        "startedAt": 51.30000019073486,
+        "lastChangeAt": 91.30000019073486,
+        "settledAt": 1302.5999999046326,
+        "agreementAt": 3303,
         "before": [],
-        "after": []
+        "after": [
+          {
+            "destination": "peer_5XD5tssuNeJS",
+            "nextHop": "peer_5XD5tssuNeJS",
+            "path": [
+              "peer_bWNmEd-1yPzJ",
+              "peer_5XD5tssuNeJS"
+            ],
+            "cost": 1
+          }
+        ]
       },
-      "receivedLocallyAt": 1617.7999997138977
+      "receivedLocallyAt": 4672.599999904633
     }
   ]
 }

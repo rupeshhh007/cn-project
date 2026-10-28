@@ -142,13 +142,20 @@ test("SEND conversations, Lab evidence exports, Replay controls and responsive v
     await edge("Studio Mac", "Studio Phone").click();
     await edge("Studio Mac B", "Studio Phone").click();
     await edge("Studio Phone B", "Studio Phone").click();
+    // Establish a provably interruptible trial instead of racing a completed
+    // localhost transfer. This slows real receiver processing, not RTC or ACKs.
+    await host.getByLabel("Failure relay").selectOption({ label: "Studio Mac B" });
+    await host.getByLabel("Experiment test file").setInputFiles({name:"hopnet-recovery-16MiB.bin",mimeType:"application/octet-stream",buffer:Buffer.alloc(16*1024*1024,65)});
+    const receiverCpu=await context.newCDPSession(peer);await receiverCpu.send("Emulation.setCPUThrottlingRate",{rate:8});
     await expect(host.getByRole("button", { name: "Start experiment", exact: true })).toBeEnabled({ timeout: 15_000 });
     await host.getByRole("button", { name: "Start experiment", exact: true }).click();
-    await peer.getByRole("button", { name: "Accept hopnet-repeatable-4MiB.bin" }).click();
-    const bulk = host.getByTestId("transfer-send").filter({ hasText: "hopnet-repeatable-4MiB.bin" });
+    await peer.getByRole("button", { name: "Accept hopnet-recovery-16MiB.bin" }).click();
+    const bulk = host.getByTestId("transfer-send").filter({ hasText: "hopnet-recovery-16MiB.bin" });
     await expect.poll(async () => JSON.parse(await bulk.getByTestId("transfer-evidence").textContent() ?? "{}").pathStats?.filter((item: { acknowledgedChunks: number }) => item.acknowledgedChunks > 0).length).toBe(2);
-    await host.getByLabel("Failure relay").selectOption({ label: "Studio Mac B" });
+    const partial=JSON.parse(await bulk.getByTestId("transfer-evidence").textContent() ?? "{}");expect(partial.acknowledgedChunks).toBeLessThan(partial.totalChunks);
     await host.getByRole("button", { name: "Disconnect relay links", exact: true }).click();
+    await expect.poll(async()=>JSON.parse(await bulk.getByTestId("transfer-evidence").textContent() ?? "{}").history?.some((event:{type:string})=>event.type==="path-unavailable")).toBe(true);
+    await receiverCpu.send("Emulation.setCPUThrottlingRate",{rate:1});
     await host.screenshot({ path: path.join(screenshots, "lab-active-recovery.png") });
     await expect(bulk).toHaveAttribute("data-status", "verified", { timeout: 45_000 });
     const recoveryDownload = host.waitForEvent("download");

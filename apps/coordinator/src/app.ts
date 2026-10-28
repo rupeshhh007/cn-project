@@ -97,7 +97,7 @@ function bearer(value: string | string[] | undefined): string | undefined {
   return value.slice(7);
 }
 
-export type BuildOptions = { serveWeb?: boolean; port?: number; networkInterfaces?: LanInterface[] };
+export type BuildOptions = { serveWeb?: boolean; port?: number; networkInterfaces?: LanInterface[]; publicOrigin?: string };
 
 export function requestLogFields(request: { method?: string; url?: string; ip?: string }) {
   return { method: request.method, url: request.url?.split("?")[0], remoteAddress: request.ip };
@@ -109,7 +109,7 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
   const https = certPath && keyPath ? { cert: fs.readFileSync(certPath), key: fs.readFileSync(keyPath) } : undefined;
   const protocol = https ? "https" : "http";
   const configuredPort = options.port ?? Number(process.env.PORT ?? 4173);
-  const network = createNetworkConfig(protocol, configuredPort, options.networkInterfaces ?? discoverLanInterfaces(protocol, configuredPort));
+  const network = createNetworkConfig(protocol, configuredPort, options.networkInterfaces ?? discoverLanInterfaces(protocol, configuredPort), options.publicOrigin ?? process.env.HOPNET_PUBLIC_ORIGIN ?? process.env.RENDER_EXTERNAL_URL);
   // Fastify's overloads cannot express a server that is selected between HTTP and
   // HTTPS at runtime. The returned API remains the common FastifyInstance surface.
   const app = Fastify({ logger: process.env.NODE_ENV === "test" ? false : { serializers: { req: requestLogFields } }, bodyLimit: 96 * 1024, ...(https ? { https } : {}) } as never) as unknown as FastifyInstance;
@@ -159,12 +159,13 @@ export async function buildApp(options: BuildOptions = {}): Promise<FastifyInsta
   app.get("/api/health", async () => ({ status: "ok", service: "hopnet-coordinator", rooms: rooms.size }));
   app.get("/api/network", async (_request, reply) => reply.header("cache-control", "no-store").send({
     ...network,
-    currentOriginHint: "Use the selected LAN origin on other devices; localhost is reachable only from this computer.",
+    currentOriginHint: network.mode === "hosted" ? "Public HTTPS coordinator. Use this same address on all peers; WebRTC still requires a reachable peer network." : "Use the selected LAN origin on other devices; localhost is reachable only from this computer.",
   }));
 
   app.post("/api/rooms", async (request, reply) => {
     const parsed = createRoomSchema.safeParse(request.body);
     if (!parsed.success) return reply.code(400).send({ error: "INVALID_REQUEST" });
+    if (rooms.size >= 128) return reply.code(503).send({ error: "ROOM_CAPACITY", message: "This classroom coordinator has reached its room limit. Retry later." });
     const roomId = id("room");
     const hostPeerId = id("peer");
     const session: Session = {

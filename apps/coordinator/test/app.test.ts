@@ -10,6 +10,18 @@ test("request logs exclude invitation and bearer-token query strings", () => {
   assert.doesNotMatch(JSON.stringify(fields), /private-session|private-invitation/);
 });
 
+test("a hosted coordinator advertises its trusted HTTPS URL and rejects attacker QR origins", async (t) => {
+  process.env.NODE_ENV="test";
+  const app=await buildApp({serveWeb:false,publicOrigin:"https://hopnet.example.com",networkInterfaces:normalizeLanInterfaces([{name:"docker0",address:"10.0.0.3"}],"http",10000)});
+  t.after(()=>app.close());
+  const info=(await app.inject({url:"/api/network",headers:{host:"attacker.invalid"}})).json();
+  assert.equal(info.mode,"hosted");assert.equal(info.secure,true);assert.deepEqual(info.interfaces,[]);assert.equal(info.preferredOrigin,"https://hopnet.example.com");
+  const room=(await app.inject({method:"POST",url:"/api/rooms",payload:{displayName:"Public host",deviceCategory:"laptop"}})).json();
+  const qr=await app.inject({url:`/api/rooms/${room.roomId}/qr?invite=${encodeURIComponent(room.inviteSecret)}`,headers:{host:"attacker.invalid"}});
+  assert.equal(qr.statusCode,200);assert.equal(qr.headers["x-hopnet-invitation-origin"],"https://hopnet.example.com");
+  assert.equal((await app.inject({url:`/api/rooms/${room.roomId}/qr?invite=${room.inviteSecret}&origin=https%3A%2F%2Fattacker.invalid`})).statusCode,400);
+});
+
 test("network discovery and QR invitations use an allow-listed LAN origin", async (t) => {
   process.env.NODE_ENV = "test";
   const networkInterfaces = normalizeLanInterfaces([{ name: "en0", address: "192.168.40.12" }], "http", 4173);

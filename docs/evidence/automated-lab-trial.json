@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-10-22T03:21:43.938Z",
+  "exportedAt": "2026-10-28T22:26:50.948Z",
   "results": [
     {
       "schemaVersion": 1,
@@ -8,14 +8,14 @@
         "preset": "direct-overlay",
         "mode": "direct",
         "strategy": "minimum-hops",
-        "peerId": "peer_o_yWc404Jqx5",
-        "id": "d1dbee36-066a-4aa3-ab0d-902ba9d642a2",
-        "createdAt": 12148.900000095367,
-        "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
+        "peerId": "peer_oHhZpOWm4Xp0",
+        "id": "2b60a2b6-b700-4e96-8d64-2b8e562d976f",
+        "createdAt": 7499.5,
+        "transferId": "47d0765b-0e69-4896-8492-0db05997d459",
         "result": {
-          "id": "20ef427d-fdf2-4d31-878c-d515158e43c9",
+          "id": "47d0765b-0e69-4896-8492-0db05997d459",
           "direction": "send",
-          "peerId": "peer_o_yWc404Jqx5",
+          "peerId": "peer_oHhZpOWm4Xp0",
           "fileName": "lab-proof.bin",
           "mime": "application/octet-stream",
           "size": 22,
@@ -25,73 +25,73 @@
           "acknowledgedBytes": 22,
           "paths": [
             [
-              "peer_XKU9yAnqJlqR",
-              "peer_o_yWc404Jqx5"
+              "peer_HW9WQJY6OeI8",
+              "peer_oHhZpOWm4Xp0"
             ]
           ],
           "recoveryCount": 0,
           "pathStats": [
             {
               "path": [
-                "peer_XKU9yAnqJlqR",
-                "peer_o_yWc404Jqx5"
+                "peer_HW9WQJY6OeI8",
+                "peer_oHhZpOWm4Xp0"
               ],
               "attemptedChunks": 1,
               "acknowledgedChunks": 1,
               "deliveredBytes": 22,
               "retries": 0,
               "failures": 0,
-              "rttMs": 10.700000286102295
+              "rttMs": 14.599999904632568
             }
           ],
           "history": [
             {
               "type": "offer",
-              "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
-              "at": 12184.200000286102,
+              "transferId": "47d0765b-0e69-4896-8492-0db05997d459",
+              "at": 7508.299999713898,
               "path": [
-                "peer_XKU9yAnqJlqR",
-                "peer_o_yWc404Jqx5"
+                "peer_HW9WQJY6OeI8",
+                "peer_oHhZpOWm4Xp0"
               ]
             },
             {
               "type": "accepted",
-              "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
-              "at": 13026.800000190735
+              "transferId": "47d0765b-0e69-4896-8492-0db05997d459",
+              "at": 8655.89999961853
             },
             {
               "type": "chunk-scheduled",
-              "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
-              "at": 13027.599999904633,
+              "transferId": "47d0765b-0e69-4896-8492-0db05997d459",
+              "at": 8656.199999809265,
               "path": [
-                "peer_XKU9yAnqJlqR",
-                "peer_o_yWc404Jqx5"
+                "peer_HW9WQJY6OeI8",
+                "peer_oHhZpOWm4Xp0"
               ],
               "chunkIndex": 0
             },
             {
               "type": "receiver-ack",
-              "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
-              "at": 13038.5,
+              "transferId": "47d0765b-0e69-4896-8492-0db05997d459",
+              "at": 8670.799999713898,
               "path": [
-                "peer_XKU9yAnqJlqR",
-                "peer_o_yWc404Jqx5"
+                "peer_HW9WQJY6OeI8",
+                "peer_oHhZpOWm4Xp0"
               ],
               "chunkIndex": 0
             },
             {
               "type": "verified",
-              "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
-              "at": 13041.300000190735,
+              "transferId": "47d0765b-0e69-4896-8492-0db05997d459",
+              "at": 8672.099999904633,
               "path": [
-                "peer_XKU9yAnqJlqR",
-                "peer_o_yWc404Jqx5"
+                "peer_HW9WQJY6OeI8",
+                "peer_oHhZpOWm4Xp0"
               ]
             }
           ],
-          "startedAt": 13026.800000190735,
+          "startedAt": 8655.89999961853,
           "verifiedHash": "bfdc6133033b107ec4b790cc70084cf9006d1c069edaeccffc278994d88fbac2",
-          "completedAt": 13041.300000190735
+          "completedAt": 8672.099999904633
         }
       },
       "status": "verified",
@@ -102,71 +102,71 @@
       "individuallyObservedChunkAcks": 1,
       "attempts": 1,
       "retries": 0,
-      "elapsedMs": 14.5,
-      "payloadBytesPerSecond": 1517.2413793103447,
+      "elapsedMs": 16.200000286102295,
+      "payloadBytesPerSecond": 1358.0246673744462,
       "failureDetectionMs": null,
       "recoveryMs": null,
       "observedAckGapMs": null,
-      "offeredAtMs": 12184.200000286102,
-      "acceptedAtMs": 13026.800000190735,
-      "completedAtMs": 13041.300000190735,
+      "offeredAtMs": 7508.299999713898,
+      "acceptedAtMs": 8655.89999961853,
+      "completedAtMs": 8672.099999904633,
       "verifiedHash": "bfdc6133033b107ec4b790cc70084cf9006d1c069edaeccffc278994d88fbac2",
       "pathStats": [
         {
           "path": [
-            "peer_XKU9yAnqJlqR",
-            "peer_o_yWc404Jqx5"
+            "peer_HW9WQJY6OeI8",
+            "peer_oHhZpOWm4Xp0"
           ],
           "attemptedChunks": 1,
           "acknowledgedChunks": 1,
           "deliveredBytes": 22,
           "retries": 0,
           "failures": 0,
-          "rttMs": 10.700000286102295
+          "rttMs": 14.599999904632568
         }
       ],
       "pathHistory": [
         {
           "type": "offer",
-          "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
-          "at": 12184.200000286102,
+          "transferId": "47d0765b-0e69-4896-8492-0db05997d459",
+          "at": 7508.299999713898,
           "path": [
-            "peer_XKU9yAnqJlqR",
-            "peer_o_yWc404Jqx5"
+            "peer_HW9WQJY6OeI8",
+            "peer_oHhZpOWm4Xp0"
           ]
         },
         {
           "type": "accepted",
-          "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
-          "at": 13026.800000190735
+          "transferId": "47d0765b-0e69-4896-8492-0db05997d459",
+          "at": 8655.89999961853
         },
         {
           "type": "chunk-scheduled",
-          "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
-          "at": 13027.599999904633,
+          "transferId": "47d0765b-0e69-4896-8492-0db05997d459",
+          "at": 8656.199999809265,
           "path": [
-            "peer_XKU9yAnqJlqR",
-            "peer_o_yWc404Jqx5"
+            "peer_HW9WQJY6OeI8",
+            "peer_oHhZpOWm4Xp0"
           ],
           "chunkIndex": 0
         },
         {
           "type": "receiver-ack",
-          "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
-          "at": 13038.5,
+          "transferId": "47d0765b-0e69-4896-8492-0db05997d459",
+          "at": 8670.799999713898,
           "path": [
-            "peer_XKU9yAnqJlqR",
-            "peer_o_yWc404Jqx5"
+            "peer_HW9WQJY6OeI8",
+            "peer_oHhZpOWm4Xp0"
           ],
           "chunkIndex": 0
         },
         {
           "type": "verified",
-          "transferId": "20ef427d-fdf2-4d31-878c-d515158e43c9",
-          "at": 13041.300000190735,
+          "transferId": "47d0765b-0e69-4896-8492-0db05997d459",
+          "at": 8672.099999904633,
           "path": [
-            "peer_XKU9yAnqJlqR",
-            "peer_o_yWc404Jqx5"
+            "peer_HW9WQJY6OeI8",
+            "peer_oHhZpOWm4Xp0"
           ]
         }
       ],
