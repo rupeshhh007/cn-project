@@ -38,9 +38,11 @@ test("live public HTTPS serves the app, authenticated signaling, WebRTC, signed 
     await host.getByRole("button",{name:"Send route pulse",exact:true}).click();
     const pulse=host.getByRole("region",{name:"Route Pulse",exact:true});await expect(pulse.getByText("Receipt returned",{exact:true})).toBeVisible();
     await expect(pulse.getByRole("list",{name:"Receiver-reported outward route"}).locator("li")).toHaveCount(2);
+    await host.locator(".routing-workspace img").evaluateAll(async (images)=>{await Promise.all(images.map((image)=>(image as HTMLImageElement).decode()));});
     await pulse.scrollIntoViewIfNeeded();await host.screenshot({path:"/tmp/hopnet-hosted-desktop.png",animations:"disabled"});
     await phone.getByRole("button",{name:"Routing",exact:true}).click();await phone.getByRole("button",{name:"Send route pulse",exact:true}).click();
     await expect(phone.getByRole("region",{name:"Route Pulse",exact:true}).getByText("Receipt returned",{exact:true})).toBeVisible();
+    await phone.locator(".routing-workspace img").evaluateAll(async (images)=>{await Promise.all(images.map((image)=>(image as HTMLImageElement).decode()));});
     await phone.screenshot({path:"/tmp/hopnet-hosted-mobile.png",animations:"disabled"});
     expect(errors).toEqual([]);
   } finally {await Promise.all(contexts.map((context)=>context.close()));}

@@ -2,6 +2,18 @@
 
 Deployment target authorized on 29 October 2026: one **free Render web service** in the user's confirmed **My Workspace**, source branch `codex/hopnet-cn-studio`. PR #3 remains a draft targeting `feat/hopnet-lan`; no merge into either feature base or main is required to deploy this branch.
 
+## Verified deployment record
+
+- Public application: **https://hopnet-cn-studio.onrender.com**
+- Dashboard: https://dashboard.render.com/web/srv-dbh7ent9el5s73d04bd0
+- Service: `srv-dbh7ent9el5s73d04bd0`; initial deployment: `dep-dbh7eol9el5s73d04d10`.
+- Deployed source: `9d23423f74879289a51c3327545c02da8a34b42a`; Render reported **live**. Subsequent documentation/test-only commits do not alter that running product build.
+- Plan: **free**, one instance, Singapore. Automatic deploys are **off** to preserve a stable presentation build; explicitly deploy future runtime changes through Render when ready. A deployment/restart clears in-memory rooms.
+- Live-only Chrome test passed against this exact public URL: HTTPS/health, secure browser context, hosted network metadata and QR origin, authentic admission and WSS signaling, native RTC message, consented signed file, independently SHA-256-matched downloaded bytes and Route Pulse in both directions. No browser console/page errors were observed. This is two automated browser contexts on one Mac, not physical Android or cross-network NAT acceptance.
+- Desktop 1440×900 and phone viewport 390×844 captures: `/tmp/hopnet-hosted-desktop.png`, `/tmp/hopnet-hosted-mobile.png`. Device artwork decode is awaited before final captures. Screenshots were visually opened for QA; packet timings are observations of this automated run, not a benchmark.
+
+Local gate before deployment: `npm run check` (**75** unit/integration tests plus type/build), full sequential browser suite (**13 passed**, one intentionally skipped public-only test, 4.6 minutes), and audit (**zero vulnerabilities**). The skipped public-only gate was then executed successfully against the live deployment. The existing non-fatal Vite bundle-size warning remains.
+
 ## What is hosted
 
 One Node service serves the built frontend, REST admission/session API, QR generation and authenticated WebSocket signaling. It is **not a static-only demo**. Messages, probes and files still use actual peer RTCDataChannels; hosting the coordinator does not simulate peers or turn relays into server-computed routes. A database, worker, paid compute plan and TURN server are not provisioned.
@@ -44,7 +56,7 @@ npm audit --audit-level=high
 An explicit public URL runs the live-only gate without launching or accidentally testing a localhost coordinator:
 
 ```bash
-HOPNET_TEST_URL=https://YOUR_DEPLOYED_HOST npm run test:e2e -- --workers=1 tests/e2e/hosted.spec.ts
+HOPNET_TEST_URL=https://hopnet-cn-studio.onrender.com npm run test:e2e -- --workers=1 tests/e2e/hosted.spec.ts
 ```
 
 This gate checks public HTTPS/network metadata/QR origin, authentic host admission and signaling, two actual RTC peers, delivered messaging, accepted signed transfer, independently hashed downloaded bytes and two-way Route Pulse. It captures `/tmp/hopnet-hosted-desktop.png` and `/tmp/hopnet-hosted-mobile.png`. Its two Chrome contexts are automated desktop/phone-sized views on one computer, **not a physical Android/Safari/four-device acceptance pass**. A live provider status or HTTP 200 alone is not this gate.
