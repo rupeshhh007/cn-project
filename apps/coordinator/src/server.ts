@@ -7,10 +7,10 @@ const app = await buildApp({ port });
 await app.listen({ port, host });
 
 const protocol = process.env.HOPNET_TLS_CERT && process.env.HOPNET_TLS_KEY ? "https" : "http";
-const network = createNetworkConfig(protocol, port, discoverLanInterfaces(protocol, port));
+const network = createNetworkConfig(protocol, port, discoverLanInterfaces(protocol, port), process.env.HOPNET_PUBLIC_ORIGIN ?? process.env.RENDER_EXTERNAL_URL);
 console.log("\nHOPNET coordinator is ready");
-console.log(`Local: ${protocol}://localhost:${port}`);
+console.log(network.mode === "hosted" ? `Public HTTPS: ${network.preferredOrigin}` : `Local: ${protocol}://localhost:${port}`);
 for (const item of network.interfaces) console.log(`${item.recommended ? "LAN*: " : "LAN:  "} ${item.origin}  (${item.name}, ${item.kind})`);
 if (!network.preferredOrigin) console.warn("No non-loopback IPv4 interface was detected. Connect Wi-Fi or a hotspot, then restart HOPNET.");
-if (protocol === "http") console.log("HTTP LAN mode is not a secure browser context. Use `npm run doctor` and trusted HTTPS before integrity-verified file transfer.");
+if (!network.secure) console.log("HTTP LAN mode is not a secure browser context. Use `npm run doctor` and trusted HTTPS before integrity-verified file transfer.");
 console.log("Preflight: npm run doctor");

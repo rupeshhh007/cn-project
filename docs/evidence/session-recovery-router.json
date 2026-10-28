@@ -1,0 +1,174 @@
+{
+  "provenance": "RTC-FLOODED ROUTER OBSERVATIONS",
+  "observer": "peer_5XD5tssuNeJS",
+  "snapshots": [
+    {
+      "id": "peer_5XD5tssuNeJS",
+      "observedAt": 4673.099999904633,
+      "strategy": "minimum-hops",
+      "digest": "[[\"peer_5XD5tssuNeJS\",\"peer_bWNmEd-1yPzJ\",1]]",
+      "neighbors": [
+        {
+          "id": "peer_bWNmEd-1yPzJ",
+          "channelOpen": true,
+          "active": true,
+          "lastHello": 3922.4000000953674,
+          "rttMs": 1.5999999046325684
+        }
+      ],
+      "lsdb": [
+        {
+          "origin": "peer_5XD5tssuNeJS",
+          "generation": 1,
+          "sequence": 5,
+          "receivedAt": 1459.0999999046326,
+          "expiresAt": 19459.099999904633,
+          "neighbors": [
+            {
+              "id": "peer_bWNmEd-1yPzJ",
+              "rttMs": 500
+            }
+          ]
+        },
+        {
+          "origin": "peer_bWNmEd-1yPzJ",
+          "generation": 1,
+          "sequence": 2,
+          "receivedAt": 1459.5,
+          "expiresAt": 19459.5,
+          "neighbors": [
+            {
+              "id": "peer_5XD5tssuNeJS",
+              "rttMs": 500
+            }
+          ]
+        }
+      ],
+      "table": [
+        {
+          "destination": "peer_bWNmEd-1yPzJ",
+          "nextHop": "peer_bWNmEd-1yPzJ",
+          "path": [
+            "peer_5XD5tssuNeJS",
+            "peer_bWNmEd-1yPzJ"
+          ],
+          "cost": 1
+        }
+      ],
+      "counters": {
+        "helloSent": 5,
+        "helloReceived": 5,
+        "lsaSent": 5,
+        "lsaReceived": 2,
+        "duplicates": 0,
+        "recomputations": 4,
+        "forwarded": 0,
+        "received": 1,
+        "dropped": 0,
+        "controlBytes": 5060
+      },
+      "convergence": {
+        "startedAt": 1277.0999999046326,
+        "lastChangeAt": 1459.5,
+        "before": [],
+        "after": [
+          {
+            "destination": "peer_bWNmEd-1yPzJ",
+            "nextHop": "peer_bWNmEd-1yPzJ",
+            "path": [
+              "peer_5XD5tssuNeJS",
+              "peer_bWNmEd-1yPzJ"
+            ],
+            "cost": 1
+          }
+        ],
+        "settledAt": 2568.5999999046326
+      }
+    },
+    {
+      "id": "peer_bWNmEd-1yPzJ",
+      "observedAt": 3303.2000002861023,
+      "strategy": "minimum-hops",
+      "digest": "[[\"peer_5XD5tssuNeJS\",\"peer_bWNmEd-1yPzJ\",1]]",
+      "neighbors": [
+        {
+          "id": "peer_5XD5tssuNeJS",
+          "channelOpen": true,
+          "active": true,
+          "lastHello": 2554.5,
+          "rttMs": 1.799999713897705
+        }
+      ],
+      "lsdb": [
+        {
+          "origin": "peer_bWNmEd-1yPzJ",
+          "generation": 1,
+          "sequence": 2,
+          "receivedAt": 89.30000019073486,
+          "expiresAt": 18089.300000190735,
+          "neighbors": [
+            {
+              "id": "peer_5XD5tssuNeJS",
+              "rttMs": 500
+            }
+          ]
+        },
+        {
+          "origin": "peer_5XD5tssuNeJS",
+          "generation": 1,
+          "sequence": 5,
+          "receivedAt": 91.2000002861023,
+          "expiresAt": 18091.200000286102,
+          "neighbors": [
+            {
+              "id": "peer_bWNmEd-1yPzJ",
+              "rttMs": 500
+            }
+          ]
+        }
+      ],
+      "table": [
+        {
+          "destination": "peer_5XD5tssuNeJS",
+          "nextHop": "peer_5XD5tssuNeJS",
+          "path": [
+            "peer_bWNmEd-1yPzJ",
+            "peer_5XD5tssuNeJS"
+          ],
+          "cost": 1
+        }
+      ],
+      "counters": {
+        "helloSent": 4,
+        "helloReceived": 3,
+        "lsaSent": 2,
+        "lsaReceived": 1,
+        "duplicates": 0,
+        "recomputations": 2,
+        "forwarded": 0,
+        "received": 1,
+        "dropped": 0,
+        "controlBytes": 2049
+      },
+      "convergence": {
+        "startedAt": 51.30000019073486,
+        "lastChangeAt": 91.30000019073486,
+        "settledAt": 1302.5999999046326,
+        "agreementAt": 3303,
+        "before": [],
+        "after": [
+          {
+            "destination": "peer_5XD5tssuNeJS",
+            "nextHop": "peer_5XD5tssuNeJS",
+            "path": [
+              "peer_bWNmEd-1yPzJ",
+              "peer_5XD5tssuNeJS"
+            ],
+            "cost": 1
+          }
+        ]
+      },
+      "receivedLocallyAt": 4672.599999904633
+    }
+  ]
+}

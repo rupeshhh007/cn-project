@@ -1,0 +1,2226 @@
+{
+  "provenance": "AUTOMATED CHROME WEBRTC — NOT PHYSICAL DEVICES",
+  "before": {
+    "provenance": "RTC-FLOODED ROUTER OBSERVATIONS",
+    "observer": "peer_qy7zn2HtcQpm",
+    "snapshots": [
+      {
+        "id": "peer_qy7zn2HtcQpm",
+        "observedAt": 12486.900000095367,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_eS6hd5dnBX-W\",\"peer_kxHYoUjQKNDf\",1],[\"peer_eS6hd5dnBX-W\",\"peer_sIYOcNBSX59s\",1],[\"peer_kxHYoUjQKNDf\",\"peer_qy7zn2HtcQpm\",1],[\"peer_qy7zn2HtcQpm\",\"peer_sIYOcNBSX59s\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_sIYOcNBSX59s",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 12142.799999713898,
+            "rttMs": 3.5999999046325684
+          },
+          {
+            "id": "peer_kxHYoUjQKNDf",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 12112.099999904633,
+            "rttMs": 3.5999999046325684
+          },
+          {
+            "id": "peer_eS6hd5dnBX-W",
+            "channelOpen": false,
+            "active": false,
+            "lastHello": 8245,
+            "rttMs": 8.800000190734863
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_qy7zn2HtcQpm",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 8322.299999713898,
+            "expiresAt": 26322.299999713898,
+            "neighbors": [
+              {
+                "id": "peer_kxHYoUjQKNDf",
+                "rttMs": 9
+              },
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 9
+              }
+            ]
+          },
+          {
+            "origin": "peer_sIYOcNBSX59s",
+            "generation": 0,
+            "sequence": 3,
+            "receivedAt": 8498.900000095367,
+            "expiresAt": 26498.599999904633,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 4
+              }
+            ]
+          },
+          {
+            "origin": "peer_kxHYoUjQKNDf",
+            "generation": 0,
+            "sequence": 3,
+            "receivedAt": 8820,
+            "expiresAt": 26819.799999713898,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 5
+              }
+            ]
+          },
+          {
+            "origin": "peer_eS6hd5dnBX-W",
+            "generation": 0,
+            "sequence": 6,
+            "receivedAt": 8837.099999904633,
+            "expiresAt": 26836.300000190735,
+            "neighbors": [
+              {
+                "id": "peer_kxHYoUjQKNDf",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 31
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_sIYOcNBSX59s",
+            "nextHop": "peer_sIYOcNBSX59s",
+            "path": [
+              "peer_qy7zn2HtcQpm",
+              "peer_sIYOcNBSX59s"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_kxHYoUjQKNDf",
+            "nextHop": "peer_kxHYoUjQKNDf",
+            "path": [
+              "peer_qy7zn2HtcQpm",
+              "peer_kxHYoUjQKNDf"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_eS6hd5dnBX-W",
+            "nextHop": "peer_kxHYoUjQKNDf",
+            "path": [
+              "peer_qy7zn2HtcQpm",
+              "peer_kxHYoUjQKNDf",
+              "peer_eS6hd5dnBX-W"
+            ],
+            "cost": 2
+          }
+        ],
+        "counters": {
+          "helloSent": 19,
+          "helloReceived": 19,
+          "lsaSent": 5,
+          "lsaReceived": 7,
+          "duplicates": 3,
+          "recomputations": 7,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 75241
+        },
+        "convergence": {
+          "startedAt": 7655.299999713898,
+          "lastChangeAt": 8837.400000095367,
+          "before": [
+            {
+              "destination": "peer_sIYOcNBSX59s",
+              "nextHop": "peer_sIYOcNBSX59s",
+              "path": [
+                "peer_qy7zn2HtcQpm",
+                "peer_sIYOcNBSX59s"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_kxHYoUjQKNDf",
+              "nextHop": "peer_kxHYoUjQKNDf",
+              "path": [
+                "peer_qy7zn2HtcQpm",
+                "peer_kxHYoUjQKNDf"
+              ],
+              "cost": 1
+            }
+          ],
+          "after": [
+            {
+              "destination": "peer_sIYOcNBSX59s",
+              "nextHop": "peer_sIYOcNBSX59s",
+              "path": [
+                "peer_qy7zn2HtcQpm",
+                "peer_sIYOcNBSX59s"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_kxHYoUjQKNDf",
+              "nextHop": "peer_kxHYoUjQKNDf",
+              "path": [
+                "peer_qy7zn2HtcQpm",
+                "peer_kxHYoUjQKNDf"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_eS6hd5dnBX-W",
+              "nextHop": "peer_kxHYoUjQKNDf",
+              "path": [
+                "peer_qy7zn2HtcQpm",
+                "peer_kxHYoUjQKNDf",
+                "peer_eS6hd5dnBX-W"
+              ],
+              "cost": 2
+            }
+          ],
+          "settledAt": 9985.900000095367,
+          "agreementAt": 11987.400000095367
+        }
+      },
+      {
+        "id": "peer_sIYOcNBSX59s",
+        "observedAt": 10996.5,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_eS6hd5dnBX-W\",\"peer_kxHYoUjQKNDf\",1],[\"peer_eS6hd5dnBX-W\",\"peer_sIYOcNBSX59s\",1],[\"peer_kxHYoUjQKNDf\",\"peer_qy7zn2HtcQpm\",1],[\"peer_qy7zn2HtcQpm\",\"peer_sIYOcNBSX59s\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_qy7zn2HtcQpm",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 10250.300000190735,
+            "rttMs": 5.400000095367432
+          },
+          {
+            "id": "peer_eS6hd5dnBX-W",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 10468.10000038147,
+            "rttMs": 5.300000190734863
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_sIYOcNBSX59s",
+            "generation": 0,
+            "sequence": 3,
+            "receivedAt": 7842.400000095367,
+            "expiresAt": 25842.400000095367,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 4
+              }
+            ]
+          },
+          {
+            "origin": "peer_qy7zn2HtcQpm",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 7677.300000190735,
+            "expiresAt": 25676,
+            "neighbors": [
+              {
+                "id": "peer_kxHYoUjQKNDf",
+                "rttMs": 9
+              },
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 9
+              }
+            ]
+          },
+          {
+            "origin": "peer_kxHYoUjQKNDf",
+            "generation": 0,
+            "sequence": 3,
+            "receivedAt": 8185.800000190735,
+            "expiresAt": 26185.599999904633,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 5
+              }
+            ]
+          },
+          {
+            "origin": "peer_eS6hd5dnBX-W",
+            "generation": 0,
+            "sequence": 6,
+            "receivedAt": 8169.5,
+            "expiresAt": 26168.700000286102,
+            "neighbors": [
+              {
+                "id": "peer_kxHYoUjQKNDf",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 31
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_qy7zn2HtcQpm",
+            "nextHop": "peer_qy7zn2HtcQpm",
+            "path": [
+              "peer_sIYOcNBSX59s",
+              "peer_qy7zn2HtcQpm"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_kxHYoUjQKNDf",
+            "nextHop": "peer_eS6hd5dnBX-W",
+            "path": [
+              "peer_sIYOcNBSX59s",
+              "peer_eS6hd5dnBX-W",
+              "peer_kxHYoUjQKNDf"
+            ],
+            "cost": 2
+          },
+          {
+            "destination": "peer_eS6hd5dnBX-W",
+            "nextHop": "peer_eS6hd5dnBX-W",
+            "path": [
+              "peer_sIYOcNBSX59s",
+              "peer_eS6hd5dnBX-W"
+            ],
+            "cost": 1
+          }
+        ],
+        "counters": {
+          "helloSent": 11,
+          "helloReceived": 14,
+          "lsaSent": 3,
+          "lsaReceived": 9,
+          "duplicates": 4,
+          "recomputations": 7,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 33724
+        },
+        "convergence": {
+          "startedAt": 7014,
+          "lastChangeAt": 8186.10000038147,
+          "settledAt": 9245.200000286102,
+          "before": [
+            {
+              "destination": "peer_qy7zn2HtcQpm",
+              "nextHop": "peer_qy7zn2HtcQpm",
+              "path": [
+                "peer_sIYOcNBSX59s",
+                "peer_qy7zn2HtcQpm"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_kxHYoUjQKNDf",
+              "nextHop": "peer_qy7zn2HtcQpm",
+              "path": [
+                "peer_sIYOcNBSX59s",
+                "peer_qy7zn2HtcQpm",
+                "peer_kxHYoUjQKNDf"
+              ],
+              "cost": 2
+            }
+          ],
+          "after": [
+            {
+              "destination": "peer_qy7zn2HtcQpm",
+              "nextHop": "peer_qy7zn2HtcQpm",
+              "path": [
+                "peer_sIYOcNBSX59s",
+                "peer_qy7zn2HtcQpm"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_kxHYoUjQKNDf",
+              "nextHop": "peer_eS6hd5dnBX-W",
+              "path": [
+                "peer_sIYOcNBSX59s",
+                "peer_eS6hd5dnBX-W",
+                "peer_kxHYoUjQKNDf"
+              ],
+              "cost": 2
+            },
+            {
+              "destination": "peer_eS6hd5dnBX-W",
+              "nextHop": "peer_eS6hd5dnBX-W",
+              "path": [
+                "peer_sIYOcNBSX59s",
+                "peer_eS6hd5dnBX-W"
+              ],
+              "cost": 1
+            }
+          ]
+        },
+        "receivedLocallyAt": 11647.299999713898
+      },
+      {
+        "id": "peer_kxHYoUjQKNDf",
+        "observedAt": 8632.5,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_eS6hd5dnBX-W\",\"peer_kxHYoUjQKNDf\",1],[\"peer_eS6hd5dnBX-W\",\"peer_sIYOcNBSX59s\",1],[\"peer_kxHYoUjQKNDf\",\"peer_qy7zn2HtcQpm\",1],[\"peer_qy7zn2HtcQpm\",\"peer_sIYOcNBSX59s\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_qy7zn2HtcQpm",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 8519.599999904633,
+            "rttMs": 6.800000190734863
+          },
+          {
+            "id": "peer_eS6hd5dnBX-W",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 7898.900000095367,
+            "rttMs": 6.799999713897705
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_kxHYoUjQKNDf",
+            "generation": 0,
+            "sequence": 3,
+            "receivedAt": 5592.199999809265,
+            "expiresAt": 23592.199999809265,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 5
+              }
+            ]
+          },
+          {
+            "origin": "peer_qy7zn2HtcQpm",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 5108.099999904633,
+            "expiresAt": 23106.799999713898,
+            "neighbors": [
+              {
+                "id": "peer_kxHYoUjQKNDf",
+                "rttMs": 9
+              },
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 9
+              }
+            ]
+          },
+          {
+            "origin": "peer_sIYOcNBSX59s",
+            "generation": 0,
+            "sequence": 3,
+            "receivedAt": 5283.199999809265,
+            "expiresAt": 23282.89999961853,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 4
+              }
+            ]
+          },
+          {
+            "origin": "peer_eS6hd5dnBX-W",
+            "generation": 0,
+            "sequence": 6,
+            "receivedAt": 5599.599999904633,
+            "expiresAt": 23598.800000190735,
+            "neighbors": [
+              {
+                "id": "peer_kxHYoUjQKNDf",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 31
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_qy7zn2HtcQpm",
+            "nextHop": "peer_qy7zn2HtcQpm",
+            "path": [
+              "peer_kxHYoUjQKNDf",
+              "peer_qy7zn2HtcQpm"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_sIYOcNBSX59s",
+            "nextHop": "peer_eS6hd5dnBX-W",
+            "path": [
+              "peer_kxHYoUjQKNDf",
+              "peer_eS6hd5dnBX-W",
+              "peer_sIYOcNBSX59s"
+            ],
+            "cost": 2
+          },
+          {
+            "destination": "peer_eS6hd5dnBX-W",
+            "nextHop": "peer_eS6hd5dnBX-W",
+            "path": [
+              "peer_kxHYoUjQKNDf",
+              "peer_eS6hd5dnBX-W"
+            ],
+            "cost": 1
+          }
+        ],
+        "counters": {
+          "helloSent": 10,
+          "helloReceived": 11,
+          "lsaSent": 3,
+          "lsaReceived": 8,
+          "duplicates": 6,
+          "recomputations": 7,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 26753
+        },
+        "convergence": {
+          "startedAt": 4443.900000095367,
+          "lastChangeAt": 5599.900000095367,
+          "settledAt": 6633.199999809265,
+          "before": [
+            {
+              "destination": "peer_qy7zn2HtcQpm",
+              "nextHop": "peer_qy7zn2HtcQpm",
+              "path": [
+                "peer_kxHYoUjQKNDf",
+                "peer_qy7zn2HtcQpm"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_sIYOcNBSX59s",
+              "nextHop": "peer_qy7zn2HtcQpm",
+              "path": [
+                "peer_kxHYoUjQKNDf",
+                "peer_qy7zn2HtcQpm",
+                "peer_sIYOcNBSX59s"
+              ],
+              "cost": 2
+            }
+          ],
+          "after": [
+            {
+              "destination": "peer_qy7zn2HtcQpm",
+              "nextHop": "peer_qy7zn2HtcQpm",
+              "path": [
+                "peer_kxHYoUjQKNDf",
+                "peer_qy7zn2HtcQpm"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_sIYOcNBSX59s",
+              "nextHop": "peer_eS6hd5dnBX-W",
+              "path": [
+                "peer_kxHYoUjQKNDf",
+                "peer_eS6hd5dnBX-W",
+                "peer_sIYOcNBSX59s"
+              ],
+              "cost": 2
+            },
+            {
+              "destination": "peer_eS6hd5dnBX-W",
+              "nextHop": "peer_eS6hd5dnBX-W",
+              "path": [
+                "peer_kxHYoUjQKNDf",
+                "peer_eS6hd5dnBX-W"
+              ],
+              "cost": 1
+            }
+          ]
+        },
+        "receivedLocallyAt": 11858.199999809265
+      },
+      {
+        "id": "peer_eS6hd5dnBX-W",
+        "observedAt": 6382.299999713898,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_eS6hd5dnBX-W\",\"peer_kxHYoUjQKNDf\",1],[\"peer_eS6hd5dnBX-W\",\"peer_sIYOcNBSX59s\",1],[\"peer_kxHYoUjQKNDf\",\"peer_qy7zn2HtcQpm\",1],[\"peer_qy7zn2HtcQpm\",\"peer_sIYOcNBSX59s\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_qy7zn2HtcQpm",
+            "channelOpen": false,
+            "active": false,
+            "lastHello": 2753.3999996185303,
+            "rttMs": 55
+          },
+          {
+            "id": "peer_sIYOcNBSX59s",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 5633.699999809265,
+            "rttMs": 4.199999809265137
+          },
+          {
+            "id": "peer_kxHYoUjQKNDf",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 5633.5,
+            "rttMs": 3.8000001907348633
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_eS6hd5dnBX-W",
+            "generation": 0,
+            "sequence": 6,
+            "receivedAt": 3322.5999999046326,
+            "expiresAt": 21322.599999904633,
+            "neighbors": [
+              {
+                "id": "peer_kxHYoUjQKNDf",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 31
+              }
+            ]
+          },
+          {
+            "origin": "peer_qy7zn2HtcQpm",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 3019,
+            "expiresAt": 20852.299999713898,
+            "neighbors": [
+              {
+                "id": "peer_kxHYoUjQKNDf",
+                "rttMs": 9
+              },
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 9
+              }
+            ]
+          },
+          {
+            "origin": "peer_sIYOcNBSX59s",
+            "generation": 0,
+            "sequence": 3,
+            "receivedAt": 3017.7999997138977,
+            "expiresAt": 21017.499999523163,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 4
+              }
+            ]
+          },
+          {
+            "origin": "peer_kxHYoUjQKNDf",
+            "generation": 0,
+            "sequence": 3,
+            "receivedAt": 3330,
+            "expiresAt": 21329.799999713898,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 5
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_qy7zn2HtcQpm",
+            "nextHop": "peer_kxHYoUjQKNDf",
+            "path": [
+              "peer_eS6hd5dnBX-W",
+              "peer_kxHYoUjQKNDf",
+              "peer_qy7zn2HtcQpm"
+            ],
+            "cost": 2
+          },
+          {
+            "destination": "peer_sIYOcNBSX59s",
+            "nextHop": "peer_sIYOcNBSX59s",
+            "path": [
+              "peer_eS6hd5dnBX-W",
+              "peer_sIYOcNBSX59s"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_kxHYoUjQKNDf",
+            "nextHop": "peer_kxHYoUjQKNDf",
+            "path": [
+              "peer_eS6hd5dnBX-W",
+              "peer_kxHYoUjQKNDf"
+            ],
+            "cost": 1
+          }
+        ],
+        "counters": {
+          "helloSent": 11,
+          "helloReceived": 8,
+          "lsaSent": 6,
+          "lsaReceived": 6,
+          "duplicates": 7,
+          "recomputations": 7,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 32586
+        },
+        "convergence": {
+          "startedAt": 1877.3999996185303,
+          "lastChangeAt": 3330.7999997138977,
+          "settledAt": 4378.699999809265,
+          "agreementAt": 6382.099999904633,
+          "before": [],
+          "after": [
+            {
+              "destination": "peer_qy7zn2HtcQpm",
+              "nextHop": "peer_kxHYoUjQKNDf",
+              "path": [
+                "peer_eS6hd5dnBX-W",
+                "peer_kxHYoUjQKNDf",
+                "peer_qy7zn2HtcQpm"
+              ],
+              "cost": 2
+            },
+            {
+              "destination": "peer_sIYOcNBSX59s",
+              "nextHop": "peer_sIYOcNBSX59s",
+              "path": [
+                "peer_eS6hd5dnBX-W",
+                "peer_sIYOcNBSX59s"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_kxHYoUjQKNDf",
+              "nextHop": "peer_kxHYoUjQKNDf",
+              "path": [
+                "peer_eS6hd5dnBX-W",
+                "peer_kxHYoUjQKNDf"
+              ],
+              "cost": 1
+            }
+          ]
+        },
+        "receivedLocallyAt": 11882.5
+      }
+    ]
+  },
+  "after": {
+    "provenance": "RTC-FLOODED ROUTER OBSERVATIONS",
+    "observer": "peer_qy7zn2HtcQpm",
+    "snapshots": [
+      {
+        "id": "peer_qy7zn2HtcQpm",
+        "observedAt": 21464.699999809265,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_eS6hd5dnBX-W\",\"peer_sIYOcNBSX59s\",1],[\"peer_qy7zn2HtcQpm\",\"peer_sIYOcNBSX59s\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_sIYOcNBSX59s",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 21147.299999713898,
+            "rttMs": 9.399999618530273
+          },
+          {
+            "id": "peer_kxHYoUjQKNDf",
+            "channelOpen": true,
+            "active": false,
+            "lastHello": 15604.099999904633,
+            "rttMs": 12.099999904632568
+          },
+          {
+            "id": "peer_eS6hd5dnBX-W",
+            "channelOpen": false,
+            "active": false,
+            "lastHello": 8245,
+            "rttMs": 8.800000190734863
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_qy7zn2HtcQpm",
+            "generation": 0,
+            "sequence": 7,
+            "receivedAt": 20238.5,
+            "expiresAt": 38238.5,
+            "neighbors": [
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 2
+              }
+            ]
+          },
+          {
+            "origin": "peer_sIYOcNBSX59s",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 20894.5,
+            "expiresAt": 38894.2000002861,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 14
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 3
+              }
+            ]
+          },
+          {
+            "origin": "peer_kxHYoUjQKNDf",
+            "generation": 0,
+            "sequence": 4,
+            "receivedAt": 14855,
+            "expiresAt": 32854.5,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 6
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 6
+              }
+            ]
+          },
+          {
+            "origin": "peer_eS6hd5dnBX-W",
+            "generation": 0,
+            "sequence": 9,
+            "receivedAt": 21460.799999713898,
+            "expiresAt": 39460.699999809265,
+            "neighbors": [
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 9
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_sIYOcNBSX59s",
+            "nextHop": "peer_sIYOcNBSX59s",
+            "path": [
+              "peer_qy7zn2HtcQpm",
+              "peer_sIYOcNBSX59s"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_eS6hd5dnBX-W",
+            "nextHop": "peer_sIYOcNBSX59s",
+            "path": [
+              "peer_qy7zn2HtcQpm",
+              "peer_sIYOcNBSX59s",
+              "peer_eS6hd5dnBX-W"
+            ],
+            "cost": 2
+          }
+        ],
+        "counters": {
+          "helloSent": 33,
+          "helloReceived": 30,
+          "lsaSent": 7,
+          "lsaReceived": 13,
+          "duplicates": 6,
+          "recomputations": 9,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 112174
+        },
+        "convergence": {
+          "startedAt": 20238.699999809265,
+          "lastChangeAt": 20370.900000095367,
+          "before": [
+            {
+              "destination": "peer_sIYOcNBSX59s",
+              "nextHop": "peer_sIYOcNBSX59s",
+              "path": [
+                "peer_qy7zn2HtcQpm",
+                "peer_sIYOcNBSX59s"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_kxHYoUjQKNDf",
+              "nextHop": "peer_kxHYoUjQKNDf",
+              "path": [
+                "peer_qy7zn2HtcQpm",
+                "peer_kxHYoUjQKNDf"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_eS6hd5dnBX-W",
+              "nextHop": "peer_kxHYoUjQKNDf",
+              "path": [
+                "peer_qy7zn2HtcQpm",
+                "peer_kxHYoUjQKNDf",
+                "peer_eS6hd5dnBX-W"
+              ],
+              "cost": 2
+            }
+          ],
+          "after": [
+            {
+              "destination": "peer_sIYOcNBSX59s",
+              "nextHop": "peer_sIYOcNBSX59s",
+              "path": [
+                "peer_qy7zn2HtcQpm",
+                "peer_sIYOcNBSX59s"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_eS6hd5dnBX-W",
+              "nextHop": "peer_sIYOcNBSX59s",
+              "path": [
+                "peer_qy7zn2HtcQpm",
+                "peer_sIYOcNBSX59s",
+                "peer_eS6hd5dnBX-W"
+              ],
+              "cost": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "peer_sIYOcNBSX59s",
+        "observedAt": 20495,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_eS6hd5dnBX-W\",\"peer_sIYOcNBSX59s\",1],[\"peer_qy7zn2HtcQpm\",\"peer_sIYOcNBSX59s\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_qy7zn2HtcQpm",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 19599.200000286102,
+            "rttMs": 3.1999998092651367
+          },
+          {
+            "id": "peer_eS6hd5dnBX-W",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 19720.400000095367,
+            "rttMs": 13.800000190734863
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_sIYOcNBSX59s",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 20244.200000286102,
+            "expiresAt": 38244.2000002861,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 14
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 3
+              }
+            ]
+          },
+          {
+            "origin": "peer_qy7zn2HtcQpm",
+            "generation": 0,
+            "sequence": 7,
+            "receivedAt": 19598.400000095367,
+            "expiresAt": 37598,
+            "neighbors": [
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 2
+              }
+            ]
+          },
+          {
+            "origin": "peer_kxHYoUjQKNDf",
+            "generation": 0,
+            "sequence": 4,
+            "receivedAt": 14215.400000095367,
+            "expiresAt": 32214.900000095367,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 6
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 6
+              }
+            ]
+          },
+          {
+            "origin": "peer_eS6hd5dnBX-W",
+            "generation": 0,
+            "sequence": 8,
+            "receivedAt": 19719.60000038147,
+            "expiresAt": 37718.50000047684,
+            "neighbors": [
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 2
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_qy7zn2HtcQpm",
+            "nextHop": "peer_qy7zn2HtcQpm",
+            "path": [
+              "peer_sIYOcNBSX59s",
+              "peer_qy7zn2HtcQpm"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_eS6hd5dnBX-W",
+            "nextHop": "peer_eS6hd5dnBX-W",
+            "path": [
+              "peer_sIYOcNBSX59s",
+              "peer_eS6hd5dnBX-W"
+            ],
+            "cost": 1
+          }
+        ],
+        "counters": {
+          "helloSent": 29,
+          "helloReceived": 30,
+          "lsaSent": 5,
+          "lsaReceived": 14,
+          "duplicates": 8,
+          "recomputations": 9,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 85063
+        },
+        "convergence": {
+          "startedAt": 19598.800000190735,
+          "lastChangeAt": 19720,
+          "before": [
+            {
+              "destination": "peer_qy7zn2HtcQpm",
+              "nextHop": "peer_qy7zn2HtcQpm",
+              "path": [
+                "peer_sIYOcNBSX59s",
+                "peer_qy7zn2HtcQpm"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_kxHYoUjQKNDf",
+              "nextHop": "peer_eS6hd5dnBX-W",
+              "path": [
+                "peer_sIYOcNBSX59s",
+                "peer_eS6hd5dnBX-W",
+                "peer_kxHYoUjQKNDf"
+              ],
+              "cost": 2
+            },
+            {
+              "destination": "peer_eS6hd5dnBX-W",
+              "nextHop": "peer_eS6hd5dnBX-W",
+              "path": [
+                "peer_sIYOcNBSX59s",
+                "peer_eS6hd5dnBX-W"
+              ],
+              "cost": 1
+            }
+          ],
+          "after": [
+            {
+              "destination": "peer_qy7zn2HtcQpm",
+              "nextHop": "peer_qy7zn2HtcQpm",
+              "path": [
+                "peer_sIYOcNBSX59s",
+                "peer_qy7zn2HtcQpm"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_eS6hd5dnBX-W",
+              "nextHop": "peer_eS6hd5dnBX-W",
+              "path": [
+                "peer_sIYOcNBSX59s",
+                "peer_eS6hd5dnBX-W"
+              ],
+              "cost": 1
+            }
+          ]
+        },
+        "receivedLocallyAt": 21152.900000095367
+      },
+      {
+        "id": "peer_kxHYoUjQKNDf",
+        "observedAt": 11634.900000095367,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_eS6hd5dnBX-W\",\"peer_kxHYoUjQKNDf\",1],[\"peer_eS6hd5dnBX-W\",\"peer_sIYOcNBSX59s\",1],[\"peer_kxHYoUjQKNDf\",\"peer_qy7zn2HtcQpm\",1],[\"peer_qy7zn2HtcQpm\",\"peer_sIYOcNBSX59s\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_qy7zn2HtcQpm",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 11387.900000095367,
+            "rttMs": 5.800000190734863
+          },
+          {
+            "id": "peer_eS6hd5dnBX-W",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 11388,
+            "rttMs": 5.800000190734863
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_kxHYoUjQKNDf",
+            "generation": 0,
+            "sequence": 4,
+            "receivedAt": 11633.199999809265,
+            "expiresAt": 29633.199999809265,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 6
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 6
+              }
+            ]
+          },
+          {
+            "origin": "peer_qy7zn2HtcQpm",
+            "generation": 0,
+            "sequence": 6,
+            "receivedAt": 11274.799999713898,
+            "expiresAt": 29274.499999523163,
+            "neighbors": [
+              {
+                "id": "peer_kxHYoUjQKNDf",
+                "rttMs": 4
+              },
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 4
+              }
+            ]
+          },
+          {
+            "origin": "peer_sIYOcNBSX59s",
+            "generation": 0,
+            "sequence": 4,
+            "receivedAt": 11431.400000095367,
+            "expiresAt": 29431.199999809265,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 20
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 20
+              }
+            ]
+          },
+          {
+            "origin": "peer_eS6hd5dnBX-W",
+            "generation": 0,
+            "sequence": 6,
+            "receivedAt": 5599.599999904633,
+            "expiresAt": 23598.800000190735,
+            "neighbors": [
+              {
+                "id": "peer_kxHYoUjQKNDf",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 31
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_qy7zn2HtcQpm",
+            "nextHop": "peer_qy7zn2HtcQpm",
+            "path": [
+              "peer_kxHYoUjQKNDf",
+              "peer_qy7zn2HtcQpm"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_sIYOcNBSX59s",
+            "nextHop": "peer_eS6hd5dnBX-W",
+            "path": [
+              "peer_kxHYoUjQKNDf",
+              "peer_eS6hd5dnBX-W",
+              "peer_sIYOcNBSX59s"
+            ],
+            "cost": 2
+          },
+          {
+            "destination": "peer_eS6hd5dnBX-W",
+            "nextHop": "peer_eS6hd5dnBX-W",
+            "path": [
+              "peer_kxHYoUjQKNDf",
+              "peer_eS6hd5dnBX-W"
+            ],
+            "cost": 1
+          }
+        ],
+        "counters": {
+          "helloSent": 16,
+          "helloReceived": 16,
+          "lsaSent": 4,
+          "lsaReceived": 10,
+          "duplicates": 9,
+          "recomputations": 7,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 42038
+        },
+        "convergence": {
+          "startedAt": 4443.900000095367,
+          "lastChangeAt": 5599.900000095367,
+          "settledAt": 6633.199999809265,
+          "agreementAt": 8886.400000095367,
+          "before": [
+            {
+              "destination": "peer_qy7zn2HtcQpm",
+              "nextHop": "peer_qy7zn2HtcQpm",
+              "path": [
+                "peer_kxHYoUjQKNDf",
+                "peer_qy7zn2HtcQpm"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_sIYOcNBSX59s",
+              "nextHop": "peer_qy7zn2HtcQpm",
+              "path": [
+                "peer_kxHYoUjQKNDf",
+                "peer_qy7zn2HtcQpm",
+                "peer_sIYOcNBSX59s"
+              ],
+              "cost": 2
+            }
+          ],
+          "after": [
+            {
+              "destination": "peer_qy7zn2HtcQpm",
+              "nextHop": "peer_qy7zn2HtcQpm",
+              "path": [
+                "peer_kxHYoUjQKNDf",
+                "peer_qy7zn2HtcQpm"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_sIYOcNBSX59s",
+              "nextHop": "peer_eS6hd5dnBX-W",
+              "path": [
+                "peer_kxHYoUjQKNDf",
+                "peer_eS6hd5dnBX-W",
+                "peer_sIYOcNBSX59s"
+              ],
+              "cost": 2
+            },
+            {
+              "destination": "peer_eS6hd5dnBX-W",
+              "nextHop": "peer_eS6hd5dnBX-W",
+              "path": [
+                "peer_kxHYoUjQKNDf",
+                "peer_eS6hd5dnBX-W"
+              ],
+              "cost": 1
+            }
+          ]
+        },
+        "receivedLocallyAt": 14855.5
+      },
+      {
+        "id": "peer_eS6hd5dnBX-W",
+        "observedAt": 15970.5,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_eS6hd5dnBX-W\",\"peer_sIYOcNBSX59s\",1],[\"peer_qy7zn2HtcQpm\",\"peer_sIYOcNBSX59s\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_qy7zn2HtcQpm",
+            "channelOpen": false,
+            "active": false,
+            "lastHello": 2753.3999996185303,
+            "rttMs": 55
+          },
+          {
+            "id": "peer_sIYOcNBSX59s",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 15662.699999809265,
+            "rttMs": 8.799999713897705
+          },
+          {
+            "id": "peer_kxHYoUjQKNDf",
+            "channelOpen": false,
+            "active": false,
+            "lastHello": 10136.39999961853,
+            "rttMs": 6.299999713897705
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_eS6hd5dnBX-W",
+            "generation": 0,
+            "sequence": 9,
+            "receivedAt": 15970.299999713898,
+            "expiresAt": 33970.2999997139,
+            "neighbors": [
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 9
+              }
+            ]
+          },
+          {
+            "origin": "peer_qy7zn2HtcQpm",
+            "generation": 0,
+            "sequence": 7,
+            "receivedAt": 14762.39999961853,
+            "expiresAt": 32761.999999523163,
+            "neighbors": [
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 2
+              }
+            ]
+          },
+          {
+            "origin": "peer_sIYOcNBSX59s",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 15409.799999713898,
+            "expiresAt": 33409.5,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 14
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 3
+              }
+            ]
+          },
+          {
+            "origin": "peer_kxHYoUjQKNDf",
+            "generation": 0,
+            "sequence": 4,
+            "receivedAt": 9369.199999809265,
+            "expiresAt": 27368.699999809265,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 6
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 6
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_qy7zn2HtcQpm",
+            "nextHop": "peer_sIYOcNBSX59s",
+            "path": [
+              "peer_eS6hd5dnBX-W",
+              "peer_sIYOcNBSX59s",
+              "peer_qy7zn2HtcQpm"
+            ],
+            "cost": 2
+          },
+          {
+            "destination": "peer_sIYOcNBSX59s",
+            "nextHop": "peer_sIYOcNBSX59s",
+            "path": [
+              "peer_eS6hd5dnBX-W",
+              "peer_sIYOcNBSX59s"
+            ],
+            "cost": 1
+          }
+        ],
+        "counters": {
+          "helloSent": 27,
+          "helloReceived": 21,
+          "lsaSent": 9,
+          "lsaReceived": 11,
+          "duplicates": 13,
+          "recomputations": 9,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 76082
+        },
+        "convergence": {
+          "startedAt": 14762.599999904633,
+          "lastChangeAt": 14880.699999809265,
+          "before": [
+            {
+              "destination": "peer_qy7zn2HtcQpm",
+              "nextHop": "peer_kxHYoUjQKNDf",
+              "path": [
+                "peer_eS6hd5dnBX-W",
+                "peer_kxHYoUjQKNDf",
+                "peer_qy7zn2HtcQpm"
+              ],
+              "cost": 2
+            },
+            {
+              "destination": "peer_sIYOcNBSX59s",
+              "nextHop": "peer_sIYOcNBSX59s",
+              "path": [
+                "peer_eS6hd5dnBX-W",
+                "peer_sIYOcNBSX59s"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_kxHYoUjQKNDf",
+              "nextHop": "peer_kxHYoUjQKNDf",
+              "path": [
+                "peer_eS6hd5dnBX-W",
+                "peer_kxHYoUjQKNDf"
+              ],
+              "cost": 1
+            }
+          ],
+          "after": [
+            {
+              "destination": "peer_qy7zn2HtcQpm",
+              "nextHop": "peer_sIYOcNBSX59s",
+              "path": [
+                "peer_eS6hd5dnBX-W",
+                "peer_sIYOcNBSX59s",
+                "peer_qy7zn2HtcQpm"
+              ],
+              "cost": 2
+            },
+            {
+              "destination": "peer_sIYOcNBSX59s",
+              "nextHop": "peer_sIYOcNBSX59s",
+              "path": [
+                "peer_eS6hd5dnBX-W",
+                "peer_sIYOcNBSX59s"
+              ],
+              "cost": 1
+            }
+          ]
+        },
+        "receivedLocallyAt": 21464.5
+      }
+    ]
+  },
+  "afterDelivery": {
+    "provenance": "RTC-FLOODED ROUTER OBSERVATIONS",
+    "observer": "peer_qy7zn2HtcQpm",
+    "snapshots": [
+      {
+        "id": "peer_qy7zn2HtcQpm",
+        "observedAt": 23107.099999904633,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_eS6hd5dnBX-W\",\"peer_sIYOcNBSX59s\",1],[\"peer_qy7zn2HtcQpm\",\"peer_sIYOcNBSX59s\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_sIYOcNBSX59s",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 22738.799999713898,
+            "rttMs": 2.6999998092651367
+          },
+          {
+            "id": "peer_kxHYoUjQKNDf",
+            "channelOpen": false,
+            "active": false,
+            "lastHello": 15604.099999904633,
+            "rttMs": 12.099999904632568
+          },
+          {
+            "id": "peer_eS6hd5dnBX-W",
+            "channelOpen": false,
+            "active": false,
+            "lastHello": 8245,
+            "rttMs": 8.800000190734863
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_qy7zn2HtcQpm",
+            "generation": 0,
+            "sequence": 8,
+            "receivedAt": 23106.599999904633,
+            "expiresAt": 41106.59999990463,
+            "neighbors": [
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 3
+              }
+            ]
+          },
+          {
+            "origin": "peer_sIYOcNBSX59s",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 20894.5,
+            "expiresAt": 38894.2000002861,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 14
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 3
+              }
+            ]
+          },
+          {
+            "origin": "peer_kxHYoUjQKNDf",
+            "generation": 0,
+            "sequence": 4,
+            "receivedAt": 14855,
+            "expiresAt": 32854.5,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 6
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 6
+              }
+            ]
+          },
+          {
+            "origin": "peer_eS6hd5dnBX-W",
+            "generation": 0,
+            "sequence": 9,
+            "receivedAt": 21460.799999713898,
+            "expiresAt": 39460.699999809265,
+            "neighbors": [
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 9
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_sIYOcNBSX59s",
+            "nextHop": "peer_sIYOcNBSX59s",
+            "path": [
+              "peer_qy7zn2HtcQpm",
+              "peer_sIYOcNBSX59s"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_eS6hd5dnBX-W",
+            "nextHop": "peer_sIYOcNBSX59s",
+            "path": [
+              "peer_qy7zn2HtcQpm",
+              "peer_sIYOcNBSX59s",
+              "peer_eS6hd5dnBX-W"
+            ],
+            "cost": 2
+          }
+        ],
+        "counters": {
+          "helloSent": 37,
+          "helloReceived": 31,
+          "lsaSent": 8,
+          "lsaReceived": 13,
+          "duplicates": 6,
+          "recomputations": 9,
+          "forwarded": 0,
+          "received": 1,
+          "dropped": 0,
+          "controlBytes": 116090
+        },
+        "convergence": {
+          "startedAt": 20238.699999809265,
+          "lastChangeAt": 20370.900000095367,
+          "before": [
+            {
+              "destination": "peer_sIYOcNBSX59s",
+              "nextHop": "peer_sIYOcNBSX59s",
+              "path": [
+                "peer_qy7zn2HtcQpm",
+                "peer_sIYOcNBSX59s"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_kxHYoUjQKNDf",
+              "nextHop": "peer_kxHYoUjQKNDf",
+              "path": [
+                "peer_qy7zn2HtcQpm",
+                "peer_kxHYoUjQKNDf"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_eS6hd5dnBX-W",
+              "nextHop": "peer_kxHYoUjQKNDf",
+              "path": [
+                "peer_qy7zn2HtcQpm",
+                "peer_kxHYoUjQKNDf",
+                "peer_eS6hd5dnBX-W"
+              ],
+              "cost": 2
+            }
+          ],
+          "after": [
+            {
+              "destination": "peer_sIYOcNBSX59s",
+              "nextHop": "peer_sIYOcNBSX59s",
+              "path": [
+                "peer_qy7zn2HtcQpm",
+                "peer_sIYOcNBSX59s"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_eS6hd5dnBX-W",
+              "nextHop": "peer_sIYOcNBSX59s",
+              "path": [
+                "peer_qy7zn2HtcQpm",
+                "peer_sIYOcNBSX59s",
+                "peer_eS6hd5dnBX-W"
+              ],
+              "cost": 2
+            }
+          ],
+          "settledAt": 21485.799999713898,
+          "agreementAt": 21485.799999713898
+        }
+      },
+      {
+        "id": "peer_sIYOcNBSX59s",
+        "observedAt": 20495,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_eS6hd5dnBX-W\",\"peer_sIYOcNBSX59s\",1],[\"peer_qy7zn2HtcQpm\",\"peer_sIYOcNBSX59s\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_qy7zn2HtcQpm",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 19599.200000286102,
+            "rttMs": 3.1999998092651367
+          },
+          {
+            "id": "peer_eS6hd5dnBX-W",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 19720.400000095367,
+            "rttMs": 13.800000190734863
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_sIYOcNBSX59s",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 20244.200000286102,
+            "expiresAt": 38244.2000002861,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 14
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 3
+              }
+            ]
+          },
+          {
+            "origin": "peer_qy7zn2HtcQpm",
+            "generation": 0,
+            "sequence": 7,
+            "receivedAt": 19598.400000095367,
+            "expiresAt": 37598,
+            "neighbors": [
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 2
+              }
+            ]
+          },
+          {
+            "origin": "peer_kxHYoUjQKNDf",
+            "generation": 0,
+            "sequence": 4,
+            "receivedAt": 14215.400000095367,
+            "expiresAt": 32214.900000095367,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 6
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 6
+              }
+            ]
+          },
+          {
+            "origin": "peer_eS6hd5dnBX-W",
+            "generation": 0,
+            "sequence": 8,
+            "receivedAt": 19719.60000038147,
+            "expiresAt": 37718.50000047684,
+            "neighbors": [
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 2
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_qy7zn2HtcQpm",
+            "nextHop": "peer_qy7zn2HtcQpm",
+            "path": [
+              "peer_sIYOcNBSX59s",
+              "peer_qy7zn2HtcQpm"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_eS6hd5dnBX-W",
+            "nextHop": "peer_eS6hd5dnBX-W",
+            "path": [
+              "peer_sIYOcNBSX59s",
+              "peer_eS6hd5dnBX-W"
+            ],
+            "cost": 1
+          }
+        ],
+        "counters": {
+          "helloSent": 29,
+          "helloReceived": 30,
+          "lsaSent": 5,
+          "lsaReceived": 14,
+          "duplicates": 8,
+          "recomputations": 9,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 85063
+        },
+        "convergence": {
+          "startedAt": 19598.800000190735,
+          "lastChangeAt": 19720,
+          "before": [
+            {
+              "destination": "peer_qy7zn2HtcQpm",
+              "nextHop": "peer_qy7zn2HtcQpm",
+              "path": [
+                "peer_sIYOcNBSX59s",
+                "peer_qy7zn2HtcQpm"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_kxHYoUjQKNDf",
+              "nextHop": "peer_eS6hd5dnBX-W",
+              "path": [
+                "peer_sIYOcNBSX59s",
+                "peer_eS6hd5dnBX-W",
+                "peer_kxHYoUjQKNDf"
+              ],
+              "cost": 2
+            },
+            {
+              "destination": "peer_eS6hd5dnBX-W",
+              "nextHop": "peer_eS6hd5dnBX-W",
+              "path": [
+                "peer_sIYOcNBSX59s",
+                "peer_eS6hd5dnBX-W"
+              ],
+              "cost": 1
+            }
+          ],
+          "after": [
+            {
+              "destination": "peer_qy7zn2HtcQpm",
+              "nextHop": "peer_qy7zn2HtcQpm",
+              "path": [
+                "peer_sIYOcNBSX59s",
+                "peer_qy7zn2HtcQpm"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_eS6hd5dnBX-W",
+              "nextHop": "peer_eS6hd5dnBX-W",
+              "path": [
+                "peer_sIYOcNBSX59s",
+                "peer_eS6hd5dnBX-W"
+              ],
+              "cost": 1
+            }
+          ]
+        },
+        "receivedLocallyAt": 21152.900000095367
+      },
+      {
+        "id": "peer_kxHYoUjQKNDf",
+        "observedAt": 11634.900000095367,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_eS6hd5dnBX-W\",\"peer_kxHYoUjQKNDf\",1],[\"peer_eS6hd5dnBX-W\",\"peer_sIYOcNBSX59s\",1],[\"peer_kxHYoUjQKNDf\",\"peer_qy7zn2HtcQpm\",1],[\"peer_qy7zn2HtcQpm\",\"peer_sIYOcNBSX59s\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_qy7zn2HtcQpm",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 11387.900000095367,
+            "rttMs": 5.800000190734863
+          },
+          {
+            "id": "peer_eS6hd5dnBX-W",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 11388,
+            "rttMs": 5.800000190734863
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_kxHYoUjQKNDf",
+            "generation": 0,
+            "sequence": 4,
+            "receivedAt": 11633.199999809265,
+            "expiresAt": 29633.199999809265,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 6
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 6
+              }
+            ]
+          },
+          {
+            "origin": "peer_qy7zn2HtcQpm",
+            "generation": 0,
+            "sequence": 6,
+            "receivedAt": 11274.799999713898,
+            "expiresAt": 29274.499999523163,
+            "neighbors": [
+              {
+                "id": "peer_kxHYoUjQKNDf",
+                "rttMs": 4
+              },
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 4
+              }
+            ]
+          },
+          {
+            "origin": "peer_sIYOcNBSX59s",
+            "generation": 0,
+            "sequence": 4,
+            "receivedAt": 11431.400000095367,
+            "expiresAt": 29431.199999809265,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 20
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 20
+              }
+            ]
+          },
+          {
+            "origin": "peer_eS6hd5dnBX-W",
+            "generation": 0,
+            "sequence": 6,
+            "receivedAt": 5599.599999904633,
+            "expiresAt": 23598.800000190735,
+            "neighbors": [
+              {
+                "id": "peer_kxHYoUjQKNDf",
+                "rttMs": 500
+              },
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 31
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_qy7zn2HtcQpm",
+            "nextHop": "peer_qy7zn2HtcQpm",
+            "path": [
+              "peer_kxHYoUjQKNDf",
+              "peer_qy7zn2HtcQpm"
+            ],
+            "cost": 1
+          },
+          {
+            "destination": "peer_sIYOcNBSX59s",
+            "nextHop": "peer_eS6hd5dnBX-W",
+            "path": [
+              "peer_kxHYoUjQKNDf",
+              "peer_eS6hd5dnBX-W",
+              "peer_sIYOcNBSX59s"
+            ],
+            "cost": 2
+          },
+          {
+            "destination": "peer_eS6hd5dnBX-W",
+            "nextHop": "peer_eS6hd5dnBX-W",
+            "path": [
+              "peer_kxHYoUjQKNDf",
+              "peer_eS6hd5dnBX-W"
+            ],
+            "cost": 1
+          }
+        ],
+        "counters": {
+          "helloSent": 16,
+          "helloReceived": 16,
+          "lsaSent": 4,
+          "lsaReceived": 10,
+          "duplicates": 9,
+          "recomputations": 7,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 42038
+        },
+        "convergence": {
+          "startedAt": 4443.900000095367,
+          "lastChangeAt": 5599.900000095367,
+          "settledAt": 6633.199999809265,
+          "agreementAt": 8886.400000095367,
+          "before": [
+            {
+              "destination": "peer_qy7zn2HtcQpm",
+              "nextHop": "peer_qy7zn2HtcQpm",
+              "path": [
+                "peer_kxHYoUjQKNDf",
+                "peer_qy7zn2HtcQpm"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_sIYOcNBSX59s",
+              "nextHop": "peer_qy7zn2HtcQpm",
+              "path": [
+                "peer_kxHYoUjQKNDf",
+                "peer_qy7zn2HtcQpm",
+                "peer_sIYOcNBSX59s"
+              ],
+              "cost": 2
+            }
+          ],
+          "after": [
+            {
+              "destination": "peer_qy7zn2HtcQpm",
+              "nextHop": "peer_qy7zn2HtcQpm",
+              "path": [
+                "peer_kxHYoUjQKNDf",
+                "peer_qy7zn2HtcQpm"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_sIYOcNBSX59s",
+              "nextHop": "peer_eS6hd5dnBX-W",
+              "path": [
+                "peer_kxHYoUjQKNDf",
+                "peer_eS6hd5dnBX-W",
+                "peer_sIYOcNBSX59s"
+              ],
+              "cost": 2
+            },
+            {
+              "destination": "peer_eS6hd5dnBX-W",
+              "nextHop": "peer_eS6hd5dnBX-W",
+              "path": [
+                "peer_kxHYoUjQKNDf",
+                "peer_eS6hd5dnBX-W"
+              ],
+              "cost": 1
+            }
+          ]
+        },
+        "receivedLocallyAt": 14855.5
+      },
+      {
+        "id": "peer_eS6hd5dnBX-W",
+        "observedAt": 15970.5,
+        "strategy": "minimum-hops",
+        "digest": "[[\"peer_eS6hd5dnBX-W\",\"peer_sIYOcNBSX59s\",1],[\"peer_qy7zn2HtcQpm\",\"peer_sIYOcNBSX59s\",1]]",
+        "neighbors": [
+          {
+            "id": "peer_qy7zn2HtcQpm",
+            "channelOpen": false,
+            "active": false,
+            "lastHello": 2753.3999996185303,
+            "rttMs": 55
+          },
+          {
+            "id": "peer_sIYOcNBSX59s",
+            "channelOpen": true,
+            "active": true,
+            "lastHello": 15662.699999809265,
+            "rttMs": 8.799999713897705
+          },
+          {
+            "id": "peer_kxHYoUjQKNDf",
+            "channelOpen": false,
+            "active": false,
+            "lastHello": 10136.39999961853,
+            "rttMs": 6.299999713897705
+          }
+        ],
+        "lsdb": [
+          {
+            "origin": "peer_eS6hd5dnBX-W",
+            "generation": 0,
+            "sequence": 9,
+            "receivedAt": 15970.299999713898,
+            "expiresAt": 33970.2999997139,
+            "neighbors": [
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 9
+              }
+            ]
+          },
+          {
+            "origin": "peer_qy7zn2HtcQpm",
+            "generation": 0,
+            "sequence": 7,
+            "receivedAt": 14762.39999961853,
+            "expiresAt": 32761.999999523163,
+            "neighbors": [
+              {
+                "id": "peer_sIYOcNBSX59s",
+                "rttMs": 2
+              }
+            ]
+          },
+          {
+            "origin": "peer_sIYOcNBSX59s",
+            "generation": 0,
+            "sequence": 5,
+            "receivedAt": 15409.799999713898,
+            "expiresAt": 33409.5,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 14
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 3
+              }
+            ]
+          },
+          {
+            "origin": "peer_kxHYoUjQKNDf",
+            "generation": 0,
+            "sequence": 4,
+            "receivedAt": 9369.199999809265,
+            "expiresAt": 27368.699999809265,
+            "neighbors": [
+              {
+                "id": "peer_eS6hd5dnBX-W",
+                "rttMs": 6
+              },
+              {
+                "id": "peer_qy7zn2HtcQpm",
+                "rttMs": 6
+              }
+            ]
+          }
+        ],
+        "table": [
+          {
+            "destination": "peer_qy7zn2HtcQpm",
+            "nextHop": "peer_sIYOcNBSX59s",
+            "path": [
+              "peer_eS6hd5dnBX-W",
+              "peer_sIYOcNBSX59s",
+              "peer_qy7zn2HtcQpm"
+            ],
+            "cost": 2
+          },
+          {
+            "destination": "peer_sIYOcNBSX59s",
+            "nextHop": "peer_sIYOcNBSX59s",
+            "path": [
+              "peer_eS6hd5dnBX-W",
+              "peer_sIYOcNBSX59s"
+            ],
+            "cost": 1
+          }
+        ],
+        "counters": {
+          "helloSent": 27,
+          "helloReceived": 21,
+          "lsaSent": 9,
+          "lsaReceived": 11,
+          "duplicates": 13,
+          "recomputations": 9,
+          "forwarded": 0,
+          "received": 0,
+          "dropped": 0,
+          "controlBytes": 76082
+        },
+        "convergence": {
+          "startedAt": 14762.599999904633,
+          "lastChangeAt": 14880.699999809265,
+          "before": [
+            {
+              "destination": "peer_qy7zn2HtcQpm",
+              "nextHop": "peer_kxHYoUjQKNDf",
+              "path": [
+                "peer_eS6hd5dnBX-W",
+                "peer_kxHYoUjQKNDf",
+                "peer_qy7zn2HtcQpm"
+              ],
+              "cost": 2
+            },
+            {
+              "destination": "peer_sIYOcNBSX59s",
+              "nextHop": "peer_sIYOcNBSX59s",
+              "path": [
+                "peer_eS6hd5dnBX-W",
+                "peer_sIYOcNBSX59s"
+              ],
+              "cost": 1
+            },
+            {
+              "destination": "peer_kxHYoUjQKNDf",
+              "nextHop": "peer_kxHYoUjQKNDf",
+              "path": [
+                "peer_eS6hd5dnBX-W",
+                "peer_kxHYoUjQKNDf"
+              ],
+              "cost": 1
+            }
+          ],
+          "after": [
+            {
+              "destination": "peer_qy7zn2HtcQpm",
+              "nextHop": "peer_sIYOcNBSX59s",
+              "path": [
+                "peer_eS6hd5dnBX-W",
+                "peer_sIYOcNBSX59s",
+                "peer_qy7zn2HtcQpm"
+              ],
+              "cost": 2
+            },
+            {
+              "destination": "peer_sIYOcNBSX59s",
+              "nextHop": "peer_sIYOcNBSX59s",
+              "path": [
+                "peer_eS6hd5dnBX-W",
+                "peer_sIYOcNBSX59s"
+              ],
+              "cost": 1
+            }
+          ]
+        },
+        "receivedLocallyAt": 21464.5
+      }
+    ]
+  },
+  "runtimeErrors": []
+}

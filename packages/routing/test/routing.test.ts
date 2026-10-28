@@ -49,6 +49,17 @@ test("falls back honestly to one path when a second does not exist", () => {
   assert.deepEqual(twoNodeDisjointPaths(nodes, edges, "A", "D"), [["A", "B", "D"]]);
 });
 
+test("a direct edge is never counted as two independent paths", () => {
+  assert.deepEqual(twoNodeDisjointPaths(["A", "B"], [{ a: "A", b: "B" }], "A", "B"), [["A", "B"]]);
+});
+
+test("finds a disjoint pair even when the cheapest path blocks both alternatives", () => {
+  const vertices = ["S", "A", "B", "C", "D", "T"];
+  const now = Date.now();
+  const edges = [["S", "A", 1], ["A", "B", 1], ["B", "T", 1], ["S", "C", 10], ["C", "B", 10], ["A", "D", 10], ["D", "T", 10]].map(([a, b, rttMs]) => ({ a: String(a), b: String(b), metrics: { rttMs: Number(rttMs), measuredAt: now } }));
+  assert.deepEqual(twoNodeDisjointPaths(vertices, edges, "S", "T", "lowest-latency", now), [["S", "A", "D", "T"], ["S", "C", "B", "T"]]);
+});
+
 test("rejects malformed graphs and derives canonical path edges", () => {
   assert.throws(() => validateGraph(nodes, [{ a: "A", b: "A" }]), /distinct/);
   assert.throws(() => validateGraph(nodes, [{ a: "A", b: "B" }, { a: "B", b: "A" }]), /Duplicate/);

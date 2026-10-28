@@ -1,4 +1,72 @@
-# HOPNET continuity checkpoint
+# HOPNET Route Pulse and deployment readiness — 2026-10-29
+
+Continues the preserved, already-pushed recovery checkpoint `19fcaf4` on `codex/hopnet-cn-studio`; PR #3 remains a draft targeting `feat/hopnet-lan`. Route Pulse adds bounded, on-demand RTC overlay probes with receiver-reported outward/return trails, sender-local RTT, actual path-change indication, data-plane Replay events and JSON export. Existing font, spatial assets, signed transfers, routing, Lab and Replay are preserved. See `ROUTE_PULSE.md` for protocol bounds, visual QA and failed-run disclosures.
+
+Final local verification: `npm run check` passed all **75 unit/integration tests**, TypeScript and production build; `npm run test:e2e -- --workers=1` passed **13**, with **one explicitly skipped public-host-only test** (4.6 minutes); `npm audit --audit-level=high` found **zero vulnerabilities**. Desktop 1440×900 and mobile 390×844 Route Pulse/Routing captures were opened and visually inspected. Browser plugin unavailable: existing Chrome/Playwright fallback was used. Recovery fault scheduling uses explicitly documented receiver CPU emulation and genuine RTC bytes/receipts; no physical speed or five-device result is inferred. One intermittent admission negotiation timeout did not recur in three diagnostic repeats or the final complete gate; physical browser suspension remains a risk.
+
+Public deployment configuration is prepared for the user's explicitly confirmed **My Workspace / free Render service**, with same-origin frontend/API/WSS, allow-listed public HTTPS invitations, bounded room creation and patched transitive URI dependencies. See `DEPLOYMENT.md` for the actual deployment record, live-only verification command and free-tier/LAN limits. A local pass is not public-deployment or physical-device proof. No merge is authorized.
+
+---
+
+# HOPNET physical-device reliability checkpoint — 2026-10-22
+
+Implemented from `852f105` on `codex/hopnet-cn-studio`, draft PR #3 targeting `feat/hopnet-lan`. Reload resumes the same authorized peer from per-tab capability storage, rotates its ephemeral signing/router incarnation, and rebuilds permitted RTC/Hello/LSA state without new admission. Host-only authoritative pending snapshots repair missed notifications; deduplicated/expiring requests support approve/reject and bounded waiting-screen recovery. Permanent desktop/mobile Room invitation controls preserve the original visual system. Signaling, channel, Hello neighbor, route and historical metrics are distinguished. Endpoint refresh honestly interrupts files/messages; relay reload and repeated logical fault/restore preserve alternate-route recovery. Panel transitions no longer strand pending admissions or retain duplicate interactive inspectors.
+
+Final checks: `npm ci`; `npm run check` with **66** unit/integration tests plus type/build; complete sequential Chrome suite **12 passed** (5.1 minutes); final recovery subset **4 passed** (40.9 seconds) including browser storage-denial fallback and capture/export assertions; clean diff checks. Desktop 1440×900/mobile 390×844 Routing and invitation screenshots visually inspected. See `SESSION_RECOVERY_20261022.md` for root causes, security, A–O mapping, failure disclosures and precise limits. Final UI-exported incarnation evidence is `evidence/session-recovery-router.json`; screenshots use `hopnet-recovery-*` plus regenerated existing evidence.
+
+Use `PHYSICAL_DEMO_GUIDE.md` for the actual two-laptop/two-phone presentation. Prior one-MacBook/one-phone, four-logical-session observations are preserved with limited provenance in `evidence/MANUAL_LAN_REPORTED.md`: 4,194,304-byte baseline/14.85 s/0 retries and 16,144,879-byte logical-fault transfer/21.54 s/8 retries/99.6 ms fault-to-ACK progress, both reported SHA-256 verified. Unequal files do not establish superiority; original raw exports were not inspected. **Four independent physical devices and Safari/WebKit remain unverified.** Background suspension, origin/IP changes, discarded tab storage, coordinator restart and malicious token replay are not solved by a reload handshake. No durable transfer/history or Byzantine/E2E relay-encryption claim is made. Load the same new build on all peers; do not merge into main or the feature base without approval.
+
+---
+
+# HOPNET CN Studio stabilization — 2026-10-22
+
+The three PR #3 stabilization findings are implemented: authenticated preparation/capacity declines, local-first route-independent cancellation with resource cleanup, and bounded distributed-message ACK/retry/deduplication with terminal late-ACK rejection. No styling/assets/layout were changed. Final checks: 56 unit/integration tests plus TypeScript/build passed; all eight sequential Chrome flows passed (3.9 minutes); npm high-severity audit found zero vulnerabilities. Desktop/mobile Routing captures were visually inspected. See `STABILIZATION_20261022.md` for semantics, regression evidence and remaining risks. Existing checkpoint history below is preserved and must not be mistaken for the current verification counts.
+
+---
+
+# HOPNET CN Studio checkpoint — 2026-10-21
+
+Current branch: `codex/hopnet-cn-studio`, extending preserved Resilience Studio commit `1c6c99d`. New work includes RTC hello/LSA flooding, independent LSDB/SPF/forwarding, locally routed messages and ACKs, per-router Routing inspectors/exports, observer-local convergence episodes, saved-link restoration, and control/data Replay filtering with historical router snapshots. File selection uses the local LSA graph; signed file forwarding remains source-routed. See `CN_STUDIO.md` for the exact gate status, protocol/trust definitions, demonstration and pending work; `CN_RESEARCH_DRAFT.md` is the implementation-backed paper extension.
+
+New automated evidence is `evidence/distributed-routing.json`: four real Chrome contexts, all-router LSDB/table exports, actual chosen-relay browser closure, alternate next-hop selection and acknowledged message delivery. Six requested responsive Routing viewports are captured in `screenshots/hopnet-routing-WIDTHxHEIGHT.png`. These are one-host automated experiments, not physical LAN acceptance. The existing file-recovery and no-alternate flows remain present. Admission is explicitly bounded to eight total admitted sessions per room to match protocol reports; create a fresh room after exhausting sessions during repeated rejoining.
+
+Source checkpoint `1c43a2c` is pushed. Final verification: 46 unit/integration tests plus TypeScript/build pass; final sequential seven-flow Chrome suite passed in 4.7 minutes; npm high-severity audit reports zero findings. Prior loaded failures and harness corrections are documented rather than counted as successes. Production no-progress and recovery-assertion deadlines are unchanged.
+
+Remaining: dynamic local-next-hop file envelopes without breaking signed receipts, application delay controls, automatic routing-specific A–F trial orchestration/message-stream metrics, full graphical shortest-path tree/convergence timeline, physical five-device validation and comparative trials. Do not represent those as complete. Keep the feature review unmerged into main. Prior checkpoint history follows unchanged.
+
+---
+
+# HOPNET Resilience Studio checkpoint — 2026-10-20
+
+## Current branch and preservation
+
+Development branch: `codex/hopnet-resilience-studio`, from confirmed remote `feat/hopnet-lan` at `1683052`. UI checkpoint `82b7a2a` and Sentinel are preserved. PR #1 was confirmed OPEN, fetched and integrated through its repair branch ending `8b8b020`; no merge into main occurred. Gate 1 implementation checkpoint: `bca9707`; Studio/protocol checkpoint: `3e830a1`; credential-log privacy checkpoint: `73c278b`; final visual checkpoint: `41110f8`. Final source verification passed before the visual/evidence commits. The branch is pushed for review against `feat/hopnet-lan`, never `main`.
+
+## Current implementation
+
+Bounded two-route RTC transfer scheduling, measured/backed-off ACK deadlines, per-path receiver confirmation, alternate-path recovery, idempotent lost-completion recovery, serialized receiver hashing, cancellation and terminal-state guards are implemented. Ephemeral ECDSA keys authenticate file envelopes and receipts. The coordinator requires open-channel reports from both endpoints and invalidates observations when permissions are removed. Old connection callbacks cannot overwrite a replacement.
+
+Send now has session conversations and file results. Lab provides A/B/C presets, actual path prerequisites, three strategies, custom/repeatable payloads, host-only logical fault injection, local metrics and JSON/CSV export. Replay freezes actual local journal snapshots with scrub, step, playback, speed and export; it sends no packets. Route geometry uses measured canvas dimensions and plinth perimeter anchors.
+
+Visual refinement uses self-hosted OFL Instrument Sans, a text-free generated silk atmosphere, new alpha laptop/phone renders, a light frosted inspector and spring-driven navigation. Original assets are preserved. Centering and tablet scaling are independent; selection lifts only hardware, not route anchors. Decorative cutout padding cannot intercept peer clicks. Replay coordinates share the historical node coordinate space. Space keeps active/latest file status while Send retains the full bounded transfer history. Prompts, source/licensing decisions and reference comparisons are in `design/REFINEMENT.md` and `VISUAL_QA.md`.
+
+## Verification and evidence
+
+The implementation passed `npm run check` (38 unit/integration tests and production build), all six Chrome browser flows and `npm audit --audit-level=high` (zero findings). The expanded gate passed five real browser peers, Lab's logical fault button, parsed JSON/CSV export, seven viewport walkthroughs (including the native 1586×992 concept size), and the production no-progress deadline after loss of the only relay. Stable screenshots wait for fully opaque transfer cards and disable capture-time CSS transitions.
+
+Raw evidence lives in `docs/evidence/automated-relay-recovery.json`, `automated-lab-trial.json` and `automated-lab-logical-recovery.json`. Browser recovery uses an actual closed relay context, 8 MiB/256 chunks and an independently hashed download. Screenshots from passing flows are in `docs/screenshots/studio/`, `hopnet-resilience-active.png`, `hopnet-resilience-recovered.png`, and `hopnet-no-alternate-failure.png`. Public invitation QR captures are masked. The final sequential `npm run check` plus six-flow E2E gate passed on 20 October (E2E: 3.8 minutes); timings are test execution duration, not a network benchmark.
+
+Continuous trace snapshots caused excessive observer overhead, including an observed 18.8-second UI click in a trace; the E2E flows retain explicit assertions, structured evidence and screenshots with tracing disabled. Protocol timeouts were not extended. The no-alternate test's overall harness budget is 120 seconds to include setup, the production 60-second no-progress deadline, screenshot and cleanup; its failure-state assertion remains capped at 65 seconds. E2E runs the production app. Iteration also included an interrupted sleep/wake run, resource-sensitive capture deadlines, and genuine overlap/alignment regressions; these were not treated as passes. Final source verification is distinct from pending physical acceptance.
+
+## Physical and research handoff
+
+**Physical acceptance is pending.** No five-device, Safari, Android, mobile keyboard or physical Wi-Fi recovery result is claimed. Doctor discovered `en0`, `172.17.96.201` on 2026-10-20; re-run it if the address changes. Exact trusted-HTTPS commands, diamond links, metric definitions, demo script and evidence requirements are in `RESILIENCE_STUDIO.md` and `DEVICE_TESTING.md`. The implementation-backed paper is `RESEARCH_DRAFT.md`; no physical performance improvement or statistical superiority is asserted.
+
+Known limitations: loss/queue strategy inputs use conservative defaults, not measured live telemetry; payload encryption is hop-by-hop; conversations clear on reload; chat receipts lack file endpoint signatures; replay cannot recover evicted/remote history; completed downloads have bounded retention; Vite reports a non-fatal bundle-size warning. Human visual acceptance against the original references remains pending.
+
+---
+
+# Archived checkpoint before Resilience Studio
 
 ## Repository state
 

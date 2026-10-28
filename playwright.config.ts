@@ -1,16 +1,18 @@
 import { defineConfig } from "@playwright/test";
 
+const hostedURL = process.env.HOPNET_TEST_URL;
+
 export default defineConfig({
   testDir: "./tests/e2e",
   timeout: 30_000,
   fullyParallel: false,
   reporter: "line",
   use: {
-    baseURL: "http://127.0.0.1:4173",
+    baseURL: hostedURL ?? "http://127.0.0.1:4173",
     channel: "chrome",
     trace: "retain-on-failure"
   },
-  webServer: {
+  webServer: hostedURL ? undefined : {
     command: "npm start",
     url: "http://127.0.0.1:4173/api/health",
     reuseExistingServer: true,
